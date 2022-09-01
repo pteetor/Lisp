@@ -3,13 +3,13 @@
 //
 
 #include <stdexcept>
+#include <string>
 #include <iostream>
 
 using namespace std;
 
 typedef enum {
-  EMPTY_TAG = 0,
-  NIL_TAG = 2,
+  NIL_TAG = 0,
   BOOL_TAG = 4,
   CHAR_TAG = 6,
   INT_TAG = 8,
@@ -37,7 +37,7 @@ private:
 	char char_v;
 	long int int_v;   /* 8 bytes */
 	double double_v;
-	char *string_p;
+	std::string *string_p;
 	Cell *plist_p;
       };
     };
@@ -52,25 +52,37 @@ private:
   }
     
 public:
-  Cell() { tag = EMPTY_TAG; }
+  Cell() { tag = NIL_TAG; }
   Cell(bool b) { tag = BOOL_TAG; bool_v = b; }
   Cell(char c) { tag = CHAR_TAG; char_v = c; }
   Cell(int i) { tag = INT_TAG; int_v = i; }
   Cell(double d) { tag = DOUBLE_TAG; double_v = d; }
+  Cell(std::string *s) { tag = STRING_TAG; string_p = s; }
 
   Cell(Cell *a, Cell *b) {
     car_p = a; cdr_p = b;
   }
 
-  bool isAtomic() { return this->tag <= MAX_TAG; }
-  bool isCons() { return !this->isAtomic(); }
-  bool isEmpty() { return this->tag == EMPTY_TAG; }
-  bool isBool() { return this->tag == BOOL_TAG; }
-  bool isChar() { return this->tag == CHAR_TAG; }
-  bool isInt() { return this->tag == INT_TAG; }
-  bool isDouble() { return this->tag == DOUBLE_TAG; }
+  friend Cell *makeSymbol(Cell *cp, std::string *);
+  
+  Cell *set(bool b) { tag = BOOL_TAG; bool_v = b; return this; }
+  Cell *set(char c) { tag = CHAR_TAG; char_v = c; return this; }
+  Cell *set(int i) { tag = INT_TAG; int_v = i; return this; }
+  Cell *set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
+  Cell *set(std::string *s) { tag = STRING_TAG; string_p = s; return this; }
+  
+  Cell *set(Cell *a, Cell *d) { car_p = a; cdr_p = d; return this; }
 
-  bool isNumeric() { return this->tag == INT_TAG || this->tag == DOUBLE_TAG; }
+  bool null() { return this == NULL || tag == NIL_TAG; }
+  bool isAtomic() { return tag <= MAX_TAG; }
+  bool isCons() { return !isAtomic(); }
+  
+  bool isBool() { return tag == BOOL_TAG; }
+  bool isChar() { return tag == CHAR_TAG; }
+  bool isInt() { return tag == INT_TAG; }
+  bool isDouble() { return tag == DOUBLE_TAG; }
+
+  bool isNumeric() { return tag == INT_TAG || tag == DOUBLE_TAG; }
 
   operator int() {
     if (this->tag == INT_TAG) return this->int_v;
@@ -95,6 +107,12 @@ public:
   bool isMarked() { return (bool) (tag & MARK_BIT); }
 };
 
+Cell *makeSymbol(Cell *cp, std::string *s) {
+  cp->tag = SYMBOL_TAG;
+  cp->string_p = s;
+  return cp;
+}
+
 int main() {
   cout << "sizeof(short int) = " << sizeof(short int) << endl;
   cout << "sizeof(int) = " << sizeof(int) << endl;
@@ -105,12 +123,18 @@ int main() {
 
   cout << "sizeof(Cell) = " << sizeof(Cell) << endl;
 
+  Cell nil;
+
+  cout << endl;
+  cout << "nil.null() = " << nil.null() << endl;
+  // cout << "0->null() = " << ((Cell *) NULL)->null() << endl;
+
   Cell intCell(3);
 
   cout << endl;
+  cout << "intCell.null() = " << intCell.null() << endl;
   cout << "isAtomic(intCell) = " << intCell.isAtomic() << endl;
   cout << "isCons(intCell) = " << intCell.isCons() << endl;
-  cout << "isEmpty(intCell) = " << intCell.isEmpty() << endl;
   cout << "isInt(intCell) = " << intCell.isInt() << endl;
   cout << "(int) intCell = " << (int) intCell << endl;
   cout << "(double) intCell = " << (double) intCell << endl;
@@ -124,9 +148,9 @@ int main() {
   Cell consCell(new Cell, new Cell);
 
   cout << endl;
-  cout << "isAtomic(consCell) = " << consCell.isAtomic() << endl;
-  cout << "isCons(consCell) = " << consCell.isCons() << endl;
-  cout << "isEmpty(consCell) = " << consCell.isEmpty() << endl;
+  cout << "consCell.null() = " << consCell.null() << endl;
+  cout << "consCell.isAtomic() = " << consCell.isAtomic() << endl;
+  cout << "consCell.isCons() = " << consCell.isCons() << endl;
 
   try {
     cout << "(int) consCell = " << (int) consCell << endl;
