@@ -113,6 +113,70 @@ Cell *makeSymbol(Cell *cp, std::string *s) {
   return cp;
 }
 
+// ----------------------------------------------------------
+
+class CellHeap {
+  int nFree;
+  Cell *heap;
+  Cell *pFree;
+
+  void initHeap(int n) {
+    nFree = n;
+    Cell *p = pFree = &heap[0];
+    while (--n > 0) {
+      p->replacd(p + 1);
+      p++;
+    }
+    p->replacd((Cell *) NULL);
+  }
+  
+public:
+  CellHeap(int n) {
+    heap = new Cell[n];
+    initHeap(n);
+  }
+  ~CellHeap() {
+    delete heap;
+  }
+
+  int freesize() { return nFree; }
+  
+  Cell *alloc() {
+    if (pFree == (Cell *) NULL)
+      throw std::bad_alloc();
+    Cell *p = pFree;
+    pFree = pFree->cdr();
+    nFree--;
+    return(p);
+  }
+
+  Cell *alloc(bool b) {
+    return alloc() -> set(b);
+  }
+  Cell *alloc(char c) {
+    return alloc() -> set(c);
+  }
+  Cell *alloc(int i) {
+    return alloc() -> set(i);
+  }
+  Cell *alloc(double d) {
+    return alloc() -> set(d);
+  }
+
+  Cell *alloc(Cell *a, Cell *d) {
+    return alloc() -> set(a, d);
+  }
+
+  void free(Cell *p) {
+    p->replaca((Cell *) NULL);
+    p->replacd(pFree);
+    pFree = p;
+    ++nFree;
+  }
+};
+
+// ----------------------------------------------------------
+
 int main() {
   cout << "sizeof(short int) = " << sizeof(short int) << endl;
   cout << "sizeof(int) = " << sizeof(int) << endl;
@@ -166,9 +230,24 @@ int main() {
   cout << "intCell.isMarked() = " << intCell.isMarked() << endl;
   cout << "markedCell.isMarked() = " << markedCell.isMarked() << endl;
 
-  auto cells = new Cell[100];
+  CellHeap heap(100);
 
   cout << endl;
-  cout << "Allocated 100" << endl;
-}
+  cout << "heap.freesize() = " << heap.freesize() << endl;
+  Cell *heap3 = heap.alloc(3);
+  Cell *heap4 = heap.alloc(4);
+  cout << "heap.freesize() = " << heap.freesize() << endl;
+  Cell *heapCons = heap.alloc(heap3, heap4);
+  cout << "heap.freesize() = " << heap.freesize() << endl;
+  cout << "heapCons->isCons() = " << heapCons->isCons() << endl;
 
+  CellHeap uHeap(2);
+  uHeap.alloc(11);
+  uHeap.alloc(12);
+  try {
+    uHeap.alloc(13);
+  }
+  catch (const std::bad_alloc &e) {
+    cout << endl << "Caught heap exception" << endl;
+  }
+}
