@@ -73,31 +73,31 @@ public:
   
   Cell *set(Cell *a, Cell *d) { car_p = a; cdr_p = d; return this; }
 
-  bool null() { return this == NULL || tag == NIL_TAG; }
-  bool isAtomic() { return tag <= MAX_TAG; }
-  bool isCons() { return !isAtomic(); }
+  bool null() const { return this == NULL || tag == NIL_TAG; }
+  bool isAtomic() const { return tag <= MAX_TAG; }
+  bool isCons() const { return !isAtomic(); }
   
-  bool isBool() { return tag == BOOL_TAG; }
-  bool isChar() { return tag == CHAR_TAG; }
-  bool isInt() { return tag == INT_TAG; }
-  bool isDouble() { return tag == DOUBLE_TAG; }
+  bool isBool() const { return tag == BOOL_TAG; }
+  bool isChar() const { return tag == CHAR_TAG; }
+  bool isInt() const { return tag == INT_TAG; }
+  bool isDouble() const { return tag == DOUBLE_TAG; }
 
-  bool isNumeric() { return tag == INT_TAG || tag == DOUBLE_TAG; }
+  bool isNumeric() const { return tag == INT_TAG || tag == DOUBLE_TAG; }
 
-  operator int() {
+  operator int() const {
     if (this->tag == INT_TAG) return this->int_v;
     if (this->tag == DOUBLE_TAG) return (int) this->double_v;
     throw std::bad_cast();
   };
 
-  operator double() {
+  operator double() const {
     if (this->tag == DOUBLE_TAG) return this->double_v;
     if (this->tag == INT_TAG) return (double) this->int_v;
     throw std::bad_cast();
   }
 
-  Cell *car() { return car_p; }
-  Cell *cdr() { return cdr_p; }
+  Cell *car() const { return car_p; }
+  Cell *cdr() const { return cdr_p; }
 
   Cell *replaca(Cell *p) { this->car_p = p; return this; }
   Cell *replacd(Cell *p) { this->cdr_p = p; return this; }
@@ -105,12 +105,52 @@ public:
   void mark() { tag = tag | MARK_BIT; }
   void unmark() { tag = tag & !MARK_BIT; }
   bool isMarked() { return (bool) (tag & MARK_BIT); }
+
+  friend ostream& operator<<(ostream& os, const Cell& c);
 };
 
-Cell *makeSymbol(Cell *cp, std::string *s) {
+Cell *makeSymbol(Cell *cp, std::string *s)
+{
   cp->tag = SYMBOL_TAG;
   cp->string_p = s;
   return cp;
+}
+
+ostream& operator<<(ostream& os, const Cell& c)
+{
+  if (&c == (Cell *) NULL) {
+    os << "nil";
+  } else if (c.isCons()) {
+    os << " ( " << *c.car() << " . " << *c.cdr() << " ) ";
+  } else {
+    switch (c.tag) {
+    case NIL_TAG:
+      os << "nil";
+      break;
+    case BOOL_TAG:
+      os << (c.bool_v ? "*T*" : "*F*");
+      break;
+    case CHAR_TAG:
+      os << c.char_v;
+      break;
+    case INT_TAG:
+      os << c.int_v;
+      break;
+    case DOUBLE_TAG:
+      os << c.double_v;
+      break;
+    case STRING_TAG:
+      os << "<string>";
+      break;
+    case SYMBOL_TAG:
+      os << "<symbol>";
+      break;
+    default:
+      os << "???";
+      break;
+    }
+  }
+  return os;
 }
 
 // ----------------------------------------------------------
@@ -242,12 +282,15 @@ int main() {
   cout << "heapCons->isCons() = " << heapCons->isCons() << endl;
 
   CellHeap uHeap(2);
-  uHeap.alloc(11);
-  uHeap.alloc(12);
+  uHeap.alloc(1);
+  uHeap.alloc(2);
   try {
-    uHeap.alloc(13);
+    uHeap.alloc(3);
   }
   catch (const std::bad_alloc &e) {
     cout << endl << "Caught heap exception" << endl;
   }
+
+  cout << endl;
+  cout << *heap3 << *heapCons << *heap4 << endl;
 }
