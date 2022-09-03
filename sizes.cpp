@@ -107,6 +107,7 @@ public:
   bool isMarked() { return (bool) (tag & MARK_BIT); }
 
   friend ostream& operator<<(ostream& os, const Cell& c);
+  friend void printAtom(ostream&os, const Cell& c);
 };
 
 Cell *makeSymbol(Cell *cp, std::string *s)
@@ -116,14 +117,8 @@ Cell *makeSymbol(Cell *cp, std::string *s)
   return cp;
 }
 
-ostream& operator<<(ostream& os, const Cell& c)
-{
-  if (&c == (Cell *) NULL) {
-    os << "nil";
-  } else if (c.isCons()) {
-    os << " ( " << *c.car() << " . " << *c.cdr() << " ) ";
-  } else {
-    switch (c.tag) {
+void printAtom(ostream&os, const Cell& c) {  
+  switch (c.tag) {
     case NIL_TAG:
       os << "nil";
       break;
@@ -148,6 +143,26 @@ ostream& operator<<(ostream& os, const Cell& c)
     default:
       os << "???";
       break;
+  }
+}
+
+ostream& operator<<(ostream& os, const Cell& c)
+{
+  if (c.null()) {
+    os << "nil";
+  } else if (c.isAtomic()) {
+    printAtom(os, c);
+  } else {
+    os << "(" << *c.car();
+    Cell *p = c.cdr();
+    while (p->isCons()) {
+      os << " " << *(p->car());
+      p = p->cdr();
+    }
+    if (p->null()) {
+      os << ")";
+    } else {
+      os << " . " << (*p) << ")";
     }
   }
   return os;
@@ -292,5 +307,5 @@ int main() {
   }
 
   cout << endl;
-  cout << *heap3 << *heapCons << *heap4 << endl;
+  cout << *heap3 << " " << *heapCons << " " << *heap4 << endl;
 }
