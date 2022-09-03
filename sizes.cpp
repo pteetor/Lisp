@@ -64,7 +64,8 @@ public:
   }
 
   friend Cell *makeSymbol(Cell *cp, std::string *);
-  
+
+  Cell *set() { tag = NIL_TAG; return this; }
   Cell *set(bool b) { tag = BOOL_TAG; bool_v = b; return this; }
   Cell *set(char c) { tag = CHAR_TAG; char_v = c; return this; }
   Cell *set(int i) { tag = INT_TAG; int_v = i; return this; }
@@ -184,6 +185,15 @@ class CellHeap {
     }
     p->replacd((Cell *) NULL);
   }
+ 
+  Cell *alloc() {
+    if (pFree == (Cell *) NULL)
+      throw std::bad_alloc();
+    Cell *p = pFree;
+    pFree = pFree->cdr();
+    nFree--;
+    return(p);
+  }
   
 public:
   CellHeap(int n) {
@@ -195,32 +205,14 @@ public:
   }
 
   int freesize() { return nFree; }
-  
-  Cell *alloc() {
-    if (pFree == (Cell *) NULL)
-      throw std::bad_alloc();
-    Cell *p = pFree;
-    pFree = pFree->cdr();
-    nFree--;
-    return(p);
-  }
 
-  Cell *alloc(bool b) {
-    return alloc() -> set(b);
-  }
-  Cell *alloc(char c) {
-    return alloc() -> set(c);
-  }
-  Cell *alloc(int i) {
-    return alloc() -> set(i);
-  }
-  Cell *alloc(double d) {
-    return alloc() -> set(d);
-  }
+  Cell *nil() { return alloc() -> set(); }
+  Cell *alloc(bool b) { return alloc() -> set(b); }
+  Cell *alloc(char c) { return alloc() -> set(c); }
+  Cell *alloc(int i) { return alloc() -> set(i); }
+  Cell *alloc(double d) { return alloc() -> set(d); }
 
-  Cell *alloc(Cell *a, Cell *d) {
-    return alloc() -> set(a, d);
-  }
+  Cell *cons(Cell *a, Cell *d) { return alloc() -> set(a, d); }
 
   void free(Cell *p) {
     p->replaca((Cell *) NULL);
@@ -229,6 +221,32 @@ public:
     ++nFree;
   }
 };
+
+// ----------------------------------------------------------
+
+//
+// The interpreter's global heap
+//
+CellHeap theHeap(1000);
+
+Cell& nil = *theHeap.nil();
+
+Cell* alloc(bool b) { return theHeap.alloc(b); }
+Cell* alloc(char c) { return theHeap.alloc(c); }
+Cell* alloc(int i) { return theHeap.alloc(i); }
+Cell* alloc(double d) { return theHeap.alloc(d); }
+
+Cell* cons(Cell *a, Cell *d) { return theHeap.cons(a, d); }
+
+// Infix cons operator
+Cell& operator+(Cell& a, Cell& d) { return *theHeap.cons(&a, &d); }
+
+// Infix list builder
+Cell& operator<<(Cell& c, Cell& d) {
+  c.replacd(&d);
+  d.replacd(&nil);
+  return d;
+}
 
 // ----------------------------------------------------------
 
@@ -292,7 +310,7 @@ int main() {
   Cell *heap3 = heap.alloc(3);
   Cell *heap4 = heap.alloc(4);
   cout << "heap.freesize() = " << heap.freesize() << endl;
-  Cell *heapCons = heap.alloc(heap3, heap4);
+  Cell *heapCons = heap.cons(heap3, heap4);
   cout << "heap.freesize() = " << heap.freesize() << endl;
   cout << "heapCons->isCons() = " << heapCons->isCons() << endl;
 
@@ -308,4 +326,7 @@ int main() {
 
   cout << endl;
   cout << *heap3 << " " << *heapCons << " " << *heap4 << endl;
+
+  // Cell *list = alloc(3) << alloc(2) << alloc(1);
+  //cout << list;
 }
