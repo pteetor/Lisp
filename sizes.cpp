@@ -23,8 +23,6 @@ const long int MAX_TAG = 31;
 typedef long int Tag;
 
 class Cell {
-
-private:
   union {
     struct {
       Cell *car_p;
@@ -65,14 +63,14 @@ public:
 
   friend Cell *makeSymbol(Cell *cp, std::string *);
 
-  Cell *set() { tag = NIL_TAG; return this; }
-  Cell *set(bool b) { tag = BOOL_TAG; bool_v = b; return this; }
-  Cell *set(char c) { tag = CHAR_TAG; char_v = c; return this; }
-  Cell *set(int i) { tag = INT_TAG; int_v = i; return this; }
-  Cell *set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
-  Cell *set(std::string *s) { tag = STRING_TAG; string_p = s; return this; }
+  Cell* set() { tag = NIL_TAG; return this; }
+  Cell* set(bool b) { tag = BOOL_TAG; bool_v = b; return this; }
+  Cell* set(char c) { tag = CHAR_TAG; char_v = c; return this; }
+  Cell* set(int i) { tag = INT_TAG; int_v = i; return this; }
+  Cell* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
+  Cell* set(std::string *s) { tag = STRING_TAG; string_p = s; return this; }
   
-  Cell *set(Cell *a, Cell *d) { car_p = a; cdr_p = d; return this; }
+  Cell* set(Cell *a, Cell *d) { car_p = a; cdr_p = d; return this; }
 
   bool null() const { return this == NULL || tag == NIL_TAG; }
   bool isAtomic() const { return tag <= MAX_TAG; }
@@ -97,20 +95,30 @@ public:
     throw std::bad_cast();
   }
 
-  Cell *car() const { return car_p; }
-  Cell *cdr() const { return cdr_p; }
+  Cell* car() const { return car_p; }
+  Cell* cdr() const { return cdr_p; }
 
-  Cell *replaca(Cell *p) { this->car_p = p; return this; }
-  Cell *replacd(Cell *p) { this->cdr_p = p; return this; }
+  // friend Cell* car(const Cell& c);
+  // friend Cell* cdr(const Cell& c);
+
+  Cell* replaca(Cell* p) { this->car_p = p; return this; }
+  Cell* replacd(Cell* p) { this->cdr_p = p; return this; }
 
   void mark() { tag = tag | MARK_BIT; }
   void unmark() { tag = tag & !MARK_BIT; }
   bool isMarked() { return (bool) (tag & MARK_BIT); }
 
-  friend ostream& operator<<(ostream& os, const Cell& c);
-  friend void printAtom(ostream&os, const Cell& c);
+  // friend ostream& operator<<(ostream& os, const Cell& c);
+
+  friend void printAtom(const Cell* ap, ostream& os);
+  friend void printSExpr(const Cell* c, ostream& os);
 };
 
+// Friend functions
+// Cell* car(const Cell &c) { return c.car_p; }
+// Cell* cdr(const Cell &c) { return c.cdr_p; }
+
+// Friend function
 Cell *makeSymbol(Cell *cp, std::string *s)
 {
   cp->tag = SYMBOL_TAG;
@@ -118,22 +126,32 @@ Cell *makeSymbol(Cell *cp, std::string *s)
   return cp;
 }
 
-void printAtom(ostream&os, const Cell& c) {  
-  switch (c.tag) {
+int length(Cell* list) {
+  int len = 0;
+  Cell *p = list;
+  while (!p->null()) {
+    ++len;
+    p = p->cdr();
+  }
+  return len;
+}
+
+void printAtom(const Cell *ap, ostream& os = std::cout) {  
+  switch (ap->tag) {
     case NIL_TAG:
       os << "nil";
       break;
     case BOOL_TAG:
-      os << (c.bool_v ? "*T*" : "*F*");
+      os << (ap->bool_v ? "*T*" : "*F*");
       break;
     case CHAR_TAG:
-      os << c.char_v;
+      os << ap->char_v;
       break;
     case INT_TAG:
-      os << c.int_v;
+      os << ap->int_v;
       break;
     case DOUBLE_TAG:
-      os << c.double_v;
+      os << ap->double_v;
       break;
     case STRING_TAG:
       os << "<string>";
@@ -147,31 +165,41 @@ void printAtom(ostream&os, const Cell& c) {
   }
 }
 
-ostream& operator<<(ostream& os, const Cell& c)
+void printSExpr(const Cell* p, ostream& os = std::cout)
 {
-  if (c.null()) {
+  if (p->null()) {
     os << "nil";
-  } else if (c.isAtomic()) {
-    printAtom(os, c);
+  } else if (p->isAtomic()) {
+    printAtom(p, os);
   } else {
-    os << "(" << *c.car();
-    Cell *p = c.cdr();
+    os << "(";
+    printSExpr(p->car(), os);
+    
+    p = p->cdr();
     while (p->isCons()) {
-      os << " " << *(p->car());
+      os << " ";
+      printSExpr(p->car(), os);
       p = p->cdr();
     }
     if (p->null()) {
       os << ")";
     } else {
-      os << " . " << (*p) << ")";
+      os << " . ";
+      printSExpr(p, os);
+      os << ")";
     }
   }
+}
+
+ostream& operator<<(ostream& os, const Cell& c) {
+  printSExpr(&c, os);
   return os;
 }
 
 // ----------------------------------------------------------
 
 class CellHeap {
+  int nCells;
   int nFree;
   Cell *heap;
   Cell *pFree;
@@ -186,17 +214,29 @@ class CellHeap {
     p->replacd((Cell *) NULL);
   }
  
-  Cell *alloc() {
-    if (pFree == (Cell *) NULL)
-      throw std::bad_alloc();
-    Cell *p = pFree;
+  Cell* alloc() {
+
+    // DEBUG
+    // cout << "alloc(), entering: pFree = " << std::hex << (long int) pFree << endl;
+    
+    if (pFree == (Cell *) NULL) throw std::bad_alloc();
+    // DEBUG - something is wrong with pFree
+    if (nFree == 0) throw std::bad_alloc();
+
+    auto p = pFree;
     pFree = pFree->cdr();
+
+    // DEBUG
+    // cout << "alloc(), exiting: pFree = " << std::hex << (long int) pFree << endl;
+    // cout << "alloc(), exiting: p = " << std::hex << (long int) p << endl;
+    
     nFree--;
-    return(p);
+    return p;
   }
   
 public:
   CellHeap(int n) {
+    nCells = n;
     heap = new Cell[n];
     initHeap(n);
   }
@@ -206,47 +246,50 @@ public:
 
   int freesize() { return nFree; }
 
-  Cell *nil() { return alloc() -> set(); }
-  Cell *alloc(bool b) { return alloc() -> set(b); }
-  Cell *alloc(char c) { return alloc() -> set(c); }
-  Cell *alloc(int i) { return alloc() -> set(i); }
-  Cell *alloc(double d) { return alloc() -> set(d); }
+  Cell* nil() { return alloc()->set(); }
+  Cell* alloc(bool b) { return alloc()->set(b); }
+  Cell* alloc(char c) { return alloc()->set(c); }
+  Cell* alloc(int i) { return alloc()->set(i); }
+  Cell* alloc(double d) { return alloc()->set(d); }
 
-  Cell *cons(Cell *a, Cell *d) { return alloc() -> set(a, d); }
+  Cell* cons(Cell* a, Cell* d) { return alloc()->set(a, d); }
 
-  void free(Cell *p) {
+  void free(Cell* p) {
     p->replaca((Cell *) NULL);
     p->replacd(pFree);
     pFree = p;
     ++nFree;
+  }
+
+  void dump()
+  {
+    cout << "--- start heap ---" << endl;
+    cout << "nFree = " << nFree
+	 << "; pFree = " << std::hex << (long int) pFree << endl;
+    for (int i = 0; i < nCells; ++i) {
+      cout << std::dec << i << " (" << std::hex << (long int) &heap[i] << "): "
+	   << std::hex << (long int) (heap[i].car()) << ", "
+	   << std::hex << (long int) (heap[i].cdr()) << endl;
+    }
+    cout << "--- end   heap ---" << endl;
   }
 };
 
 // ----------------------------------------------------------
 
 //
-// The interpreter's global heap
+// The interpreter's global variables
 //
 CellHeap theHeap(1000);
-
-Cell& nil = *theHeap.nil();
 
 Cell* alloc(bool b) { return theHeap.alloc(b); }
 Cell* alloc(char c) { return theHeap.alloc(c); }
 Cell* alloc(int i) { return theHeap.alloc(i); }
 Cell* alloc(double d) { return theHeap.alloc(d); }
 
-Cell* cons(Cell *a, Cell *d) { return theHeap.cons(a, d); }
+Cell* cons(Cell* a, Cell* d) { return theHeap.cons(a, d); }
 
-// Infix cons operator
-Cell& operator+(Cell& a, Cell& d) { return *theHeap.cons(&a, &d); }
-
-// Infix list builder
-Cell& operator<<(Cell& c, Cell& d) {
-  c.replacd(&d);
-  d.replacd(&nil);
-  return d;
-}
+Cell* nil = theHeap.nil();
 
 // ----------------------------------------------------------
 
@@ -259,12 +302,6 @@ int main() {
   cout << "sizeof(void *) = " << sizeof(void *) << endl;
 
   cout << "sizeof(Cell) = " << sizeof(Cell) << endl;
-
-  Cell nil;
-
-  cout << endl;
-  cout << "nil.null() = " << nil.null() << endl;
-  // cout << "0->null() = " << ((Cell *) NULL)->null() << endl;
 
   Cell intCell(3);
 
@@ -302,15 +339,18 @@ int main() {
   cout << endl;
   cout << "intCell.isMarked() = " << intCell.isMarked() << endl;
   cout << "markedCell.isMarked() = " << markedCell.isMarked() << endl;
+  
+  cout << endl;
+  cout << "nil.null() = " << nil->null() << endl;
 
   CellHeap heap(100);
 
   cout << endl;
   cout << "heap.freesize() = " << heap.freesize() << endl;
-  Cell *heap3 = heap.alloc(3);
-  Cell *heap4 = heap.alloc(4);
+  auto heap3 = heap.alloc(3);
+  auto heap4 = heap.alloc(4);
   cout << "heap.freesize() = " << heap.freesize() << endl;
-  Cell *heapCons = heap.cons(heap3, heap4);
+  auto heapCons = heap.cons(heap3, heap4);
   cout << "heap.freesize() = " << heap.freesize() << endl;
   cout << "heapCons->isCons() = " << heapCons->isCons() << endl;
 
@@ -324,9 +364,14 @@ int main() {
     cout << endl << "Caught heap exception" << endl;
   }
 
-  cout << endl;
-  cout << *heap3 << " " << *heapCons << " " << *heap4 << endl;
+  Cell* dots = cons(cons(alloc(3), alloc(2)), alloc(1));
 
-  // Cell *list = alloc(3) << alloc(2) << alloc(1);
-  //cout << list;
+  cout << endl;
+  cout << "dots = " << *dots << endl;
+
+  auto xlist = cons(alloc(3), cons(alloc(2), cons(alloc(1), nil)));
+  cout << "xlist = " << *(xlist) <<  endl;
+  
+  cout << "length(xlist) = " << length(xlist) << endl;
+  cout << "length(xlist->cdr()) = " << length(xlist->cdr()) << endl;
 }
