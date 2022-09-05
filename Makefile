@@ -1,2 +1,3 @@
-sizes: sizes.cpp
-	g++ -o sizes sizes.cpp
+tests: interp.h tests.cpp
+	g++ -o tests tests.cpp
+
