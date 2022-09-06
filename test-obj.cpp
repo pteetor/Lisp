@@ -4,23 +4,11 @@
 
 #include "interp.h"
 
-//
-// The test's global variables
-//
-CellHeap theHeap(1000);
-
-Cell* alloc(bool b) { return theHeap.alloc(b); }
-Cell* alloc(char c) { return theHeap.alloc(c); }
-Cell* alloc(int i) { return theHeap.alloc(i); }
-Cell* alloc(double d) { return theHeap.alloc(d); }
-
-Cell* cons(Cell* a, Cell* d) { return theHeap.cons(a, d); }
-
-Cell* nil = theHeap.nil();
-
 // ----------------------------------------------------------
 
 int main() {
+  initHeap();
+  
   cout << "sizeof(short int) = " << sizeof(short int) << endl;
   cout << "sizeof(int) = " << sizeof(int) << endl;
   cout << "sizeof(long int) = " << sizeof(long int) << endl;

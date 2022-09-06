@@ -13,13 +13,9 @@ using namespace std;
 
 typedef unordered_set<string> StringPool;
 
-StringPool stringPool;
-
-const string& standarize(const string& s)
-{
-  auto pr = stringPool.insert(s);
-  return *pr.first;
-}
+extern StringPool stringPool;
+extern const string* uniqueStr(const string& s);
+extern const string* uniqueStr(const char *s);
 
 // ----------------------------------------------------------
 
@@ -50,7 +46,7 @@ class Cell {
 	char char_v;
 	long int int_v;   /* 8 bytes */
 	double double_v;
-	std::string *string_p;
+	const string *string_p;
 	Cell *plist_p;
       };
     };
@@ -83,7 +79,8 @@ public:
   Cell* set(char c) { tag = CHAR_TAG; char_v = c; return this; }
   Cell* set(int i) { tag = INT_TAG; int_v = i; return this; }
   Cell* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
-  Cell* set(std::string *s) { tag = STRING_TAG; string_p = s; return this; }
+  Cell* set(const char *s) { tag = STRING_TAG; string_p = uniqueStr(s); return this; }
+  Cell* setSymbol(const char *s) { tag = SYMBOL_TAG; string_p = uniqueStr(s); return this; }
   
   Cell* set(Cell *a, Cell *d) { car_p = a; cdr_p = d; return this; }
 
@@ -113,9 +110,6 @@ public:
   Cell* car() const { return car_p; }
   Cell* cdr() const { return cdr_p; }
 
-  // friend Cell* car(const Cell& c);
-  // friend Cell* cdr(const Cell& c);
-
   Cell* replaca(Cell* p) { this->car_p = p; return this; }
   Cell* replacd(Cell* p) { this->cdr_p = p; return this; }
 
@@ -123,93 +117,15 @@ public:
   void unmark() { tag = tag & !MARK_BIT; }
   bool isMarked() { return (bool) (tag & MARK_BIT); }
 
-  // friend ostream& operator<<(ostream& os, const Cell& c);
-
   friend void printAtom(const Cell* ap, ostream& os);
   friend void printSExpr(const Cell* c, ostream& os);
 };
 
-// Friend functions
-// Cell* car(const Cell &c) { return c.car_p; }
-// Cell* cdr(const Cell &c) { return c.cdr_p; }
-
-// Friend function
-Cell *makeSymbol(Cell *cp, std::string *s)
-{
-  cp->tag = SYMBOL_TAG;
-  cp->string_p = s;
-  return cp;
-}
-
-int length(Cell* list) {
-  int len = 0;
-  Cell *p = list;
-  while (!p->null()) {
-    ++len;
-    p = p->cdr();
-  }
-  return len;
-}
-
-void printAtom(const Cell *ap, ostream& os = std::cout) {  
-  switch (ap->tag) {
-    case NIL_TAG:
-      os << "nil";
-      break;
-    case BOOL_TAG:
-      os << (ap->bool_v ? "*T*" : "*F*");
-      break;
-    case CHAR_TAG:
-      os << ap->char_v;
-      break;
-    case INT_TAG:
-      os << ap->int_v;
-      break;
-    case DOUBLE_TAG:
-      os << ap->double_v;
-      break;
-    case STRING_TAG:
-      os << "<string>";
-      break;
-    case SYMBOL_TAG:
-      os << "<symbol>";
-      break;
-    default:
-      os << "???";
-      break;
-  }
-}
-
-void printSExpr(const Cell* p, ostream& os = std::cout)
-{
-  if (p->null()) {
-    os << "nil";
-  } else if (p->isAtomic()) {
-    printAtom(p, os);
-  } else {
-    os << "(";
-    printSExpr(p->car(), os);
-    
-    p = p->cdr();
-    while (p->isCons()) {
-      os << " ";
-      printSExpr(p->car(), os);
-      p = p->cdr();
-    }
-    if (p->null()) {
-      os << ")";
-    } else {
-      os << " . ";
-      printSExpr(p, os);
-      os << ")";
-    }
-  }
-}
-
-ostream& operator<<(ostream& os, const Cell& c) {
-  printSExpr(&c, os);
-  return os;
-}
+extern Cell *makeSymbol(Cell* cp, std::string *s);
+extern int length(Cell* list);
+extern void printAtom(const Cell *ap, ostream& os = std::cout);
+extern void printSExpr(const Cell* p, ostream& os = std::cout);
+extern ostream& operator<<(ostream& os, const Cell& c);
 
 // ----------------------------------------------------------
 
@@ -266,6 +182,7 @@ public:
   Cell* alloc(char c) { return alloc()->set(c); }
   Cell* alloc(int i) { return alloc()->set(i); }
   Cell* alloc(double d) { return alloc()->set(d); }
+  Cell* allocSymbol(const char *s) { return alloc()->setSymbol(s); }
 
   Cell* cons(Cell* a, Cell* d) { return alloc()->set(a, d); }
 
@@ -289,3 +206,18 @@ public:
     cout << "--- end   heap ---" << endl;
   }
 };
+
+//
+// Global definitions for Cell and CellHeap data structures
+//
+extern Cell* nil;
+extern CellHeap theHeap;
+
+extern void initHeap();
+
+extern Cell* alloc(bool b);
+extern Cell* alloc(char c);
+extern Cell* alloc(int i);
+extern Cell* alloc(double d);
+
+extern Cell* cons(Cell* a, Cell* d);
