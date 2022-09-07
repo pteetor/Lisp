@@ -6,14 +6,17 @@
 // Needs: #include "interp.h"
 
 class Reader {
+protected:
   Tokenizer *tkz;
   CellHeap *heap;
 
-  Cell *parseList() {
-    tkz->next();   // Skip '('
+  void syntaxError() {
+    cerr << "syntax error" << endl;
+    exit(1);
+  }
 
+  Cell *parseList() {
     if (tkz->token() == RPAREN_TOK) {
-      tkz->next();
       return nil;
     }
     
@@ -21,52 +24,57 @@ class Reader {
     Cell *head = heap->cons(car, nil);
     Cell *tail = head;
 
+    tkz->next();
     while (tkz->token() != DOT_TOK)
       {
 	if (tkz->token() == RPAREN_TOK)
 	  {
-	    tkz->next();
 	    return head;
 	  }
 	Cell *elem = parse();
 	tail->replacd(heap->cons(elem, nil));
 	tail = tail->cdr();
+	tkz->next();
       }
 
     // Here tail ends with: . <expr> )
     tkz->next();   // Skip dot
     Cell *cdr = parse();
     tail->replacd(cdr);
-    // TODO: token != ")"  =>  syntax error
-    tkz->next();   // Skip ")"
+    if (tkz->next() != RPAREN_TOK)
+      syntaxError();
     return head;
   }
 
   Cell *parse() {
-    // TODO: If EOF, throw EOF condition
-
-    if (tkz->token() == LPAREN_TOK)
-      return parseList();
-
-    Cell *p;
-    
     switch(tkz->token())
       {
+      case SOF_TOK:
+	syntaxError();   // Tokenizer screwed up?
+      case EOF_TOK:
+	syntaxError();   // Incomplete expression
+      case DOT_TOK:
+	syntaxError();
+      case LPAREN_TOK:
+	tkz->next();
+	return parseList();
+      case RPAREN_TOK:
+	syntaxError();
+      case CHAR_TOK:
+	syntaxError();   // TODO - Handle this
       case INT_TOK:
-	p = heap->alloc(std::atoi(tkz->tokenString())); break;
+	return heap->alloc(std::atoi(tkz->tokenString())); break;
       case DOUBLE_TOK:
-	p = heap->alloc(std::atof(tkz->tokenString())); break;
+	return heap->alloc(std::atof(tkz->tokenString())); break;
       case STRING_TOK:
-	p = heap->alloc(tkz->tokenString()); break;
+	return heap->alloc(tkz->tokenString()); break;
       case SYMBOL_TOK:
-	p = heap->allocSymbol(tkz->tokenString()); break;
+	return heap->allocSymbol(tkz->tokenString()); break;
+
       default:
 	// TODO: Throw syntax error
-	p = nil; break;
+	return nil;
       }
-
-    tkz->next();
-    return p;
   }
 
  public:
@@ -77,5 +85,13 @@ class Reader {
   }
 
   bool eof() { return tkz->token() == EOF_TOK; }
-  Cell *read() { return parse(); }
+  Cell *read() {
+    if (tkz->first() != SOF_TOK)
+      syntaxError();
+    tkz->next();
+    auto p = parse();
+    if (tkz->next() != EOF_TOK)
+      syntaxError();
+    return p;
+  }
 };

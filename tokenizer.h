@@ -16,13 +16,28 @@ typedef enum TokenEnum {
 } Token;
 
 class Tokenizer {
+private:
+  bool trace;
+  
+protected:
+  Token traceReturn(Token t) {
+    if (trace)
+      {
+	cout << "trace: token = " << t << endl;
+      }
+    return t;
+  }
+  
  public:
-  Tokenizer() { };
-  virtual void init() { };
+  Tokenizer() { trace = 0; }
+  virtual void init() { }
   virtual Token first() { return EOF_TOK; }
   virtual Token next() { return EOF_TOK; }
   virtual Token token() { return EOF_TOK; }
   virtual const char *tokenString() { return ""; }
+
+  void traceOn() { trace = true; }
+  void traceOff() { trace = false; }
 };
 
 class MockTokenizer: public Tokenizer {
@@ -36,6 +51,7 @@ class MockTokenizer: public Tokenizer {
   }
 
   void init() { i = 0; }
+  Token first() { i = 0; return traceReturn(tokens[0]); }
   Token token() { return tokens[i]; }
   const char *tokenString()
   {
@@ -53,7 +69,7 @@ class MockTokenizer: public Tokenizer {
   }
   
   Token next() {
-    (tokens[i] == EOF_TOK) ? EOF_TOK : tokens[++i];
+    return traceReturn((tokens[i] == EOF_TOK) ? EOF_TOK : tokens[++i]);
   }
 };
 
