@@ -44,21 +44,29 @@ class Reader {
 
   Cell *parse() {
     // TODO: If EOF, throw EOF condition
+
+    if (tkz->token() == LPAREN_TOK)
+      return parseList();
+
+    Cell *p;
     
     switch(tkz->token())
       {
       case INT_TOK:
-	return heap->alloc(std::atoi(tkz->tokenString()));
+	p = heap->alloc(std::atoi(tkz->tokenString())); break;
       case DOUBLE_TOK:
-	return heap->alloc(std::atof(tkz->tokenString()));
+	p = heap->alloc(std::atof(tkz->tokenString())); break;
       case STRING_TOK:
-	return heap->alloc(tkz->tokenString());
+	p = heap->alloc(tkz->tokenString()); break;
       case SYMBOL_TOK:
-	return heap->allocSymbol(tkz->tokenString());
-
-      case LPAREN_TOK:
-	return parseList();
+	p = heap->allocSymbol(tkz->tokenString()); break;
+      default:
+	// TODO: Throw syntax error
+	p = nil; break;
       }
+
+    tkz->next();
+    return p;
   }
 
  public:
@@ -69,5 +77,5 @@ class Reader {
   }
 
   bool eof() { return tkz->token() == EOF_TOK; }
-  Cell *next() { return parse(); }
+  Cell *read() { return parse(); }
 };

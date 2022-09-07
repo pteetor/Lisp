@@ -182,6 +182,7 @@ public:
   Cell* alloc(char c) { return alloc()->set(c); }
   Cell* alloc(int i) { return alloc()->set(i); }
   Cell* alloc(double d) { return alloc()->set(d); }
+  Cell* alloc(const char *s) { return alloc()->set(s); }
   Cell* allocSymbol(const char *s) { return alloc()->setSymbol(s); }
 
   Cell* cons(Cell* a, Cell* d) { return alloc()->set(a, d); }

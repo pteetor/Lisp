@@ -20,7 +20,7 @@ int length(Cell* list) {
 void printAtom(const Cell *ap, ostream& os) {  
   switch (ap->tag) {
     case NIL_TAG:
-      os << "nil";
+      os << "()";
       break;
     case BOOL_TAG:
       os << (ap->bool_v ? "*T*" : "*F*");
@@ -35,10 +35,10 @@ void printAtom(const Cell *ap, ostream& os) {
       os << ap->double_v;
       break;
     case STRING_TAG:
-      os << "<string>";
+      os << *(ap->string_p);
       break;
     case SYMBOL_TAG:
-      os << "<symbol>";
+      os << *(ap->string_p);
       break;
     default:
       os << "???";
@@ -49,7 +49,7 @@ void printAtom(const Cell *ap, ostream& os) {
 void printSExpr(const Cell* p, ostream& os)
 {
   if (p->null()) {
-    os << "nil";
+    os << "()";
   } else if (p->isAtomic()) {
     printAtom(p, os);
   } else {

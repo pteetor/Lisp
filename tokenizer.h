@@ -3,7 +3,8 @@
 //
 
 typedef enum TokenEnum {
-  EOF_TOK = 0,
+  SOF_TOK = 0,
+  EOF_TOK,
   DOT_TOK,
   LPAREN_TOK,
   RPAREN_TOK,
@@ -18,9 +19,10 @@ class Tokenizer {
  public:
   Tokenizer() { };
   virtual void init() { };
+  virtual Token first() { return EOF_TOK; }
+  virtual Token next() { return EOF_TOK; }
   virtual Token token() { return EOF_TOK; }
   virtual const char *tokenString() { return ""; }
-  virtual Token next() { return EOF_TOK; }
 };
 
 class MockTokenizer: public Tokenizer {
@@ -51,11 +53,7 @@ class MockTokenizer: public Tokenizer {
   }
   
   Token next() {
-    if (tokens[i] == EOF_TOK) {
-      return EOF_TOK;
-    } else {
-      return tokens[++i];
-    }
+    (tokens[i] == EOF_TOK) ? EOF_TOK : tokens[++i];
   }
 };
 

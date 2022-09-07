@@ -6,5 +6,11 @@ test-obj: interp.h test-obj.cpp StringPool.o Cell.o CellHeap.o
 test-tokenizer: tokenizer.h test-tokenizer.cpp
 	g++ -o test-tokenizer test-tokenizer.cpp
 
-test-reader: interp.h tokenizer.h reader.h test-reader.cpp
+test-reader: interp.h tokenizer.h reader.h test-reader.cpp StringPool.o Cell.o CellHeap.o
 	g++ -o test-reader test-reader.cpp StringPool.o Cell.o CellHeap.o
+
+StringPool.o: interp.h StringPool.cpp
+
+Cell.o: interp.h Cell.cpp
+
+CellHeap.o: interp.h CellHeap.cpp

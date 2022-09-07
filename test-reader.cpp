@@ -11,9 +11,21 @@ using namespace std;
 
 int main() {
   initHeap();
+
+  // Token input[] = { SOF_TOK, LPAREN_TOK, RPAREN_TOK, EOF_TOK };
+  // Token input[] = { SOF_TOK, LPAREN_TOK, STRING_TOK, RPAREN_TOK, EOF_TOK };
+  // Token input[] = { SOF_TOK, LPAREN_TOK, SYMBOL_TOK, RPAREN_TOK, EOF_TOK };
+  // Token input[] = { SOF_TOK, LPAREN_TOK, INT_TOK, DOT_TOK, DOUBLE_TOK, RPAREN_TOK, EOF_TOK };
+  // Token input[] = { SOF_TOK, LPAREN_TOK, LPAREN_TOK, RPAREN_TOK, DOT_TOK, INT_TOK, EOF_TOK };
+  Token input[] = { SOF_TOK, LPAREN_TOK, SYMBOL_TOK, INT_TOK, DOUBLE_TOK, RPAREN_TOK, EOF_TOK };
   
-  Token input[] = { LPAREN_TOK, SYMBOL_TOK, INT_TOK, DOUBLE_TOK, RPAREN_TOK, EOF_TOK };
   MockTokenizer mt(input);
   
   Reader rdr(&mt, &theHeap);
+
+  auto se = rdr.read();
+  printSExpr(se);
+  cout << endl;
+  
+  return(0);
 }
