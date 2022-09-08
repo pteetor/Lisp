@@ -23,7 +23,7 @@ protected:
   Token traceReturn(Token t) {
     if (trace)
       {
-	cout << "trace: token = " << t << endl;
+	std::cout << "trace: token = " << t << std::endl;
       }
     return t;
   }

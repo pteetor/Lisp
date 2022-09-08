@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "interp.h"
+#include "CharSrc.h"
 #include "tokenizer.h"
 #include "reader.h"
 
