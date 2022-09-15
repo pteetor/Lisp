@@ -20,3 +20,7 @@ class StringSrc: public CharSrc {
   bool next(char& ch);
   bool now(char& ch);
 };
+
+// Later:
+//   StreamSrc
+//   ConsoleSrc

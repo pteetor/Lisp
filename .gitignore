@@ -1,2 +1,7 @@
 *~
 *.o
+test-StringSrc
+test-obj
+test-reader
+test-tokenizer
+Snippets/

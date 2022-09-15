@@ -16,11 +16,16 @@ typedef enum TokenEnum {
 } Token;
 
 class Tokenizer {
-private:
+protected:
+  CharSrc& src;
+  char ch;              // Next character to use
+  bool eof;             // true when input exhausted
+  Token token;
+  char tokenText[256];
+  char* pText;
   bool trace;
   
-protected:
-  Token traceReturn(Token t) {
+  Token traceToken(Token t) {
     if (trace)
       {
 	std::cout << "trace: token = " << t << std::endl;
@@ -29,13 +34,19 @@ protected:
   }
   
  public:
-  Tokenizer() { trace = 0; }
-  virtual void init() { }
-  virtual Token first() { return EOF_TOK; }
-  virtual Token next() { return EOF_TOK; }
-  virtual Token token() { return EOF_TOK; }
-  virtual const char *tokenString() { return ""; }
+  Tokenizer(CharSrc& s) : src(s)
+  {
+    token = SOF_TOK;
+    eof = false;
+    trace = 0;
+  }
+ 
+  virtual void init();
+  virtual Token first();
+  virtual Token next();
+  virtual Token now();
 
+  const char *text() { return tokenText; }
   void traceOn() { trace = true; }
   void traceOff() { trace = false; }
 };
@@ -51,8 +62,8 @@ class MockTokenizer: public Tokenizer {
   }
 
   void init() { i = 0; }
-  Token first() { i = 0; return traceReturn(tokens[0]); }
-  Token token() { return tokens[i]; }
+  Token first() { i = 0; return traceToken(tokens[0]); }
+  Token now() { return tokens[i]; }
   const char *tokenString()
   {
     switch (tokens[i]) {
@@ -69,10 +80,26 @@ class MockTokenizer: public Tokenizer {
   }
   
   Token next() {
-    return traceReturn((tokens[i] == EOF_TOK) ? EOF_TOK : tokens[++i]);
+    return traceToken((tokens[i] == EOF_TOK) ? EOF_TOK : tokens[++i]);
   }
 };
 
 // TODO:
 //   class ReplTokenizer
 //   class FileTokenizer
+
+class StringTokenizer: public Tokenizer {
+  StringSrc src;
+  Token token;
+  char str[256];
+  char *pStr;
+
+public:
+  StringTokenizer(const char* s) : src(s);
+
+  void init() { }
+  Token first();
+  Token next();
+  Token now();
+  char *tokenString();
+};
