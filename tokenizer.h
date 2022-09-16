@@ -15,41 +15,49 @@ typedef enum TokenEnum {
   SYMBOL_TOK
 } Token;
 
-class Tokenizer {
+class AbstTokenizer {
+public:
+  virtual Token first() = 0;
+  virtual Token next() = 0;
+  virtual Token now() = 0;
+  virtual const char *text() = 0;
+};
+
+class Tokenizer: public AbstTokenizer {
 protected:
-  CharSrc& src;
+  std::istream& strm;
   char ch;              // Next character to use
   bool eof;             // true when input exhausted
-  Token token;
-  char tokenText[256];
+  Token token;          // The most-recently scanned token
+  char tokenText[256];  // The text of that token
   char* pText;
   bool trace;
-  
-  Token traceToken(Token t) {
-    if (trace)
-      {
-	std::cout << "trace: token = " << t << std::endl;
-      }
-    return t;
-  }
-  
- public:
-  Tokenizer(CharSrc& s) : src(s)
-  {
-    token = SOF_TOK;
-    eof = false;
-    trace = 0;
-  }
- 
-  virtual void init();
-  virtual Token first();
-  virtual Token next();
-  virtual Token now();
 
-  const char *text() { return tokenText; }
+  void lexError();
+  Token traceToken(Token);
+  bool nextCh();
+  Token seal(Token);
+  Token skip(Token);
+  bool isDelim();
+  Token scanLiteral();
+  Token scanAtom();
+  Token scan();
+
+ public:
+  Tokenizer(std::istream& s) : strm(s);
+
+  // Required by AbstTokenizer base class
+  Token first();
+  Token next();
+  Token now();
+  const char *text();
+  
   void traceOn() { trace = true; }
   void traceOff() { trace = false; }
 };
+
+// OBSOLETE
+#if 0
 
 class MockTokenizer: public Tokenizer {
   int i;
@@ -83,23 +91,8 @@ class MockTokenizer: public Tokenizer {
     return traceToken((tokens[i] == EOF_TOK) ? EOF_TOK : tokens[++i]);
   }
 };
+#endif
 
 // TODO:
 //   class ReplTokenizer
 //   class FileTokenizer
-
-class StringTokenizer: public Tokenizer {
-  StringSrc src;
-  Token token;
-  char str[256];
-  char *pStr;
-
-public:
-  StringTokenizer(const char* s) : src(s);
-
-  void init() { }
-  Token first();
-  Token next();
-  Token now();
-  char *tokenString();
-};

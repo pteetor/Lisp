@@ -1,8 +1,15 @@
-// requires: tokenizer.h
+//
+//  Tokenizer class
+//
 
-Tokenizer::init()
+#include <istream>
+#include "tokenizer.h"
+
+Tokenizer(std::istream& s) : strm(s)
 {
-  // nop
+  token = SOF_TOK;
+  eof = false;
+  trace = 0;
 }
 
 void Tokenizer::lexError()
@@ -11,9 +18,17 @@ void Tokenizer::lexError()
   std::exit(1);
 }
 
+Token Tokenizer::traceToken(Token t) {
+  if (trace) {
+      std::cout << "trace: token = " << t << std::endl;
+  }
+  return t;
+}
+
 bool Tokenizer::nextCh()
 {
-  eof = src.next(ch);
+  strm.get(ch);
+  eof = strm.eof();
   return !eof;
 }
 
@@ -25,11 +40,27 @@ Token Tokenizer::seal(Token t)
 
 Token Tokenizer::skip(Token t)
 {
-  eof = src.next();
+  nextCh();
   return seal(t);
 }
 
-Token Tokenizer::scanString()
+bool Tokenizer::isDelim()
+{
+  switch (ch) {
+  case ' ':
+  case '\n':
+  case '\t':
+  case '(':
+  case ')':
+  case '"':
+  case ';':
+    return true;
+  default:
+    return false;
+  }
+}
+
+Token Tokenizer::scanLiteral()
 {
   while (nextCh() && ch != '"')
     {
@@ -41,20 +72,10 @@ Token Tokenizer::scanString()
   return skip(STRING_TOK);
 }
 
-Token Tokenzier::scanNumeric()
+Token Tokenizer::scanAtom()
 {
   *(pText++) = ch;
-  while (nextCh() && isdigit(ch))
-    {
-      *(pText++) = ch;
-    }
-  return seal(INT_TOK);
-}
-
-Token Tokenizer::scanSymbol()
-{
-  *(pText++) = ch;
-  while (nextCh() && isalphanum(ch))
+  while (nextCh() && !isDelim())
     {
       *pText++ = ch;
     }
@@ -67,12 +88,13 @@ Token Tokenizer::scan()
   
   while (!eof) {
 
-    // TODO: If ';', handle the comment line
+    // TODO: If ';', flushLine(); continue;
     
     switch(ch) {
     case ' ':
     case '\n':
-      src.next();
+    case '\t':
+      nextCh();
       continue;
     case '(':
       return skip(LPAREN_TOK);
@@ -81,14 +103,10 @@ Token Tokenizer::scan()
     case '.':
       return skip(DOT_TOK);
     case '"':
-      return scanString();
+      return scanLiteral();
     }
 
-    if (isdigit(ch))
-      return scanNumeric();
-    if (isalphnum(ch))
-      return scanSymbol();
-    lexError();
+    return scanAtom();
   }
 
   return traceToken(EOF_TOK);
@@ -96,12 +114,13 @@ Token Tokenizer::scan()
 
 Token Tokenizer::first()
 {
-  // TODO - init char src; scan
+  nextCh();
+  return scan();
 }
 
 Token Tokenizer::next()
 {
-  // TODO - scan
+  return scan();
 }
 
 Token Tokenizer::now()
@@ -109,34 +128,8 @@ Token Tokenizer::now()
   return token;
 }
 
-// ----------------------------------------------------------
-
-StringTokenizer::StringTokenizer(const char* s) : src(s)
+const char* Tokenizer::text()
 {
-  token = SOF_TOK;
-  str[0] = 0;
-  pStr = str;
+  return tokenText;
 }
 
-void StringTokenizer::init() { }
-
-Token StringTokenizer::first()
-{
-  pStr = str;
-  if (!tkz->first(str[0])) return EOF_TOK;
-  return scan();
-}
-
-Token StringTokenizer::next()
-{
-  pStr = str;
-  if (!tkz->next(str[0])) return EOF_TOK;
-  return scan;
-}
-
-Token StringTokenizer::now();
-
-char* StringTokenizer::tokenString()
-{
-  return str;
-}
