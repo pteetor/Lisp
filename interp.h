@@ -129,7 +129,7 @@ extern ostream& operator<<(ostream& os, const Cell& c);
 
 // ----------------------------------------------------------
 
-class CellHeap {
+class Heap {
   int nCells;
   int nFree;
   Cell *heap;
@@ -166,12 +166,12 @@ class CellHeap {
   }
   
 public:
-  CellHeap(int n) {
+  Heap(int n) {
     nCells = n;
     heap = new Cell[n];
     initHeap(n);
   }
-  ~CellHeap() {
+  ~Heap() {
     delete heap;
   }
 
@@ -209,10 +209,10 @@ public:
 };
 
 //
-// Global definitions for Cell and CellHeap data structures
+// Global definitions for Cell and Heap data structures
 //
 extern Cell* nil;
-extern CellHeap theHeap;
+extern Heap theHeap;
 
 extern void initHeap();
 

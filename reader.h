@@ -8,14 +8,14 @@
 class Reader {
 protected:
   Tokenizer *tkz;
-  CellHeap *heap;
+  Heap *heap;
 
   void syntaxError(const char *msg = "syntax error");
   Cell *parseList();
   Cell *parse();
 
 public:
-  Reader(Tokenizer* t, CellHeap *h);
+  Reader(Tokenizer* t, Heap *h);
   
   bool eof();
   Cell *read();

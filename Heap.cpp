@@ -4,7 +4,7 @@
 #include "interp.h"
 
 Cell* nil;
-CellHeap theHeap(1000);
+Heap theHeap(1000);
 
 void initHeap() {
   nil = theHeap.nil();

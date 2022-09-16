@@ -75,7 +75,7 @@ Cell* Reader::parse() {
       }
 }
 
-Reader::Reader(Tokenizer* t, CellHeap *h) {
+Reader::Reader(Tokenizer* t, Heap *h) {
   tkz = t;
   heap = h;
   tkz->init();

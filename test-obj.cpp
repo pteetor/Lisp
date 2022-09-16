@@ -59,7 +59,7 @@ int main() {
   cout << endl;
   cout << "nil.null() = " << nil->null() << endl;
 
-  CellHeap heap(100);
+  Heap heap(100);
 
   cout << endl;
   cout << "heap.freesize() = " << heap.freesize() << endl;
@@ -70,7 +70,7 @@ int main() {
   cout << "heap.freesize() = " << heap.freesize() << endl;
   cout << "heapCons->isCons() = " << heapCons->isCons() << endl;
 
-  CellHeap uHeap(2);
+  Heap uHeap(2);
   uHeap.alloc(1);
   uHeap.alloc(2);
   try {

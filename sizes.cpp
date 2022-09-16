@@ -213,7 +213,7 @@ ostream& operator<<(ostream& os, const Cell& c) {
 
 // ----------------------------------------------------------
 
-class CellHeap {
+class Heap {
   int nCells;
   int nFree;
   Cell *heap;
@@ -250,12 +250,12 @@ class CellHeap {
   }
   
 public:
-  CellHeap(int n) {
+  Heap(int n) {
     nCells = n;
     heap = new Cell[n];
     initHeap(n);
   }
-  ~CellHeap() {
+  ~Heap() {
     delete heap;
   }
 
@@ -295,7 +295,7 @@ public:
 //
 // The interpreter's global variables
 //
-CellHeap theHeap(1000);
+Heap theHeap(1000);
 
 Cell* alloc(bool b) { return theHeap.alloc(b); }
 Cell* alloc(char c) { return theHeap.alloc(c); }
@@ -359,7 +359,7 @@ int main() {
   cout << endl;
   cout << "nil.null() = " << nil->null() << endl;
 
-  CellHeap heap(100);
+  Heap heap(100);
 
   cout << endl;
   cout << "heap.freesize() = " << heap.freesize() << endl;
@@ -370,7 +370,7 @@ int main() {
   cout << "heap.freesize() = " << heap.freesize() << endl;
   cout << "heapCons->isCons() = " << heapCons->isCons() << endl;
 
-  CellHeap uHeap(2);
+  Heap uHeap(2);
   uHeap.alloc(1);
   uHeap.alloc(2);
   try {
