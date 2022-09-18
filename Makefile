@@ -1,21 +1,18 @@
 tests: test-obj test-tokenizer test-reader
 
-test-obj: interp.h test-obj.cpp StringPool.o Cell.o CellHeap.o
-	g++ -o test-obj test-obj.cpp StringPool.o Cell.o CellHeap.o
+test-obj: interp.h test-obj.o StringPool.o Cell.o Heap.o
+	g++ -o test-obj test-obj.o StringPool.o Cell.o Heap.o
 
-test-tokenizer: tokenizer.h test-tokenizer.cpp
-	g++ -o test-tokenizer test-tokenizer.cpp
+test-tokenizer: tokenizer.h test-tokenizer.o tokenizer.o
+	g++ -o test-tokenizer test-tokenizer.o tokenizer.o
 
-test-reader: interp.h tokenizer.h reader.h test-reader.cpp StringPool.o Cell.o CellHeap.o reader.o 
-	g++ -o test-reader test-reader.cpp reader.o StringPool.o Cell.o CellHeap.o
-
-test-StringSrc: CharSrc.h CharSrc.o test-StringSrc.cpp
-	g++ -o test-StringSrc test-StringSrc.cpp CharSrc.o
+test-reader: interp.h tokenizer.h reader.h test-reader.o StringPool.o Cell.o Heap.o reader.o 
+	g++ -o test-reader test-reader.o reader.o StringPool.o Cell.o Heap.o
 
 StringPool.o: interp.h StringPool.cpp
 
 Cell.o: interp.h Cell.cpp
 
-CellHeap.o: interp.h CellHeap.cpp
+Heap.o: interp.h Heap.cpp
 
-CharSrc.o: CharSrc.h CharSrc.cpp
+tokenizer.o: tokenizer.h tokenizer.cpp

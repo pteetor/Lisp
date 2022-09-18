@@ -44,7 +44,7 @@ protected:
   Token scan();
 
  public:
-  Tokenizer(std::istream& s) : strm(s);
+  Tokenizer(std::istream& s);
 
   // Required by AbstTokenizer base class
   Token first();

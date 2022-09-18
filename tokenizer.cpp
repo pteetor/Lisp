@@ -2,10 +2,10 @@
 //  Tokenizer class
 //
 
-#include <istream>
+#include <iostream>
 #include "tokenizer.h"
 
-Tokenizer(std::istream& s) : strm(s)
+Tokenizer::Tokenizer(std::istream& s) : strm(s)
 {
   token = SOF_TOK;
   eof = false;
@@ -40,6 +40,7 @@ Token Tokenizer::seal(Token t)
 
 Token Tokenizer::skip(Token t)
 {
+  *pText++ = ch;
   nextCh();
   return seal(t);
 }
@@ -68,8 +69,7 @@ Token Tokenizer::scanLiteral()
     }
   if (ch != '"')
     lexError();
-  *pText = 0;
-  return skip(STRING_TOK);
+  return seal(STRING_TOK);
 }
 
 Token Tokenizer::scanAtom()
