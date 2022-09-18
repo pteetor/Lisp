@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include "interp.h"
-#include "CharSrc.h"
 #include "tokenizer.h"
 #include "reader.h"
 
@@ -14,7 +13,7 @@ void Reader::syntaxError(const char *msg) {
   }
 
 Cell* Reader::parseList() {
-    if (tkz->token() == RPAREN_TOK) {
+    if (tkz->now() == RPAREN_TOK) {
       return nil;
     }
     
@@ -23,9 +22,9 @@ Cell* Reader::parseList() {
     Cell *tail = head;
 
     tkz->next();
-    while (tkz->token() != DOT_TOK)
+    while (tkz->now() != DOT_TOK)
       {
-	if (tkz->token() == RPAREN_TOK)
+	if (tkz->now() == RPAREN_TOK)
 	  {
 	    return head;
 	  }
@@ -45,7 +44,7 @@ Cell* Reader::parseList() {
   }
 
 Cell* Reader::parse() {
-    switch(tkz->token())
+    switch(tkz->now())
       {
       case SOF_TOK:
 	syntaxError();   // Tokenizer screwed up?
@@ -61,13 +60,13 @@ Cell* Reader::parse() {
       case CHAR_TOK:
 	syntaxError();   // TODO - Handle this
       case INT_TOK:
-	return heap->alloc(std::atoi(tkz->tokenString())); break;
+	return heap->alloc(std::atoi(tkz->text())); break;
       case DOUBLE_TOK:
-	return heap->alloc(std::atof(tkz->tokenString())); break;
+	return heap->alloc(std::atof(tkz->text())); break;
       case STRING_TOK:
-	return heap->alloc(tkz->tokenString()); break;
+	return heap->alloc(tkz->text()); break;
       case SYMBOL_TOK:
-	return heap->allocSymbol(tkz->tokenString()); break;
+	return heap->allocSymbol(tkz->text()); break;
 
       default:
 	// TODO: Throw syntax error
@@ -78,10 +77,9 @@ Cell* Reader::parse() {
 Reader::Reader(Tokenizer* t, Heap *h) {
   tkz = t;
   heap = h;
-  tkz->init();
 }
 
-bool Reader::eof() { return tkz->token() == EOF_TOK; }
+bool Reader::eof() { return tkz->now() == EOF_TOK; }
 
 Cell* Reader::read() {
   if (tkz->first() != SOF_TOK)

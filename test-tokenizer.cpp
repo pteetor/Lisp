@@ -10,7 +10,7 @@
 
 int main()
 {
-  std::string theString = "( \n (lambda (a b) (+ a b)) two \"three\" \n )";
+  std::string theString = "( \n (lambda (a b) (+ a b)) two \"dogs and cats\" \n )";
   std::stringstream strm(theString);
 
   std::cout << "Input is: " << theString << std::endl;
