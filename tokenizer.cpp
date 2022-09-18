@@ -19,8 +19,10 @@ void Tokenizer::lexError()
 }
 
 Token Tokenizer::traceToken(Token t) {
+  token = t;
   if (trace) {
-      std::cout << "trace: token = " << t << std::endl;
+      std::cout << "trace: token = " << t
+		<< " <" << tokenText << ">" << std::endl;
   }
   return t;
 }
@@ -38,7 +40,7 @@ Token Tokenizer::seal(Token t)
   return traceToken(t);
 }
 
-Token Tokenizer::skip(Token t)
+Token Tokenizer::singleChar(Token t)
 {
   *pText++ = ch;
   nextCh();
@@ -98,11 +100,11 @@ Token Tokenizer::scan()
       nextCh();
       continue;
     case '(':
-      return skip(LPAREN_TOK);
+      return singleChar(LPAREN_TOK);
     case ')':
-      return skip(RPAREN_TOK);
+      return singleChar(RPAREN_TOK);
     case '.':
-      return skip(DOT_TOK);
+      return singleChar(DOT_TOK);
     case '"':
       return scanLiteral();
     }
@@ -110,7 +112,7 @@ Token Tokenizer::scan()
     return scanAtom();
   }
 
-  return traceToken(EOF_TOK);
+  return seal(EOF_TOK);
 }
 
 Token Tokenizer::first()

@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <sstream>
 #include "interp.h"
 #include "tokenizer.h"
 #include "reader.h"
@@ -20,13 +21,20 @@ int main() {
   // Token input[] = { SOF_TOK, LPAREN_TOK, SYMBOL_TOK, RPAREN_TOK, EOF_TOK };
   // Token input[] = { SOF_TOK, LPAREN_TOK, INT_TOK, DOT_TOK, DOUBLE_TOK, RPAREN_TOK, EOF_TOK };
   // Token input[] = { SOF_TOK, LPAREN_TOK, LPAREN_TOK, RPAREN_TOK, DOT_TOK, INT_TOK, EOF_TOK };
-  Token input[] = { SOF_TOK, LPAREN_TOK, SYMBOL_TOK, INT_TOK, DOUBLE_TOK, RPAREN_TOK, EOF_TOK };
+  // Token input[] = { SOF_TOK, LPAREN_TOK, SYMBOL_TOK, INT_TOK, DOUBLE_TOK, RPAREN_TOK, EOF_TOK };
   
-  MockTokenizer mt(input);
+  // MockTokenizer mt(input);
   // mt.traceOn();
-  
-  Reader rdr(&mt, &theHeap);
 
+  std::string theInput = "( (lambda (x y) (+ x (* 2 y))) 10 3.14)";
+
+  std::cout << "Input is: " << theInput << std::endl;
+  
+  std::stringstream theStream(theInput);
+  Tokenizer tkz(theStream);
+  Reader rdr(&tkz, &theHeap);
+
+  tkz.traceOn();
   auto se = rdr.read();
   printSExpr(se);
   cout << endl;

@@ -39,7 +39,7 @@ Cell* Reader::parseList() {
     Cell *cdr = parse();
     tail->replacd(cdr);
     if (tkz->next() != RPAREN_TOK)
-      syntaxError();
+      syntaxError("expected right-parenthesis");
     return head;
   }
 
@@ -47,16 +47,16 @@ Cell* Reader::parse() {
     switch(tkz->now())
       {
       case SOF_TOK:
-	syntaxError();   // Tokenizer screwed up?
+	syntaxError("start-of-file?");   // Tokenizer screwed up?
       case EOF_TOK:
-	syntaxError();   // Incomplete expression
+	syntaxError("unexpected end-of-input");   // Incomplete expression
       case DOT_TOK:
-	syntaxError();
+	syntaxError("unexpected dot");
       case LPAREN_TOK:
 	tkz->next();
 	return parseList();
       case RPAREN_TOK:
-	syntaxError();
+	syntaxError("unexpected right parenthesis");
       case CHAR_TOK:
 	syntaxError();   // TODO - Handle this
       case INT_TOK:
@@ -82,11 +82,9 @@ Reader::Reader(Tokenizer* t, Heap *h) {
 bool Reader::eof() { return tkz->now() == EOF_TOK; }
 
 Cell* Reader::read() {
-  if (tkz->first() != SOF_TOK)
-    syntaxError();
-  tkz->next();
+  tkz->first();
   auto p = parse();
   if (tkz->next() != EOF_TOK)
-    syntaxError();
+    syntaxError("extra stuff after s-expr");
   return p;
 }

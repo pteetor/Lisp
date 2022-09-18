@@ -37,7 +37,7 @@ protected:
   Token traceToken(Token);
   bool nextCh();
   Token seal(Token);
-  Token skip(Token);
+  Token singleChar(Token);
   bool isDelim();
   Token scanLiteral();
   Token scanAtom();
