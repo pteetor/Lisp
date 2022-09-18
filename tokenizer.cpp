@@ -69,6 +69,7 @@ Token Tokenizer::scanLiteral()
     }
   if (ch != '"')
     lexError();
+  nextCh();
   return seal(STRING_TOK);
 }
 
