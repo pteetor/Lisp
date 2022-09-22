@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include <regex>
 #include "tokenizer.h"
 
 Tokenizer::Tokenizer(std::istream& s) : strm(s)
@@ -81,8 +82,22 @@ Token Tokenizer::scanAtom()
   while (nextCh() && !isDelim())
     {
       *pText++ = ch;
-    }
-  return seal(SYMBOL_TOK);
+    };
+  *pText++ = 0;
+
+  // TODO: Compile this regex once only
+  auto doublePat = std::regex("[+-]?([0-9]+\\.)|(\\.[0-9]+)|([0-9]+\\.[0-9]+)");
+
+  if (regex_match(tokenText, doublePat))
+    return traceToken(DOUBLE_TOK);
+
+  // TODO: Compile this regex once only
+  auto integerPat = std::regex("[+-]?[0-9][0-9]*");
+
+  if (regex_match(tokenText, integerPat))
+    return traceToken(INT_TOK);
+      
+  return traceToken(SYMBOL_TOK);
 }
 
 Token Tokenizer::scan()

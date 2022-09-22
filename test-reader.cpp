@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <sstream>
-#include "interp.h"
+#include "Heap.h"
 #include "tokenizer.h"
 #include "reader.h"
 

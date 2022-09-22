@@ -2,7 +2,7 @@
 // Simple unit tests for Lisp data structures
 //
 
-#include "interp.h"
+#include "Heap.h"
 
 // ----------------------------------------------------------
 

@@ -3,7 +3,7 @@
 //
 
 // Needs: #include "tokenizer.h"
-// Needs: #include "interp.h"
+// Needs: #include "Heap.h"
 
 class Reader {
 protected:

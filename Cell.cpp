@@ -1,4 +1,4 @@
-#include "interp.h"
+#include "Heap.h"
 
 Cell *makeSymbol(Cell *cp, std::string *s)
 {

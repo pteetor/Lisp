@@ -1,7 +1,7 @@
 //
 // StringPool implementation
 //
-#include "interp.h"
+#include "Heap.h"
 
 StringPool stringPool;
 

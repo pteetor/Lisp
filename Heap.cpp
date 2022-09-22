@@ -1,7 +1,7 @@
 //
 // Global variables for Lisp interpreter
 //
-#include "interp.h"
+#include "Heap.h"
 
 Cell* nil;
 Heap theHeap(1000);
