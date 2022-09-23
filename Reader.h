@@ -7,15 +7,15 @@
 
 class Reader {
 protected:
-  Tokenizer *tkz;
-  Heap *heap;
+  Tokenizer& tkz;
+  Heap& heap;
 
   void syntaxError(const char *msg = "syntax error");
   Cell *parseList();
   Cell *parse();
 
 public:
-  Reader(Tokenizer* t, Heap *h);
+  Reader(Tokenizer& t, Heap& h);
   
   bool eof();
   Cell *read();

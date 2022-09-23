@@ -32,7 +32,7 @@ int main() {
   
   std::stringstream theStream(theInput);
   Tokenizer tkz(theStream);
-  Reader rdr(&tkz, &theHeap);
+  Reader rdr(tkz, theHeap);
 
   tkz.traceOn();
   auto se = rdr.read();
