@@ -1,3 +1,6 @@
+repl: repl.o Cell.o Heap.o StringPool.o reader.o tokenizer.o
+	g++ -o repl repl.o Cell.o StringPool.o Heap.o reader.o tokenizer.o
+
 tests: test-heap test-tokenizer test-reader
 
 test-heap: Heap.h test-heap.o StringPool.o Cell.o Heap.o
@@ -16,3 +19,5 @@ Cell.o: Heap.h Cell.cpp
 Heap.o: Heap.h Heap.cpp
 
 tokenizer.o: tokenizer.h tokenizer.cpp
+
+reader.o: Reader.h reader.cpp tokenizer.h Heap.h
