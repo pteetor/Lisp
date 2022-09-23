@@ -17,7 +17,7 @@ int main()
   std::cout << "Tokens are:" << std::endl;
 
   Tokenizer tkzr(strm);
-  Token t = tkzr.first();
+  Token t = tkzr.now();
 
   while (t != EOF_TOK)
     {

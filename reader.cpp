@@ -5,7 +5,7 @@
 
 #include "Heap.h"
 #include "tokenizer.h"
-#include "reader.h"
+#include "Reader.h"
 
 void Reader::syntaxError(const char *msg) {
     cerr << "reader: " << msg << endl;
@@ -69,9 +69,11 @@ Cell* Reader::parse() {
 	return heap->allocSymbol(tkz->text()); break;
 
       default:
-	// TODO: Throw syntax error
-	return nil;
+	syntaxError("weird token");
       }
+
+    // Keep compiler happy
+    return nil;
 }
 
 Reader::Reader(Tokenizer* t, Heap *h) {
@@ -82,7 +84,10 @@ Reader::Reader(Tokenizer* t, Heap *h) {
 bool Reader::eof() { return tkz->now() == EOF_TOK; }
 
 Cell* Reader::read() {
-  tkz->first();
+  if (tkz->now() == SOF_TOK)
+    tkz->next();
+  if (tkz->now() == EOF_TOK)
+    return nil;
   auto p = parse();
   if (tkz->next() != EOF_TOK)
     syntaxError("extra stuff after s-expr");

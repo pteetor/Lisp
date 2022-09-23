@@ -8,9 +8,12 @@
 
 Tokenizer::Tokenizer(std::istream& s) : strm(s)
 {
-  token = SOF_TOK;
+  ch = 0;
   eof = false;
-  trace = 0;
+  token = SOF_TOK;
+  trace = false;
+  pText = tokenText;
+  tokenText[0] = 0;
 }
 
 void Tokenizer::lexError()
@@ -109,6 +112,7 @@ Token Tokenizer::scan()
     // TODO: If ';', flushLine(); continue;
     
     switch(ch) {
+    case '\0':     // Initial value of 'ch'
     case ' ':
     case '\n':
     case '\t':
@@ -128,12 +132,6 @@ Token Tokenizer::scan()
   }
 
   return seal(EOF_TOK);
-}
-
-Token Tokenizer::first()
-{
-  nextCh();
-  return scan();
 }
 
 Token Tokenizer::next()

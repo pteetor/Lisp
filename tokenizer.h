@@ -17,7 +17,6 @@ typedef enum TokenEnum {
 
 class AbstTokenizer {
 public:
-  virtual Token first() = 0;
   virtual Token next() = 0;
   virtual Token now() = 0;
   virtual const char *text() = 0;
@@ -29,9 +28,9 @@ protected:
   char ch;              // Next character to use
   bool eof;             // true when input exhausted
   Token token;          // The most-recently scanned token
+  bool trace;           // If true, trace returned tokens
+  char* pText;          // Points into tokenText
   char tokenText[256];  // The text of that token
-  char* pText;
-  bool trace;
 
   void lexError();
   Token traceToken(Token);
@@ -47,7 +46,6 @@ protected:
   Tokenizer(std::istream& s);
 
   // Required by AbstTokenizer base class
-  Token first();
   Token next();
   Token now();
   const char *text();
@@ -59,7 +57,7 @@ protected:
 // OBSOLETE
 #if 0
 
-class MockTokenizer: public Tokenizer {
+class MockTokenizer: public AbstTokenizer {
   int i;
   Token *tokens;
   
@@ -70,7 +68,6 @@ class MockTokenizer: public Tokenizer {
   }
 
   void init() { i = 0; }
-  Token first() { i = 0; return traceToken(tokens[0]); }
   Token now() { return tokens[i]; }
   const char *tokenString()
   {

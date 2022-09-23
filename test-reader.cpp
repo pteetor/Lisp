@@ -6,7 +6,7 @@
 #include <sstream>
 #include "Heap.h"
 #include "tokenizer.h"
-#include "reader.h"
+#include "Reader.h"
 
 using namespace std;
 

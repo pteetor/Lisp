@@ -6,7 +6,7 @@ test-heap: Heap.h test-heap.o StringPool.o Cell.o Heap.o
 test-tokenizer: tokenizer.h test-tokenizer.o tokenizer.o
 	g++ -o test-tokenizer test-tokenizer.o tokenizer.o
 
-test-reader: Heap.h tokenizer.h reader.h test-reader.o reader.o tokenizer.o StringPool.o Cell.o Heap.o reader.o 
+test-reader: Heap.h tokenizer.h Reader.h test-reader.o reader.o tokenizer.o StringPool.o Cell.o Heap.o reader.o 
 	g++ -o test-reader test-reader.o reader.o tokenizer.o StringPool.o Cell.o Heap.o
 
 StringPool.o: Heap.h StringPool.cpp
