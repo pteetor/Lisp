@@ -2,20 +2,9 @@
 // C++ types for Lisp data structures
 //
 
-#include <stdexcept>
-#include <string>
-#include <iostream>
-#include <unordered_set>
+#include "globals.h"
 
 using namespace std;
-
-// ----------------------------------------------------------
-
-typedef unordered_set<string> StringPool;
-
-extern StringPool stringPool;
-extern const string* uniqueStr(const string& s);
-extern const string* uniqueStr(const char *s);
 
 // ----------------------------------------------------------
 
@@ -28,6 +17,8 @@ typedef enum {
   STRING_TAG = 12,
   SYMBOL_TAG = 14
 } TagValue;
+
+// ----------------------------------------------------------
 
 const long int MAX_TAG = 31;
 
@@ -46,7 +37,7 @@ class Cell {
 	char char_v;
 	long int int_v;   /* 8 bytes */
 	double double_v;
-	const string *string_p;
+	const StringHead *strhead;
 	Cell *plist_p;
       };
     };
@@ -54,11 +45,7 @@ class Cell {
 
   static const Tag MARK_BIT = 0x1;
 
-  void checkTag(Tag t) {
-    if (this->tag != t) {
-      throw std::bad_cast();
-    };
-  }
+  void checkTag(Tag t);
     
 public:
   Cell() { tag = NIL_TAG; }
@@ -66,40 +53,41 @@ public:
   Cell(char c) { tag = CHAR_TAG; char_v = c; }
   Cell(int i) { tag = INT_TAG; int_v = i; }
   Cell(double d) { tag = DOUBLE_TAG; double_v = d; }
-  Cell(std::string *s) { tag = STRING_TAG; string_p = s; }
+  Cell(const char *s);
 
   Cell(Cell *a, Cell *b) {
     car_p = a; cdr_p = b;
   }
 
-  friend Cell *makeSymbol(Cell *cp, std::string *);
+  friend Cell *makeSymbol(Cell *, const char*);
 
   Cell* set() { tag = NIL_TAG; return this; }
   Cell* set(bool b) { tag = BOOL_TAG; bool_v = b; return this; }
   Cell* set(char c) { tag = CHAR_TAG; char_v = c; return this; }
   Cell* set(int i) { tag = INT_TAG; int_v = i; return this; }
   Cell* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
-  Cell* set(const char *s) { tag = STRING_TAG; string_p = uniqueStr(s); return this; }
-  Cell* setSymbol(const char *s) { tag = SYMBOL_TAG; string_p = uniqueStr(s); return this; }
+
+  Cell* set(const char *s);
+  Cell* setSymbol(const char *s);
   
   Cell* set(Cell *a, Cell *d) { car_p = a; cdr_p = d; return this; }
 
-  bool null() const { return this == NULL || tag == NIL_TAG; }
-  bool isAtomic() const { return tag <= MAX_TAG; }
-  bool isCons() const { return !isAtomic(); }
+  bool null() const { return tag == NIL_TAG; }
+  bool atom() const { return tag <= MAX_TAG; }
+  bool consp() const { return !atom(); }
   
   bool isBool() const { return tag == BOOL_TAG; }
   bool isChar() const { return tag == CHAR_TAG; }
   bool isInt() const { return tag == INT_TAG; }
   bool isDouble() const { return tag == DOUBLE_TAG; }
 
-  bool isNumeric() const { return tag == INT_TAG || tag == DOUBLE_TAG; }
+  bool numericp() const { return tag == INT_TAG || tag == DOUBLE_TAG; }
 
   operator int() const {
     if (this->tag == INT_TAG) return this->int_v;
     if (this->tag == DOUBLE_TAG) return (int) this->double_v;
     throw std::bad_cast();
-  };
+  }
 
   operator double() const {
     if (this->tag == DOUBLE_TAG) return this->double_v;
@@ -115,13 +103,13 @@ public:
 
   void mark() { tag = tag | MARK_BIT; }
   void unmark() { tag = tag & !MARK_BIT; }
-  bool isMarked() { return (bool) (tag & MARK_BIT); }
+  bool isMarked() const { return (bool) (tag & MARK_BIT); }
 
   friend void printAtom(const Cell* ap, ostream& os);
   friend void printSExpr(const Cell* c, ostream& os);
 };
 
-extern Cell *makeSymbol(Cell* cp, std::string *s);
+extern Cell *makeSymbol(Cell* cp, const char* s);
 extern int length(Cell* list);
 extern void printAtom(const Cell *ap, ostream& os = std::cout);
 extern void printSExpr(const Cell* p, ostream& os = std::cout);
@@ -135,84 +123,31 @@ class Heap {
   Cell *heap;
   Cell *pFree;
 
-  void initHeap(int n) {
-    nFree = n;
-    Cell *p = pFree = &heap[0];
-    while (--n > 0) {
-      p->replacd(p + 1);
-      p++;
-    }
-    p->replacd((Cell *) NULL);
-  }
- 
-  Cell* alloc() {
-
-    // DEBUG
-    // cout << "alloc(), entering: pFree = " << std::hex << (long int) pFree << endl;
-    
-    if (pFree == (Cell *) NULL) throw std::bad_alloc();
-    // DEBUG - something is wrong with pFree
-    if (nFree == 0) throw std::bad_alloc();
-
-    auto p = pFree;
-    pFree = pFree->cdr();
-
-    // DEBUG
-    // cout << "alloc(), exiting: pFree = " << std::hex << (long int) pFree << endl;
-    // cout << "alloc(), exiting: p = " << std::hex << (long int) p << endl;
-    
-    nFree--;
-    return p;
-  }
+  Cell* alloc();
   
 public:
-  Heap(int n) {
-    nCells = n;
-    heap = new Cell[n];
-    initHeap(n);
-  }
-  ~Heap() {
-    delete heap;
-  }
+  Heap(int n);
+  ~Heap();
 
   int freesize() { return nFree; }
 
-  Cell* nil() { return alloc()->set(); }
-  Cell* alloc(bool b) { return alloc()->set(b); }
-  Cell* alloc(char c) { return alloc()->set(c); }
-  Cell* alloc(int i) { return alloc()->set(i); }
-  Cell* alloc(double d) { return alloc()->set(d); }
-  Cell* alloc(const char *s) { return alloc()->set(s); }
-  Cell* allocSymbol(const char *s) { return alloc()->setSymbol(s); }
+  Cell* nil();
+  Cell* alloc(bool b);
+  Cell* alloc(char c);
+  Cell* alloc(int i);
+  Cell* alloc(double d);
+  Cell* alloc(const char *s);
+  Cell* allocSymbol(const char *s);
 
-  Cell* cons(Cell* a, Cell* d) { return alloc()->set(a, d); }
-
-  void free(Cell* p) {
-    p->replaca((Cell *) NULL);
-    p->replacd(pFree);
-    pFree = p;
-    ++nFree;
-  }
-
-  void dump()
-  {
-    cout << "--- start heap ---" << endl;
-    cout << "nFree = " << nFree
-	 << "; pFree = " << std::hex << (long int) pFree << endl;
-    for (int i = 0; i < nCells; ++i) {
-      cout << std::dec << i << " (" << std::hex << (long int) &heap[i] << "): "
-	   << std::hex << (long int) (heap[i].car()) << ", "
-	   << std::hex << (long int) (heap[i].cdr()) << endl;
-    }
-    cout << "--- end   heap ---" << endl;
-  }
+  Cell* cons(Cell* a, Cell* d);
+  void free(Cell* p);
+  
+  void dump();
 };
 
 //
 // Global definitions for Cell and Heap data structures
 //
-extern Cell* nil;
-extern Heap theHeap;
 
 extern void initHeap();
 
@@ -220,5 +155,6 @@ extern Cell* alloc(bool b);
 extern Cell* alloc(char c);
 extern Cell* alloc(int i);
 extern Cell* alloc(double d);
+extern Cell* alloc(const char* s);
 
 extern Cell* cons(Cell* a, Cell* d);

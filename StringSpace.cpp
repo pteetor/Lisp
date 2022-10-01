@@ -2,21 +2,30 @@
 //  Implementation of StringSpace
 //
 
+#include <cstring>
+#include <iostream>
+
+#include "globals.h"
 #include "StringSpace.h"
+
+//
+// Global variable definitions
+//
+StringSpace theSpace(1000);
 
 //
 //  StringHead object class
 //
 
-StringHead::StringHead(Cell* c, char* s)
+void StringHead::init(Cell* c, const char* s)
 {
   cell = c;
   nChar = strlen(s);
 }
 
-char* StringHead::body()
+char* StringHead::body() const
 {
-  return (char* this) + sizeof(StringHead);
+  return (char*) this + sizeof(StringHead);
 }
 
 int StringHead::nAlloc(char* s)
@@ -26,20 +35,42 @@ int StringHead::nAlloc(char* s)
 
 void StringHead::copy(StringHead* other)
 {
-  cell = other.cell;
-  nChar = other.nChar;
-  memcpy(body(), other.body(), nChar);
+  cell = other->cell;
+  nChar = other->nChar;
+  memcpy(body(), other->body(), nChar);
 }
 
-StringHead* StringHead::next()
+StringHead* StringHead::next() const
 {
-  (StringHead*) ((char* this) + nAlloc());
+  return (StringHead*) (((char*) this) + nAlloc());
 }
 
 // Total number of bytes allocated to this string
-int StringHead::nAlloc()
+int StringHead::nAlloc() const
 {
   return sizeof(StringHead) + 4*(nChar / 4);
+}
+
+void StringHead::mark()
+{
+  // TODO
+}
+
+void StringHead::unmark()
+{
+  // TODO
+}
+
+bool StringHead::isMarked() const
+{
+  // TODO
+  return true;
+}
+
+std::ostream& operator<<(std::ostream& os, const StringHead& h)
+{
+  os.write(h.body(), h.nChar);
+  return os;
 }
 
 // ----------------------------------------------------------
@@ -50,18 +81,25 @@ int StringHead::nAlloc()
 
 StringSpace::StringSpace(int nBytes)
 {
-  start = (StringHead*) malloc(nBytes);
+  availBytes = nBytes;
+  nStrings = 0;
+  start = (StringHead*) new char[nBytes];
   frontier = start;
-  end = (void*) start + nBytes;
+  end = (StringHead*) ((char*) start + nBytes);
 }
 
-StringHead* StringSpace::alloc(char* s, Cell* c)
+StringSpace::~StringSpace()
 {
-  // TODO: Check for space exceeded
-  
+  delete start;
+}
+
+StringHead* StringSpace::alloc(Cell* c, const char* s)
+{
   StringHead* p = frontier;
-  p->cell = c;
-  p->nChar = strlen(s);
+    
+  // TODO: Check for space exceeded
+
+  p->init(c, s);
   memcpy(p->body(), s, p->nChar);
 
   ++nStrings;
@@ -72,6 +110,7 @@ StringHead* StringSpace::alloc(char* s, Cell* c)
 void StringSpace::compactify()
 {
   StringHead* p = start;
+  StringHead* q;
   StringHead* front = start;   // Temporary frontier
   int nDeleted = 0;
 
@@ -79,13 +118,13 @@ void StringSpace::compactify()
     {
       // Save pointer to next, in case *p contents overwritten
       // by copy operation
-      q = p.next();
+      q = p->next();
 
-      if (p.isMarked())
+      if (p->isMarked())
 	{
-	  front.copy(p);
-	  front.unmark()
-	  front = front.next();
+	  front->copy(p);
+	  front->unmark();
+	  front = front->next();
 	}
       else
 	{
@@ -97,5 +136,3 @@ void StringSpace::compactify()
   nStrings = nStrings - nDeleted;
   frontier = front;
 }
-
-

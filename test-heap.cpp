@@ -23,8 +23,8 @@ int main() {
 
   cout << endl;
   cout << "intCell.null() = " << intCell.null() << endl;
-  cout << "isAtomic(intCell) = " << intCell.isAtomic() << endl;
-  cout << "isCons(intCell) = " << intCell.isCons() << endl;
+  cout << "atom(intCell) = " << intCell.atom() << endl;
+  cout << "consp(intCell) = " << intCell.consp() << endl;
   cout << "isInt(intCell) = " << intCell.isInt() << endl;
   cout << "(int) intCell = " << (int) intCell << endl;
   cout << "(double) intCell = " << (double) intCell << endl;
@@ -39,8 +39,8 @@ int main() {
 
   cout << endl;
   cout << "consCell.null() = " << consCell.null() << endl;
-  cout << "consCell.isAtomic() = " << consCell.isAtomic() << endl;
-  cout << "consCell.isCons() = " << consCell.isCons() << endl;
+  cout << "consCell.atom() = " << consCell.atom() << endl;
+  cout << "consCell.consp() = " << consCell.consp() << endl;
 
   try {
     cout << "(int) consCell = " << (int) consCell << endl;
@@ -68,11 +68,16 @@ int main() {
   cout << "heap.freesize() = " << heap.freesize() << endl;
   auto heapCons = heap.cons(heap3, heap4);
   cout << "heap.freesize() = " << heap.freesize() << endl;
-  cout << "heapCons->isCons() = " << heapCons->isCons() << endl;
+  cout << "heapCons->consp() = " << heapCons->consp() << endl;
 
+  cout << endl;
+  cout << "Test throwing bad_alloc" << endl;
   Heap uHeap(2);
+  cout << "heap.freesize() = " << uHeap.freesize() << endl;
   uHeap.alloc(1);
+  cout << "heap.freesize() = " << uHeap.freesize() << endl;
   uHeap.alloc(2);
+  cout << "heap.freesize() = " << uHeap.freesize() << endl;
   try {
     uHeap.alloc(3);
   }
