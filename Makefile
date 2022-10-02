@@ -30,3 +30,17 @@ tokenizer.o: tokenizer.h tokenizer.cpp
 reader.o: Reader.h reader.cpp tokenizer.h Heap.h
 
 StringSpace.o: StringSpace.cpp globals.h StringSpace.h Heap.h
+
+#
+# tests
+#
+
+test-sizes: test-sizes.o Heap.o Cell.o StringSpace.o
+	g++ -o test-sizes test-sizes.o Heap.o Cell.o StringSpace.o
+
+test-sizes: test-sizes.cpp Heap.h StringSpace.h
+
+test-Cell: test-Cell.o Cell.o StringSpace.o
+	g++ -o test-Cell test-Cell.o Cell.o StringSpace.o
+
+test-Cell.o: test-Cell.cpp Heap.h StringSpace.h

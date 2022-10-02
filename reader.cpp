@@ -20,10 +20,10 @@ Cell* Reader::parseList() {
 
   // Empty list?
   if (tkz.now() == RPAREN_TOK)
-    return nil;
+    return theHeap.nil();
     
   Cell *car = parse();
-  Cell *head = heap.cons(car, nil);
+  Cell *head = heap.cons(car, theHeap.nil());
   Cell *tail = head;
 
   tkz.next();
@@ -32,7 +32,7 @@ Cell* Reader::parseList() {
       if (tkz.now() == RPAREN_TOK)
 	    return head;
       Cell *elem = parse();
-      tail->replacd(heap.cons(elem, nil));
+      tail->replacd(heap.cons(elem, theHeap.nil()));
       tail = tail->cdr();
       tkz.next();
     }
@@ -76,7 +76,7 @@ Cell* Reader::parse() {
       }
 
     // Keep compiler happy
-    return nil;
+    return theHeap.nil();
 }
 
 bool Reader::eof() { return tkz.now() == EOF_TOK; }
@@ -85,7 +85,7 @@ Cell* Reader::read() {
   if (tkz.now() == SOF_TOK)
     tkz.next();
   if (tkz.now() == EOF_TOK)
-    return nil;
+    return theHeap.nil();
   auto p = parse();
   if (tkz.next() != EOF_TOK)
     syntaxError("extra stuff after s-expr");

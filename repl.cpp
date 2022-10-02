@@ -12,8 +12,6 @@
 
 int main()
 {
-  initHeap();
-
   std::string theInput = "( (lambda (x y) (+ x (* 2 y))) 10 3.14)";
   std::stringstream theStream(theInput);
   Tokenizer tkz(theStream);

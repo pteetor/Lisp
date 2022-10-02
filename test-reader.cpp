@@ -11,7 +11,6 @@
 using namespace std;
 
 int main() {
-  initHeap();
 
   // Token *inputs[] = {
   //   { SOF_TOK, LPAREN_TOK, RPAREN_TOK, EOF_TOK },

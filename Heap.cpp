@@ -9,14 +9,7 @@
 //
 // Global variable definitions
 //
-Cell* nil;
 Heap theHeap(1000);
-
-// TODO: MOVE THIS to the Heap constructor
-// and eliminate initHeap() altogther
-void initHeap() {
-  nil = theHeap.nil();
-}
 
 // ----------------------------------------------------------
 

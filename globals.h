@@ -14,5 +14,4 @@ class StringSpace;
 class Heap;
 
 extern StringSpace theSpace;
-extern Cell* nil;
 extern Heap theHeap;

@@ -8,3 +8,5 @@ test-tokenizer
 Snippets/
 a.out
 test-StringSpace
+test-Cell
+test-sizes
