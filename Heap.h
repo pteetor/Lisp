@@ -75,13 +75,15 @@ public:
   bool null() const { return tag == NIL_TAG; }
   bool atom() const { return tag <= MAX_TAG; }
   bool consp() const { return !atom(); }
+  bool numericp() const { return tag == INT_TAG || tag == DOUBLE_TAG; }
   
   bool isBool() const { return tag == BOOL_TAG; }
   bool isChar() const { return tag == CHAR_TAG; }
   bool isInt() const { return tag == INT_TAG; }
   bool isDouble() const { return tag == DOUBLE_TAG; }
 
-  bool numericp() const { return tag == INT_TAG || tag == DOUBLE_TAG; }
+  bool eq(const Cell* x) { return x == this; }
+  bool neq(const Cell* x) { return x != this; }
 
   operator int() const {
     if (this->tag == INT_TAG) return this->int_v;
@@ -104,6 +106,7 @@ public:
   void mark() { tag = tag | MARK_BIT; }
   void unmark() { tag = tag & !MARK_BIT; }
   bool isMarked() const { return (bool) (tag & MARK_BIT); }
+  bool notMarked() const { return (bool) !(tag & MARK_BIT); }
 
   friend void printAtom(const Cell* ap, ostream& os);
   friend void printSExpr(const Cell* c, ostream& os);
@@ -117,21 +120,30 @@ extern ostream& operator<<(ostream& os, const Cell& c);
 
 // ----------------------------------------------------------
 
+//
+// Heap of cells
+//
+// heap[0] is reserved for nil
+//
 class Heap {
   int nCells;
   int nFree;
   Cell *heap;
+  Cell *pProtected;   // List of protected cells
   Cell *pFree;
 
   Cell* alloc();
+  void mark();
+  void mark(Cell*);
+  void sweep();
   
 public:
   Heap(int n);
   ~Heap();
 
-  int freesize() { return nFree; }
+  int nFreeCells() { return nFree; }
 
-  Cell* nil();
+  Cell* nil() { return &heap[0]; }
   Cell* alloc(bool b);
   Cell* alloc(char c);
   Cell* alloc(int i);
@@ -141,6 +153,10 @@ public:
 
   Cell* cons(Cell* a, Cell* d);
   void free(Cell* p);
+
+  void protect(Cell*);
+  void unprotect(Cell*);
+  void gc();
   
   void dump();
 };

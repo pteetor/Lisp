@@ -62,22 +62,22 @@ int main() {
   Heap heap(100);
 
   cout << endl;
-  cout << "heap.freesize() = " << heap.freesize() << endl;
+  cout << "heap.nFreeCells() = " << heap.nFreeCells() << endl;
   auto heap3 = heap.alloc(3);
   auto heap4 = heap.alloc(4);
-  cout << "heap.freesize() = " << heap.freesize() << endl;
+  cout << "heap.nFreeCells() = " << heap.nFreeCells() << endl;
   auto heapCons = heap.cons(heap3, heap4);
-  cout << "heap.freesize() = " << heap.freesize() << endl;
+  cout << "heap.nFreeCells() = " << heap.nFreeCells() << endl;
   cout << "heapCons->consp() = " << heapCons->consp() << endl;
 
   cout << endl;
   cout << "Test throwing bad_alloc" << endl;
-  Heap uHeap(2);
-  cout << "heap.freesize() = " << uHeap.freesize() << endl;
+  Heap uHeap(3);
+  cout << "uHeap.nFreeCells() = " << uHeap.nFreeCells() << endl;
   uHeap.alloc(1);
-  cout << "heap.freesize() = " << uHeap.freesize() << endl;
+  cout << "uHeap.nFreeCells() = " << uHeap.nFreeCells() << endl;
   uHeap.alloc(2);
-  cout << "heap.freesize() = " << uHeap.freesize() << endl;
+  cout << "uHeap.nFreeCells() = " << uHeap.nFreeCells() << endl;
   try {
     uHeap.alloc(3);
   }

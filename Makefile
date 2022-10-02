@@ -3,7 +3,7 @@ repl: repl.o Cell.o Heap.o StringPool.o reader.o tokenizer.o
 
 tests: test-heap test-tokenizer test-reader
 
-test-heap: test-heap.o Cell.o Heap.o StringSpace.o
+test-heap: test-heap.o Heap.o Cell.o StringSpace.o
 	g++ -o test-heap test-heap.o Heap.o Cell.o StringSpace.o
 
 test-heap.o: test-heap.cpp Heap.h
