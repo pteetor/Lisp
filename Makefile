@@ -44,3 +44,8 @@ test-Cell: test-Cell.o Cell.o StringSpace.o
 	g++ -o test-Cell test-Cell.o Cell.o StringSpace.o
 
 test-Cell.o: test-Cell.cpp Heap.h StringSpace.h
+
+test-gc: test-gc.o Heap.o Cell.o StringSpace.o
+	g++ -o test-gc -g test-gc.o Heap.o Cell.o StringSpace.o
+
+test-gc.o: test-gc.cpp globals.h StringSpace.h Heap.h

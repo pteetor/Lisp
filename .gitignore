@@ -10,3 +10,4 @@ a.out
 test-StringSpace
 test-Cell
 test-sizes
+test-gc

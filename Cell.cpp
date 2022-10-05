@@ -123,3 +123,15 @@ ostream& operator<<(ostream& os, const Cell& c) {
   printSExpr(&c, os);
   return os;
 }
+
+void Cell::dump()
+{
+  cout << "[ " << std::hex << (long int) this << " ]"
+       << "  mark bit: " << markBit() << endl << std::dec;
+  if (atom()) {
+    cout << "atom: " << cleanTag() << endl;
+  } else {
+    cout << std::hex << "car: " << (long int) car()
+	 << "  cdr: " << cdr() << endl << std::dec;
+  }
+}

@@ -10,6 +10,7 @@ using namespace std;
 
 typedef enum {
   NIL_TAG = 0,
+  FREE_TAG = 2,     // Cell is on the free-list
   BOOL_TAG = 4,
   CHAR_TAG = 6,
   INT_TAG = 8,
@@ -72,6 +73,9 @@ public:
   
   Cell* set(Cell *a, Cell *d) { car_p = a; cdr_p = d; return this; }
 
+  bool isFree() const { return tag == FREE_TAG; }
+  void free() { tag = FREE_TAG; }
+
   bool null() const { return tag == NIL_TAG; }
   bool atom() const { return tag <= MAX_TAG; }
   bool consp() const { return !atom(); }
@@ -104,12 +108,17 @@ public:
   Cell* replacd(Cell* p) { this->cdr_p = p; return this; }
 
   void mark() { tag = tag | MARK_BIT; }
-  void unmark() { tag = tag & !MARK_BIT; }
+  void unmark() { tag = tag & ~MARK_BIT; }
   bool isMarked() const { return (bool) (tag & MARK_BIT); }
   bool notMarked() const { return (bool) !(tag & MARK_BIT); }
 
+  long int markBit() const { return tag & MARK_BIT; }
+  Tag cleanTag() const { return tag & ~MARK_BIT; }
+
   friend void printAtom(const Cell* ap, ostream& os);
   friend void printSExpr(const Cell* c, ostream& os);
+
+  void dump();
 };
 
 extern Cell *makeSymbol(Cell* cp, const char* s);
@@ -156,6 +165,7 @@ public:
 
   void protect(Cell*);
   void unprotect(Cell*);
+  int nProtected();
   void gc();
   
   void dump();

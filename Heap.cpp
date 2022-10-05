@@ -51,14 +51,29 @@ Cell* Heap::alloc() {
 
 void Heap::free(Cell* p)
 {
-  p->replacd(pFree);
-  pFree = p;
-  ++nFree;
+  if (!p->isFree()) {
+    p->free();
+    p->replacd(pFree);
+    pFree = p;
+    ++nFree;
+  }
 }
 
 void Heap::protect(Cell* p)
 {
   pProtected = cons(p, pProtected);
+}
+
+int Heap::nProtected()
+{
+  auto p = pProtected;
+  int n = 0;
+
+  while (p->neq(nil())) {
+    ++n;
+    p = p->cdr();
+  }
+  return n;
 }
 
 // Mark all protected cells
@@ -69,10 +84,12 @@ void Heap::mark()
 
   // The protected list is implicitly protected!
   Cell* p = pProtected;
+  Cell* q;
   
   while (p->neq(nil())) {
-    p->mark();
-    mark(p->car());
+    q = p->car();
+    p->mark();   // Careful! This tramples on car!
+    mark(q);
     p = p->cdr();
   }
 }
@@ -82,10 +99,13 @@ void Heap::mark(Cell* p)
 {
   if (p->isMarked())
     return;
+
+  Cell* q;
   
   while (p->consp()) {
-    p->mark();
-    mark(p->car());
+    q = p->car();
+    p->mark();   // Careful! This tramples on car!
+    mark(q);
     p = p->cdr();
     if (p->isMarked())
       return;
@@ -131,12 +151,15 @@ Cell* Heap::cons(Cell* a, Cell* d) { return alloc()->set(a, d); }
 void Heap::dump()
 {
     cout << "--- start heap ---" << endl;
-    cout << "nFree = " << nFree
-	 << "; pFree = " << std::hex << (long int) pFree << endl;
+    cout << "nCells = " << nCells << endl;
+    cout << "nFree = " << nFree << endl;
+    cout << "pFree = " << std::hex << (long int) pFree << endl << std::dec;
+    cout << "pProtected = " << std::hex << (long int) pProtected << endl << std::dec;
     for (int i = 0; i < nCells; ++i) {
-      cout << std::dec << i << " (" << std::hex << (long int) &heap[i] << "): "
-	   << std::hex << (long int) (heap[i].car()) << ", "
-	   << std::hex << (long int) (heap[i].cdr()) << endl;
+      heap[i].dump();
+      // cout << std::dec << i << " (" << std::hex << (long int) &heap[i] << "): "
+      //    << std::hex << (long int) (heap[i].car()) << ", "
+      //    << std::hex << (long int) (heap[i].cdr()) << endl;
     }
     cout << "--- end   heap ---" << endl;
 }
