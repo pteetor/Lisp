@@ -5,6 +5,7 @@
 
 #include "StringSpace.h"
 #include "Heap.h"
+#include "functions.h"
 
 //
 // Global variable definitions
@@ -64,16 +65,14 @@ void Heap::protect(Cell* p)
   pProtected = cons(p, pProtected);
 }
 
+void Heap::unprotect(Cell* p)
+{
+  pProtected = elide(pProtected, p);
+}
+
 int Heap::nProtected()
 {
-  auto p = pProtected;
-  int n = 0;
-
-  while (p->neq(nil())) {
-    ++n;
-    p = p->cdr();
-  }
-  return n;
+  return length(pProtected);
 }
 
 // Mark all protected cells

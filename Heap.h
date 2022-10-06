@@ -122,7 +122,6 @@ public:
 };
 
 extern Cell *makeSymbol(Cell* cp, const char* s);
-extern int length(Cell* list);
 extern void printAtom(const Cell *ap, ostream& os = std::cout);
 extern void printSExpr(const Cell* p, ostream& os = std::cout);
 extern ostream& operator<<(ostream& os, const Cell& c);

@@ -54,16 +54,6 @@ Cell *makeSymbol(Cell *cp, const char* s)
   return cp;
 }
 
-int length(Cell* list) {
-  int len = 0;
-  Cell *p = list;
-  while (!p->null()) {
-    ++len;
-    p = p->cdr();
-  }
-  return len;
-}
-
 void printAtom(const Cell *ap, ostream& os) {  
   switch (ap->tag) {
     case NIL_TAG:

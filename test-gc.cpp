@@ -56,5 +56,13 @@ int main()
   heap.gc();
   cout << "after: nFreeCells = " << heap.nFreeCells() << endl;
 
-  // TODO: Try protect/unprotect/gc cycle
+  cout << endl;
+  cout << "Unprotect two cell" << endl;
+  report("before", heap);
+  heap.unprotect(p1);
+  report("during", heap);
+  heap.unprotect(p2);
+  report("during", heap);
+  heap.gc();
+  report("after", heap);
 }
