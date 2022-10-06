@@ -91,6 +91,7 @@ public:
   bool stringp() const { return tag == STRING_TAG; }
 
   // Predicates I created
+  bool nonNull() const { return tag != NIL_TAG; }
   bool boolp() const { return tag == BOOL_TAG; }
   bool doublep() const { return tag == DOUBLE_TAG; }
 

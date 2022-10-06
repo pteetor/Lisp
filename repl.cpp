@@ -22,7 +22,7 @@ int main()
   Cell* expr = rdr.read();
   Cell* value;
 
-  while (!expr->null())
+  while (expr->nonNull())
     {
       value = interp.eval(expr);  // TODO: give global dictionary; get updated dict.
       printSExpr(expr);

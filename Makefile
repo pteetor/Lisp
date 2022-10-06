@@ -7,7 +7,7 @@
 
 CPPFLAGS = -g
 
-repl: repl.o Cell.o Heap.o StringSpace.o reader.o tokenizer.o
+repl: repl.o Cell.o Heap.o StringSpace.o reader.o tokenizer.o functions.o
 	g++ -g -o $@ $^
 
 repl.o: repl.cpp Heap.h StringSpace.h Reader.h tokenizer.h
@@ -45,7 +45,7 @@ test-tokenizer: test-tokenizer.o tokenizer.o
 
 test-tokenizer.o: test-tokenizer.cpp tokenizer.h
 
-test-reader: test-reader.o reader.o tokenizer.o Cell.o Heap.o StringSpace.o
+test-reader: test-reader.o reader.o tokenizer.o Cell.o Heap.o StringSpace.o functions.o
 	g++ -o test-reader $^
 
 test-reader.o: test-reader.cpp Reader.h tokenizer.h Heap.h 

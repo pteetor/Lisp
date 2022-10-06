@@ -43,3 +43,18 @@ Cell* elide(Cell* list, Cell* elem)
   }
   return list;
 }
+
+Cell* makeList(Cell* a)
+{
+  return cons(a, theHeap.nil());
+}
+
+Cell* makeList(Cell* a, Cell* b)
+{
+  return cons(a, cons(b, theHeap.nil()));
+}
+
+Cell* makeList(Cell* a, Cell* b, Cell* c)
+{
+  return cons(a, cons(b, cons(c, theHeap.nil())));
+}
