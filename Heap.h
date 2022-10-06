@@ -19,11 +19,13 @@ typedef enum {
   SYMBOL_TAG = 14
 } TagValue;
 
-// ----------------------------------------------------------
-
 const long int MAX_TAG = 31;
 
 typedef long int Tag;
+
+const char* tagName(Tag t);
+
+// ----------------------------------------------------------
 
 class Cell {
   union {
@@ -76,15 +78,21 @@ public:
   bool isFree() const { return tag == FREE_TAG; }
   void free() { tag = FREE_TAG; }
 
+  // Common Lisp predicated
   bool null() const { return tag == NIL_TAG; }
+  bool symbolp() const { return tag == SYMBOL_TAG; }
   bool atom() const { return tag <= MAX_TAG; }
-  bool consp() const { return !atom(); }
-  bool numericp() const { return tag == INT_TAG || tag == DOUBLE_TAG; }
-  
-  bool isBool() const { return tag == BOOL_TAG; }
-  bool isChar() const { return tag == CHAR_TAG; }
-  bool isInt() const { return tag == INT_TAG; }
-  bool isDouble() const { return tag == DOUBLE_TAG; }
+  bool consp() const { return tag > MAX_TAG; }
+  bool listp() const { return tag == NIL_TAG || tag > MAX_TAG; }
+  bool numberp() const { return tag == INT_TAG || tag == DOUBLE_TAG; }
+  bool integerp() const { return tag == INT_TAG; }
+  bool floatp() const { return tag == DOUBLE_TAG; }
+  bool characterp() const { return tag == CHAR_TAG; }
+  bool stringp() const { return tag == STRING_TAG; }
+
+  // Predicates I created
+  bool boolp() const { return tag == BOOL_TAG; }
+  bool doublep() const { return tag == DOUBLE_TAG; }
 
   bool eq(const Cell* x) { return x == this; }
   bool neq(const Cell* x) { return x != this; }
@@ -113,7 +121,7 @@ public:
   bool notMarked() const { return (bool) !(tag & MARK_BIT); }
 
   long int markBit() const { return tag & MARK_BIT; }
-  Tag cleanTag() const { return tag & ~MARK_BIT; }
+  Tag pureTag() const { return tag & ~MARK_BIT; }
 
   friend void printAtom(const Cell* ap, ostream& os);
   friend void printSExpr(const Cell* c, ostream& os);

@@ -86,8 +86,8 @@ void Heap::mark()
   Cell* q;
   
   while (p->neq(nil())) {
-    q = p->car();
-    p->mark();   // Careful! This tramples on car!
+    q = p->car();   // Save car before mark() tramples on it
+    p->mark();
     mark(q);
     p = p->cdr();
   }
@@ -102,8 +102,8 @@ void Heap::mark(Cell* p)
   Cell* q;
   
   while (p->consp()) {
-    q = p->car();
-    p->mark();   // Careful! This tramples on car!
+    q = p->car();   // Save car before mark() tramples on it
+    p->mark();
     mark(q);
     p = p->cdr();
     if (p->isMarked())

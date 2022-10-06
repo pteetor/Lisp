@@ -116,12 +116,29 @@ ostream& operator<<(ostream& os, const Cell& c) {
 
 void Cell::dump()
 {
-  cout << "[ " << std::hex << (long int) this << " ]"
+  cout << "[ " << std::hex << this << " ]"
        << "  mark bit: " << markBit() << endl << std::dec;
   if (atom()) {
-    cout << "atom: " << cleanTag() << endl;
+    cout << "atom: " << tagName(pureTag()) << " (" << pureTag() << ")" << endl;
   } else {
-    cout << std::hex << "car: " << (long int) car()
+    cout << std::hex << "car: " << car()
 	 << "  cdr: " << cdr() << endl << std::dec;
+  }
+}
+
+// ----------------------------------------------------------
+
+const char* tagName(const Tag t)
+{
+  switch (t) {
+  case NIL_TAG: return "nil";
+  case FREE_TAG: return "free";
+  case BOOL_TAG: return "bool";
+  case CHAR_TAG: return "char";
+  case INT_TAG: return "int";
+  case DOUBLE_TAG: return "dbl";
+  case STRING_TAG: return "str";
+  case SYMBOL_TAG: return "sym";
+  default: return "???";
   }
 }

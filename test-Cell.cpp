@@ -13,7 +13,7 @@ int main() {
   cout << "intCell.null() = " << intCell.null() << endl;
   cout << "atom(intCell) = " << intCell.atom() << endl;
   cout << "consp(intCell) = " << intCell.consp() << endl;
-  cout << "isInt(intCell) = " << intCell.isInt() << endl;
+  cout << "integerp(intCell) = " << intCell.integerp() << endl;
   cout << "(int) intCell = " << (int) intCell << endl;
   cout << "(double) intCell = " << (double) intCell << endl;
 
