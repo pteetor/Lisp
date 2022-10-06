@@ -1,33 +1,24 @@
-repl: repl.o Cell.o Heap.o StringPool.o reader.o tokenizer.o
-	g++ -o repl repl.o Cell.o StringPool.o Heap.o reader.o tokenizer.o
+#
+#  Lisp project makefile
+#
+#  $@ = target
+#  $^ = all pre-reqs
+#
 
-tests: test-heap test-tokenizer test-reader
+CPPFLAGS = -g
 
-test-heap: test-heap.o Heap.o Cell.o StringSpace.o
-	g++ -o test-heap test-heap.o Heap.o Cell.o StringSpace.o
+repl: repl.o Cell.o Heap.o StringSpace.o reader.o tokenizer.o
+	g++ -g -o $@ $^
 
-test-heap.o: test-heap.cpp Heap.h
-
-test-StringSpace: test-StringSpace.o StringSpace.h StringSpace.o Heap.o Cell.o
-	g++ -o test-StringSpace test-StringSpace.o StringSpace.o Heap.o Cell.o
-
-test-StringSpace.o: test-StringSpace.cpp StringSpace.h
-
-test-tokenizer: tokenizer.h test-tokenizer.o tokenizer.o
-	g++ -o test-tokenizer test-tokenizer.o tokenizer.o
-
-test-reader:test-reader.o reader.o tokenizer.o Cell.o Heap.o StringSpace.o
-	g++ -o test-reader test-reader.o reader.o tokenizer.o Cell.o Heap.o StringSpace.o
-
-test-reader.o: test-reader.cpp Reader.h tokenizer.h Heap.h 
+repl.o: repl.cpp Heap.h StringSpace.h Reader.h tokenizer.h
 
 Cell.o: Cell.cpp Heap.h StringSpace.h
 
-Heap.o: Heap.h Heap.cpp
+Heap.o: Heap.cpp Heap.h StringSpace.h
 
-tokenizer.o: tokenizer.h tokenizer.cpp
+tokenizer.o: tokenizer.cpp tokenizer.h
 
-reader.o: Reader.h reader.cpp tokenizer.h Heap.h
+reader.o: reader.cpp Reader.h tokenizer.h Heap.h
 
 StringSpace.o: StringSpace.cpp globals.h StringSpace.h Heap.h
 
@@ -35,17 +26,39 @@ StringSpace.o: StringSpace.cpp globals.h StringSpace.h Heap.h
 # tests
 #
 
-test-sizes: test-sizes.o Heap.o Cell.o StringSpace.o
-	g++ -o test-sizes test-sizes.o Heap.o Cell.o StringSpace.o
+tests: test-StringSpace test-Cell test-heap test-tokenizer test-reader test-gc
 
-test-sizes: test-sizes.cpp Heap.h StringSpace.h
+test-heap: test-heap.o Heap.o Cell.o StringSpace.o
+	g++ -g -o $@ $^
+
+test-heap.o: test-heap.cpp Heap.h StringSpace.h
+
+test-StringSpace: test-StringSpace.o StringSpace.h StringSpace.o Heap.o Cell.o
+	g++ -g -o test-StringSpace @^
+
+test-StringSpace.o: test-StringSpace.cpp StringSpace.h
+
+test-tokenizer: test-tokenizer.o tokenizer.o
+	g++ -o $@ $^
+
+test-tokenizer.o: test-tokenizer.cpp tokenizer.h
+
+test-reader: test-reader.o reader.o tokenizer.o Cell.o Heap.o StringSpace.o
+	g++ -o test-reader $^
+
+test-reader.o: test-reader.cpp Reader.h tokenizer.h Heap.h 
+
+test-sizes: test-sizes.o Heap.o Cell.o StringSpace.o
+	g++ -g -o $@ $^
+
+test-sizes.o: test-sizes.cpp Heap.h StringSpace.h
 
 test-Cell: test-Cell.o Cell.o StringSpace.o
-	g++ -o test-Cell test-Cell.o Cell.o StringSpace.o
+	g++ -g -o $@ $^
 
 test-Cell.o: test-Cell.cpp Heap.h StringSpace.h
 
 test-gc: test-gc.o Heap.o Cell.o StringSpace.o
-	g++ -o test-gc -g test-gc.o Heap.o Cell.o StringSpace.o
+	g++ -g -o $@ $^
 
 test-gc.o: test-gc.cpp globals.h StringSpace.h Heap.h
