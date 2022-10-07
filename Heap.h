@@ -76,6 +76,7 @@ public:
   Cell* set(Cell *a, Cell *d) { car_p = a; cdr_p = d; return this; }
 
   bool isFree() const { return tag == FREE_TAG; }
+  bool notFree() const { return tag != FREE_TAG; }
   void free() { tag = FREE_TAG; }
 
   // Common Lisp predicated

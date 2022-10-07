@@ -28,9 +28,13 @@ char* StringHead::body() const
   return (char*) this + sizeof(StringHead);
 }
 
+// Total number of bytes needed to contain a string.
+// We must account for
+//   (1) The string header, and
+//   (2) Round up to word boundary
 int StringHead::nAlloc(char* s)
 {
-  return sizeof(StringHead) + 4*(strlen(s) / 4);
+  return sizeof(StringHead) + 4*((strlen(s) + 3) / 4);
 }
 
 void StringHead::copy(StringHead* other)
@@ -48,7 +52,7 @@ StringHead* StringHead::next() const
 // Total number of bytes allocated to this string
 int StringHead::nAlloc() const
 {
-  return sizeof(StringHead) + 4*(nChar / 4);
+  return sizeof(StringHead) + 4*((nChar + 3) / 4);
 }
 
 void StringHead::mark()

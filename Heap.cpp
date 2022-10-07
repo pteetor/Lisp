@@ -155,10 +155,8 @@ void Heap::dump()
     cout << "pFree = " << std::hex << (long int) pFree << endl << std::dec;
     cout << "pProtected = " << std::hex << (long int) pProtected << endl << std::dec;
     for (int i = 0; i < nCells; ++i) {
-      heap[i].dump();
-      // cout << std::dec << i << " (" << std::hex << (long int) &heap[i] << "): "
-      //    << std::hex << (long int) (heap[i].car()) << ", "
-      //    << std::hex << (long int) (heap[i].cdr()) << endl;
+      if (heap[i].notFree())
+	heap[i].dump();
     }
     cout << "--- end   heap ---" << endl;
 }

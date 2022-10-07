@@ -116,10 +116,26 @@ ostream& operator<<(ostream& os, const Cell& c) {
 
 void Cell::dump()
 {
+  int nUse;
+  
   cout << "[ " << std::hex << this << " ]"
        << "  mark bit: " << markBit() << endl << std::dec;
   if (atom()) {
-    cout << "atom: " << tagName(pureTag()) << " (" << pureTag() << ")" << endl;
+    cout << "atom: " << tagName(pureTag()) << " (" << pureTag() << ") ";
+    switch (pureTag()) {
+    case STRING_TAG:
+    case SYMBOL_TAG:
+      nUse = (strhead->nChar <= 10 ? strhead->nChar : 10);
+      cout << "len " << strhead->nChar << " " << '"';
+      cout.write(strhead->body(), nUse);
+      if (nUse < strhead->nChar)
+	cout << "...";
+      cout << '"' << endl;
+      break;
+    default:
+      cout << endl;
+      break;
+    }
   } else {
     cout << std::hex << "car: " << car()
 	 << "  cdr: " << cdr() << endl << std::dec;

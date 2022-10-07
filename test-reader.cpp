@@ -25,7 +25,7 @@ int main() {
   // MockTokenizer mt(input);
   // mt.traceOn();
 
-  std::string theInput = "( (lambda (x y) (+ x (* 2 y))) 10 3.14)";
+  std::string theInput = "( (lambda (x pwr) (+ x (** 2 pwr))) 10 3.14)";
 
   std::cout << "Input is: " << theInput << std::endl;
   
@@ -35,8 +35,13 @@ int main() {
 
   tkz.traceOn();
   auto se = rdr.read();
+
+  cout << endl;
+  theHeap.dump();
+  
   printSExpr(se);
   cout << endl;
+
   
   return(0);
 }
