@@ -14,8 +14,9 @@ class Cell;
 // is *not* null-delimited.
 //
 struct StringHead {
+  short int bMark;      // If non-zero, string is marked
+  short int nChar;      // Number of chars in body
   Cell* cell;           // Cell which owns this String
-  int nChar;            // Number of chars in body
 
   void init(Cell* c, const char* s);
 
@@ -23,14 +24,18 @@ struct StringHead {
   int nAlloc() const;        // Number of bytes alloc'ed to this string
   StringHead* next() const;  // Next StringHead in StringSpace
 
+  // If this StringHead had to hold a particular string,
+  // what would be the next StringHead?
+  StringHead* next(const char* s) const;
+
   void copy(StringHead* other);
 
   void mark();
   void unmark();
   bool isMarked() const;
 
-  // Total number of bytes to allocate
-  static int nAlloc(char* s);
+  // Total number of bytes needed to allocate a particular string
+  static int nRequired(const char* s);
 };
 
 extern std::ostream& operator<<(std::ostream& os, const StringHead& h);

@@ -9,8 +9,8 @@ using namespace std;
 // ----------------------------------------------------------
 
 typedef enum {
-  NIL_TAG = 0,
-  FREE_TAG = 2,     // Cell is on the free-list
+  FREE_TAG = 0,     // Cell is on the free-list
+  NIL_TAG = 2,      // Singleton nil cell
   BOOL_TAG = 4,
   CHAR_TAG = 6,
   INT_TAG = 8,
@@ -38,10 +38,9 @@ class Cell {
       union {
 	bool bool_v;
 	char char_v;
-	long int int_v;   /* 8 bytes */
+	long int int_v;              /* 8 bytes */
 	double double_v;
-	const StringHead *strhead;
-	Cell *plist_p;
+	StringHead *strhead;         /* 8 bytes */
       };
     };
   };
@@ -51,7 +50,7 @@ class Cell {
   void checkTag(Tag t);
     
 public:
-  Cell() { tag = NIL_TAG; }
+  Cell() { tag = FREE_TAG; }
   Cell(bool b) { tag = BOOL_TAG; bool_v = b; }
   Cell(char c) { tag = CHAR_TAG; char_v = c; }
   Cell(int i) { tag = INT_TAG; int_v = i; }
@@ -64,20 +63,21 @@ public:
 
   friend Cell *makeSymbol(Cell *, const char*);
 
-  Cell* set() { tag = NIL_TAG; return this; }
+  Cell* setFree() { tag = FREE_TAG; return this; }
+  Cell* setNil() { tag = NIL_TAG; return this; }
   Cell* set(bool b) { tag = BOOL_TAG; bool_v = b; return this; }
   Cell* set(char c) { tag = CHAR_TAG; char_v = c; return this; }
   Cell* set(int i) { tag = INT_TAG; int_v = i; return this; }
   Cell* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
 
   Cell* set(const char *s);
+  Cell* set(StringHead* p);
   Cell* setSymbol(const char *s);
   
   Cell* set(Cell *a, Cell *d) { car_p = a; cdr_p = d; return this; }
 
   bool isFree() const { return tag == FREE_TAG; }
   bool notFree() const { return tag != FREE_TAG; }
-  void free() { tag = FREE_TAG; }
 
   // Common Lisp predicated
   bool null() const { return tag == NIL_TAG; }
@@ -117,10 +117,10 @@ public:
   Cell* replaca(Cell* p) { this->car_p = p; return this; }
   Cell* replacd(Cell* p) { this->cdr_p = p; return this; }
 
-  void mark() { tag = tag | MARK_BIT; }
-  void unmark() { tag = tag & ~MARK_BIT; }
-  bool isMarked() const { return (bool) (tag & MARK_BIT); }
-  bool notMarked() const { return (bool) !(tag & MARK_BIT); }
+  void mark();
+  void unmark();
+  bool isMarked() const  { return (tag & MARK_BIT) != 0; }
+  bool notMarked() const { return (tag & MARK_BIT) == 0; }
 
   long int markBit() const { return tag & MARK_BIT; }
   Tag pureTag() const { return tag & ~MARK_BIT; }
@@ -151,6 +151,7 @@ class Heap {
   Cell *pFree;
 
   Cell* alloc();
+  void free(Cell* p);
   void mark();
   void mark(Cell*);
   void sweep();
@@ -170,7 +171,6 @@ public:
   Cell* allocSymbol(const char *s);
 
   Cell* cons(Cell* a, Cell* d);
-  void free(Cell* p);
 
   void protect(Cell*);
   void unprotect(Cell*);

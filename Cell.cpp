@@ -35,10 +35,26 @@ Cell* Cell::set(const char *s) {
   return this;
 }
 
+Cell* Cell::set(StringHead* p)
+{
+  strhead = p;
+  return this;
+}
+
 Cell* Cell::setSymbol(const char *s) {
   tag = SYMBOL_TAG;
   strhead = theSpace.alloc(this,s);
   return this;
+}
+
+void Cell::mark() {
+  if (tag == STRING_TAG || tag == SYMBOL_TAG)
+    strhead->mark();
+  tag = tag | MARK_BIT;
+}
+
+void Cell::unmark() {
+  tag = tag & ~MARK_BIT;
 }
 
 //

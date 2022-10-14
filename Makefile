@@ -35,8 +35,8 @@ test-heap: test-heap.o Heap.o Cell.o StringSpace.o functions.o
 
 test-heap.o: test-heap.cpp Heap.h StringSpace.h functions.h
 
-test-StringSpace: test-StringSpace.o StringSpace.h StringSpace.o Heap.o Cell.o
-	g++ -g -o test-StringSpace @^
+test-StringSpace: test-StringSpace.o StringSpace.o Heap.o Cell.o functions.o
+	g++ -g -o test-StringSpace $^
 
 test-StringSpace.o: test-StringSpace.cpp StringSpace.h
 

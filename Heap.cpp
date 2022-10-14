@@ -53,7 +53,7 @@ Cell* Heap::alloc() {
 void Heap::free(Cell* p)
 {
   if (!p->isFree()) {
-    p->free();
+    p->setFree();
     p->replacd(pFree);
     pFree = p;
     ++nFree;
@@ -144,8 +144,6 @@ Cell* Heap::alloc(const char *s) { return alloc()->set(s); }
 Cell* Heap::allocSymbol(const char *s) { return alloc()->setSymbol(s); }
 
 Cell* Heap::cons(Cell* a, Cell* d) { return alloc()->set(a, d); }
-
-
 
 void Heap::dump()
 {
