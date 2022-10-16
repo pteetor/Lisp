@@ -29,7 +29,7 @@ int main()
   while (expr->nonNull())
     {
       value = interp.eval(expr);  // TODO: give global dictionary; get updated dict.
-      printSExpr(expr);
+      print(expr);
       cout << endl;
       expr = rdr.read();
     }

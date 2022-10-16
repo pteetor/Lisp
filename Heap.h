@@ -126,7 +126,7 @@ public:
   friend Cell *makeSymbol(const char*);
 
   friend void printAtom(const Cell* ap, ostream& os);
-  friend void printSExpr(const Cell* c, ostream& os);
+  friend void print(const Cell* c, ostream& os);
 
   void dump();
 };
@@ -137,7 +137,7 @@ extern Cell *makeString(const char* s);
 extern Cell *makeSymbol(const char* s);
 
 extern void printAtom(const Cell *ap, ostream& os = std::cout);
-extern void printSExpr(const Cell* p, ostream& os = std::cout);
+extern void print(const Cell* p, ostream& os = std::cout);
 extern ostream& operator<<(ostream& os, const Cell& c);
 
 // ----------------------------------------------------------

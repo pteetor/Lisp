@@ -29,7 +29,7 @@ int main() {
   cout << endl;
   heap.dump();
   
-  printSExpr(se);
+  print(se);
   cout << endl;
   
   return(0);

@@ -82,7 +82,7 @@ void printAtom(const Cell *ap, ostream& os) {
   }
 }
 
-void printSExpr(const Cell* p, ostream& os)
+void print(const Cell* p, ostream& os)
 {
   if (p->null()) {
     os << "()";
@@ -90,26 +90,26 @@ void printSExpr(const Cell* p, ostream& os)
     printAtom(p, os);
   } else {
     os << "(";
-    printSExpr(p->car(), os);
+    print(p->car(), os);
     
     p = p->cdr();
     while (p->consp()) {
       os << " ";
-      printSExpr(p->car(), os);
+      print(p->car(), os);
       p = p->cdr();
     }
     if (p->null()) {
       os << ")";
     } else {
       os << " . ";
-      printSExpr(p, os);
+      print(p, os);
       os << ")";
     }
   }
 }
 
 ostream& operator<<(ostream& os, const Cell& c) {
-  printSExpr(&c, os);
+  print(&c, os);
   return os;
 }
 
