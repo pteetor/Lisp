@@ -13,5 +13,5 @@ class StringHead;
 class StringSpace;
 class Heap;
 
-extern StringSpace theSpace;
-extern Heap theHeap;
+// NO: extern StringSpace theSpace;
+// NO: extern Heap theHeap;

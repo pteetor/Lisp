@@ -3,21 +3,10 @@
 //
 
 #include "globals.h"
+#include "StringSpace.h"
 #include "Heap.h"
 #include "functions.h"
 
-//
-// Length of a list
-//
-int length(Cell* list) {
-  int len = 0;
-  Cell *p = list;
-  while (!p->null()) {
-    ++len;
-    p = p->cdr();
-  }
-  return len;
-}
 
 //
 // Remove an element from a list, destructively.
@@ -44,17 +33,29 @@ Cell* elide(Cell* list, Cell* elem)
   return list;
 }
 
-Cell* makeList(Cell* a)
-{
-  return cons(a, theHeap.nil());
+//
+// Length of a list
+//
+int length(Cell* list) {
+  int len = 0;
+  Cell *p = list;
+  while (!p->null()) {
+    ++len;
+    p = p->cdr();
+  }
+  return len;
 }
 
-Cell* makeList(Cell* a, Cell* b)
+Cell* linkString(Cell* c, StringHead* s)
 {
-  return cons(a, cons(b, theHeap.nil()));
+  c->set(s);
+  s->set(c);
+  return c;
 }
 
-Cell* makeList(Cell* a, Cell* b, Cell* c)
+Cell* linkSymbol(Cell* c, StringHead* s)
 {
-  return cons(a, cons(b, cons(c, theHeap.nil())));
+  c->set(s);
+  s->set(c);
+  return c;
 }

@@ -3,14 +3,17 @@
 //
 
 #include "globals.h"
+#include "StringSpace.h"
 #include "Heap.h"
 #include "functions.h"
 
 void test_elide()
 {
-  Cell* elem = alloc(3.14);
-
-  Cell* list1 = cons(alloc(3), cons(elem, cons(alloc(1), theHeap.nil())));
+  StringSpace ss(1000);
+  Heap heap(1000, &ss);
+  
+  Cell* elem = heap.alloc(3.14);
+  Cell* list1 = heap.makeList(heap.alloc(3), elem, heap.alloc(1));
 
   cout << "test_elide" << endl;
   cout << "length before: " << length(list1) << endl;

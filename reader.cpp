@@ -20,10 +20,10 @@ Cell* Reader::parseList() {
 
   // Empty list?
   if (tkz.now() == RPAREN_TOK)
-    return theHeap.nil();
+    return heap.nil();
     
   Cell *car = parse();
-  Cell *head = heap.cons(car, theHeap.nil());
+  Cell *head = heap.cons(car, heap.nil());
   Cell *tail = head;
 
   tkz.next();
@@ -32,7 +32,7 @@ Cell* Reader::parseList() {
       if (tkz.now() == RPAREN_TOK)
 	    return head;
       Cell *elem = parse();
-      tail->replacd(heap.cons(elem, theHeap.nil()));
+      tail->replacd(heap.cons(elem, heap.nil()));
       tail = tail->cdr();
       tkz.next();
     }
@@ -67,16 +67,16 @@ Cell* Reader::parse() {
       case DOUBLE_TOK:
 	return heap.alloc(std::atof(tkz.text())); break;
       case STRING_TOK:
-	return heap.alloc(tkz.text()); break;
+	return heap.makeString(tkz.text()); break;
       case SYMBOL_TOK:
-	return heap.allocSymbol(tkz.text()); break;
+	return heap.makeSymbol(tkz.text()); break;
 
       default:
 	syntaxError("weird token");
       }
 
     // Keep compiler happy
-    return theHeap.nil();
+    return heap.nil();
 }
 
 bool Reader::eof() { return tkz.now() == EOF_TOK; }
@@ -85,7 +85,7 @@ Cell* Reader::read() {
   if (tkz.now() == SOF_TOK)
     tkz.next();
   if (tkz.now() == EOF_TOK)
-    return theHeap.nil();
+    return heap.nil();
   auto p = parse();
   if (tkz.next() != EOF_TOK)
     syntaxError("extra stuff after s-expr");

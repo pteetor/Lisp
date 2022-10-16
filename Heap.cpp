@@ -8,20 +8,15 @@
 #include "functions.h"
 
 //
-// Global variable definitions
-//
-Heap theHeap(1000);
-
-// ----------------------------------------------------------
-
-//
 // Heap - private methods
 //
 
-Heap::Heap(int n) {
+Heap::Heap(int n, StringSpace *ss) {
   nCells = n;
   heap = new Cell[n];
+  strings = ss;
 
+  heap[0].setNil(); 
   pFree = nil();
   nFree = 0;
 
@@ -52,12 +47,10 @@ Cell* Heap::alloc() {
 
 void Heap::free(Cell* p)
 {
-  if (!p->isFree()) {
-    p->setFree();
-    p->replacd(pFree);
-    pFree = p;
-    ++nFree;
-  }
+  p->setFree();
+  p->replacd(pFree);
+  pFree = p;
+  ++nFree;
 }
 
 void Heap::protect(Cell* p)
@@ -114,20 +107,12 @@ void Heap::mark(Cell* p)
   p->mark();
 }
 
-void Heap::gc()
-{
-  mark();
-  sweep();
-
-  // TODO: Compactify string space
-}
-
 // Free all unmarked cells
 void Heap::sweep() {
   for (int i = 0; i < nCells; ++i) {
     if (heap[i].isMarked())
       heap[i].unmark();
-    else
+    else if (heap[i].notFree())
       free(&heap[i]);
   }
 }
@@ -140,8 +125,11 @@ Cell* Heap::alloc(bool b) { return alloc()->set(b); }
 Cell* Heap::alloc(char c) { return alloc()->set(c); }
 Cell* Heap::alloc(int i) { return alloc()->set(i); }
 Cell* Heap::alloc(double d) { return alloc()->set(d); }
-Cell* Heap::alloc(const char *s) { return alloc()->set(s); }
-Cell* Heap::allocSymbol(const char *s) { return alloc()->setSymbol(s); }
+
+Cell* Heap::alloc(StringHead* s, Tag t)
+{
+  return alloc()->set(s, t);
+}
 
 Cell* Heap::cons(Cell* a, Cell* d) { return alloc()->set(a, d); }
 
@@ -159,23 +147,41 @@ void Heap::dump()
     cout << "--- end   heap ---" << endl;
 }
 
-// ----------------------------------------------------------
-
-//
-// Global, static functions for coding convenience
-//
-
-Cell* alloc(bool b) { return theHeap.alloc(b); }
-Cell* alloc(char c) { return theHeap.alloc(c); }
-Cell* alloc(int i) { return theHeap.alloc(i); }
-Cell* alloc(double d) { return theHeap.alloc(d); }
-
-Cell* alloc(const char* s)
+void Heap::gc()
 {
-  // TODO: Check for duplicate string in heap
+  mark();
+  sweep();
 
-  return theHeap.alloc(s);
+  // TODO: Compactify string space
 }
 
-Cell* cons(Cell* a, Cell* d) { return theHeap.cons(a, d); }
+Cell* Heap::makeList(Cell* a)
+{
+  return cons(a, nil());
+}
 
+Cell* Heap::makeList(Cell* a, Cell* b)
+{
+  return cons(a, cons(b, nil()));
+}
+
+Cell* Heap::makeList(Cell* a, Cell* b, Cell* c)
+{
+  return cons(a, cons(b, cons(c, nil())));
+}
+
+Cell* Heap::makeString(const char* s)
+{
+  auto sp = strings->alloc(s);
+  auto op = alloc(sp, STRING_TAG);
+  sp->set(op);
+  return op;
+}
+
+Cell* Heap::makeSymbol(const char* s)
+{
+  auto sp = strings->alloc(s);
+  auto op = alloc(sp, SYMBOL_TAG);
+  sp->set(op);
+  return op;
+}

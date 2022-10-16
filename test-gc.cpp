@@ -16,7 +16,8 @@ void report(const char* when, Heap& heap)
 int main()
 {
   const int N = 5;
-  Heap heap(N + 1);
+  StringSpace space(1000);
+  Heap heap(N + 1, &space);
 
   cout << "Trivial GC" << endl;
   report("before", heap);

@@ -10,10 +10,7 @@
 // Cell - constructors
 //
 
-Cell::Cell(const char *s) {
-  tag = STRING_TAG;
-  strhead = theSpace.alloc(this, s);
-}
+// None
 
 //
 // Cell - private methods
@@ -29,21 +26,16 @@ void Cell::checkTag(Tag t) {
 // Cell - public methods
 //
 
-Cell* Cell::set(const char *s) {
-  tag = STRING_TAG;
-  strhead = theSpace.alloc(this,s);
-  return this;
-}
-
-Cell* Cell::set(StringHead* p)
+Cell* Cell::set(StringHead* p, Tag t)
 {
+  tag = t;
   strhead = p;
   return this;
 }
 
-Cell* Cell::setSymbol(const char *s) {
-  tag = SYMBOL_TAG;
-  strhead = theSpace.alloc(this,s);
+Cell* Cell::set(Cell *a, Cell *d)
+{
+  car_p = a; cdr_p = d;
   return this;
 }
 
@@ -60,15 +52,6 @@ void Cell::unmark() {
 //
 // Cell - non-member functions
 //
-
-Cell *makeSymbol(Cell *cp, const char* s)
-{
-  // TODO: Look for duplicate symbol or duplicate string
-  
-  cp->tag = SYMBOL_TAG;
-  cp->strhead = theSpace.alloc(cp, s);
-  return cp;
-}
 
 void printAtom(const Cell *ap, ostream& os) {  
   switch (ap->tag) {

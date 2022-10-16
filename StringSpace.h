@@ -18,7 +18,8 @@ struct StringHead {
   short int nChar;      // Number of chars in body
   Cell* cell;           // Cell which owns this String
 
-  void init(Cell* c, const char* s);
+  int init(const char* s, Cell* c = NULL);
+  StringHead* set(Cell* c);
 
   char* body() const;        // Pointer to body of string (following header)
   int nAlloc() const;        // Number of bytes alloc'ed to this string
@@ -51,6 +52,9 @@ class StringSpace {
   StringSpace(int nBytes);
   ~StringSpace();
 
-  StringHead* alloc(Cell* c, const char* s);
+  StringHead* alloc(const char* s, Cell* c = NULL);
+  // NO: StringHead* set(Cell* c);
   void compactify();
+
+  void dump();
 };

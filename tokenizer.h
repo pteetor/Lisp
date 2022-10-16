@@ -54,42 +54,6 @@ protected:
   void traceOff() { trace = false; }
 };
 
-// OBSOLETE
-#if 0
-
-class MockTokenizer: public AbstTokenizer {
-  int i;
-  Token *tokens;
-  
- public:
-  MockTokenizer(Token t[]) {
-    i = 0;
-    tokens = t;
-  }
-
-  void init() { i = 0; }
-  Token now() { return tokens[i]; }
-  const char *tokenString()
-  {
-    switch (tokens[i]) {
-    case INT_TOK:
-      return "13";
-    case DOUBLE_TOK:
-      return "3.14";
-    case STRING_TOK:
-      return "cats and dogs";
-    case SYMBOL_TOK:
-      return "Foo";
-    }
-    return "???";   // should never happen
-  }
-  
-  Token next() {
-    return traceToken((tokens[i] == EOF_TOK) ? EOF_TOK : tokens[++i]);
-  }
-};
-#endif
-
 // TODO:
 //   class ReplTokenizer
 //   class FileTokenizer

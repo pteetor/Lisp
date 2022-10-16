@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <sstream>
+#include "StringSpace.h"
 #include "Heap.h"
 #include "tokenizer.h"
 #include "Reader.h"
@@ -11,37 +12,25 @@
 using namespace std;
 
 int main() {
-
-  // Token *inputs[] = {
-  //   { SOF_TOK, LPAREN_TOK, RPAREN_TOK, EOF_TOK },
-  //   { SOF_TOK, LPAREN_TOK, STRING_TOK, RPAREN_TOK, EOF_TOK }
-  // };
-    
-  // Token input[] = { SOF_TOK, LPAREN_TOK, SYMBOL_TOK, RPAREN_TOK, EOF_TOK };
-  // Token input[] = { SOF_TOK, LPAREN_TOK, INT_TOK, DOT_TOK, DOUBLE_TOK, RPAREN_TOK, EOF_TOK };
-  // Token input[] = { SOF_TOK, LPAREN_TOK, LPAREN_TOK, RPAREN_TOK, DOT_TOK, INT_TOK, EOF_TOK };
-  // Token input[] = { SOF_TOK, LPAREN_TOK, SYMBOL_TOK, INT_TOK, DOUBLE_TOK, RPAREN_TOK, EOF_TOK };
-  
-  // MockTokenizer mt(input);
-  // mt.traceOn();
-
   std::string theInput = "( (lambda (x pwr) (+ x (** 2 pwr))) 10 3.14)";
 
   std::cout << "Input is: " << theInput << std::endl;
+
+  StringSpace space(1000);
+  Heap heap(1000, &space);
   
   std::stringstream theStream(theInput);
   Tokenizer tkz(theStream);
-  Reader rdr(tkz, theHeap);
+  Reader rdr(tkz, heap);
 
   tkz.traceOn();
   auto se = rdr.read();
 
   cout << endl;
-  theHeap.dump();
+  heap.dump();
   
   printSExpr(se);
   cout << endl;
-
   
   return(0);
 }

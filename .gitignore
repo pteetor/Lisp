@@ -2,7 +2,7 @@
 *.o
 repl
 test-StringSrc
-test-heap
+test-Heap
 test-reader
 test-tokenizer
 Snippets/

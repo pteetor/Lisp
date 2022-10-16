@@ -28,12 +28,12 @@ functions.o: functions.cpp functions.h StringSpace.h Heap.h
 # tests
 #
 
-tests: test-StringSpace test-Cell test-heap test-tokenizer test-reader test-gc
+tests: test-StringSpace test-Cell test-Heap test-tokenizer test-reader test-gc
 
-test-heap: test-heap.o Heap.o Cell.o StringSpace.o functions.o
+test-Heap: test-Heap.o Heap.o Cell.o StringSpace.o functions.o
 	g++ -g -o $@ $^
 
-test-heap.o: test-heap.cpp Heap.h StringSpace.h functions.h
+test-Heap.o: test-Heap.cpp Heap.h StringSpace.h functions.h
 
 test-StringSpace: test-StringSpace.o StringSpace.o Heap.o Cell.o functions.o
 	g++ -g -o test-StringSpace $^
@@ -50,7 +50,7 @@ test-reader: test-reader.o reader.o tokenizer.o Cell.o Heap.o StringSpace.o func
 
 test-reader.o: test-reader.cpp Reader.h tokenizer.h Heap.h 
 
-test-sizes: test-sizes.o Heap.o Cell.o StringSpace.o
+test-sizes: test-sizes.o Heap.o Cell.o StringSpace.o functions.o
 	g++ -g -o $@ $^
 
 test-sizes.o: test-sizes.cpp Heap.h StringSpace.h

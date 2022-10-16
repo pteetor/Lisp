@@ -51,17 +51,15 @@ class Cell {
     
 public:
   Cell() { tag = FREE_TAG; }
+
+  // Question: Are these actually useful? Maybe only for testing?
   Cell(bool b) { tag = BOOL_TAG; bool_v = b; }
   Cell(char c) { tag = CHAR_TAG; char_v = c; }
   Cell(int i) { tag = INT_TAG; int_v = i; }
   Cell(double d) { tag = DOUBLE_TAG; double_v = d; }
-  Cell(const char *s);
-
   Cell(Cell *a, Cell *b) {
     car_p = a; cdr_p = b;
   }
-
-  friend Cell *makeSymbol(Cell *, const char*);
 
   Cell* setFree() { tag = FREE_TAG; return this; }
   Cell* setNil() { tag = NIL_TAG; return this; }
@@ -69,12 +67,8 @@ public:
   Cell* set(char c) { tag = CHAR_TAG; char_v = c; return this; }
   Cell* set(int i) { tag = INT_TAG; int_v = i; return this; }
   Cell* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
-
-  Cell* set(const char *s);
-  Cell* set(StringHead* p);
-  Cell* setSymbol(const char *s);
-  
-  Cell* set(Cell *a, Cell *d) { car_p = a; cdr_p = d; return this; }
+  Cell* set(StringHead* p, Tag t);
+    Cell* set(Cell *a, Cell *d);
 
   bool isFree() const { return tag == FREE_TAG; }
   bool notFree() const { return tag != FREE_TAG; }
@@ -125,13 +119,23 @@ public:
   long int markBit() const { return tag & MARK_BIT; }
   Tag pureTag() const { return tag & ~MARK_BIT; }
 
+  friend Cell *linkString(Cell*, StringHead*);
+  friend Cell *linkSymbol(Cell*, StringHead*);
+
+  friend Cell *makeString(const char*);
+  friend Cell *makeSymbol(const char*);
+
   friend void printAtom(const Cell* ap, ostream& os);
   friend void printSExpr(const Cell* c, ostream& os);
 
   void dump();
 };
 
-extern Cell *makeSymbol(Cell* cp, const char* s);
+extern Cell *linkString(Cell* cp, StringHead* s);
+extern Cell *linkSymbol(Cell* cp, StringHead* s);
+extern Cell *makeString(const char* s);
+extern Cell *makeSymbol(const char* s);
+
 extern void printAtom(const Cell *ap, ostream& os = std::cout);
 extern void printSExpr(const Cell* p, ostream& os = std::cout);
 extern ostream& operator<<(ostream& os, const Cell& c);
@@ -147,6 +151,7 @@ class Heap {
   int nCells;
   int nFree;
   Cell *heap;
+  StringSpace* strings;
   Cell *pProtected;   // List of protected cells
   Cell *pFree;
 
@@ -157,7 +162,7 @@ class Heap {
   void sweep();
   
 public:
-  Heap(int n);
+  Heap(int n, StringSpace* strings);
   ~Heap();
 
   int nFreeCells() { return nFree; }
@@ -167,8 +172,7 @@ public:
   Cell* alloc(char c);
   Cell* alloc(int i);
   Cell* alloc(double d);
-  Cell* alloc(const char *s);
-  Cell* allocSymbol(const char *s);
+  Cell* alloc(StringHead* s, Tag t);  // STRING_TAG or SYMBOL_TAG
 
   Cell* cons(Cell* a, Cell* d);
 
@@ -178,6 +182,16 @@ public:
   void gc();
   
   void dump();
+
+  Cell *makeString(const char*);
+  Cell *makeSymbol(const char*);
+
+  Cell* makeList(Cell*);
+  Cell* makeList(Cell*, Cell*);
+  Cell* makeList(Cell*, Cell*, Cell*);
+
+  friend Cell* linkString(Cell*, StringHead*);
+  friend Cell* linkSymbol(Cell*, StringHead*);
 };
 
 //
@@ -190,6 +204,5 @@ extern Cell* alloc(bool b);
 extern Cell* alloc(char c);
 extern Cell* alloc(int i);
 extern Cell* alloc(double d);
-extern Cell* alloc(const char* s);
 
 extern Cell* cons(Cell* a, Cell* d);

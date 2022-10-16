@@ -18,11 +18,20 @@ StringSpace theSpace(1000);
 //  StringHead object class
 //
 
-void StringHead::init(Cell* c, const char* s)
+int StringHead::init(const char* s, Cell* c)
 {
   bMark = false;
   nChar = strlen(s);
   cell = c;
+  memcpy(body(), s, nChar);
+
+  return nAlloc();
+}
+
+StringHead* StringHead::set(Cell* c)
+{
+  cell = c;
+  return this;
 }
 
 char* StringHead::body() const
@@ -68,12 +77,6 @@ bool StringHead::isMarked() const
   return (bool) bMark;
 }
 
-std::ostream& operator<<(std::ostream& os, const StringHead& h)
-{
-  os.write(h.body(), h.nChar);
-  return os;
-}
-
 // ----------------------------------------------------------
 
 //
@@ -87,6 +90,12 @@ std::ostream& operator<<(std::ostream& os, const StringHead& h)
 int StringHead::nRequired(const char* s)
 {
   return sizeof(StringHead) + 4*((strlen(s) + 3) / 4);
+}
+
+std::ostream& operator<<(std::ostream& os, const StringHead& h)
+{
+  os.write(h.body(), h.nChar);
+  return os;
 }
 
 // ----------------------------------------------------------
@@ -109,20 +118,22 @@ StringSpace::~StringSpace()
   delete start;
 }
 
-StringHead* StringSpace::alloc(Cell* c, const char* s)
+StringHead* StringSpace::alloc(const char* s, Cell* c)
 {
+  // TODO: Look for duplicate string
+
   StringHead* p = frontier;
+  StringHead* q = p->next(s);
     
   // Check for space exceeded
-  if (p->next(s) > end)
+  if (q > end)
     throw std::bad_alloc();
 
-  p->init(c, s);
-  memcpy(p->body(), s, p->nChar);
+  p->init(s, c);
 
   availBytes = availBytes - p->nAlloc();
   ++nStrings;
-  frontier = p->next();
+  frontier = q;
   return p;
 }
 
@@ -154,4 +165,14 @@ void StringSpace::compactify()
 
   nStrings = nStrings - nDeleted;
   frontier = front;
+}
+
+void StringSpace::dump()
+{
+  cout << "----- begin StringSpace -----" << endl;
+ 
+  cout << "availBytes = " << availBytes << endl;
+  cout << "nStrings = " << nStrings << endl;
+
+  cout << "-----  end  StringSpace -----" << endl;
 }
