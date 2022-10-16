@@ -7,7 +7,7 @@
 
 CPPFLAGS = -g
 
-repl: repl.o Cell.o Heap.o StringSpace.o reader.o tokenizer.o functions.o
+repl: repl.o Cell.o Heap.o StringSpace.o Reader.o tokenizer.o functions.o
 	g++ -g -o $@ $^
 
 repl.o: repl.cpp Heap.h StringSpace.h Reader.h tokenizer.h
@@ -18,7 +18,7 @@ Heap.o: Heap.cpp Heap.h StringSpace.h
 
 tokenizer.o: tokenizer.cpp tokenizer.h
 
-reader.o: reader.cpp Reader.h tokenizer.h Heap.h
+Reader.o: Reader.cpp Reader.h tokenizer.h Heap.h
 
 StringSpace.o: StringSpace.cpp globals.h StringSpace.h Heap.h
 
@@ -28,7 +28,7 @@ functions.o: functions.cpp functions.h StringSpace.h Heap.h
 # tests
 #
 
-tests: test-StringSpace test-Cell test-Heap test-tokenizer test-reader test-gc
+tests: test-StringSpace test-Cell test-Heap test-tokenizer test-Reader test-gc
 
 test-Heap: test-Heap.o Heap.o Cell.o StringSpace.o functions.o
 	g++ -g -o $@ $^
@@ -45,10 +45,10 @@ test-tokenizer: test-tokenizer.o tokenizer.o
 
 test-tokenizer.o: test-tokenizer.cpp tokenizer.h
 
-test-reader: test-reader.o reader.o tokenizer.o Cell.o Heap.o StringSpace.o functions.o
-	g++ -o test-reader $^
+test-Reader: test-Reader.o Reader.o tokenizer.o Cell.o Heap.o StringSpace.o functions.o
+	g++ -o test-Reader $^
 
-test-reader.o: test-reader.cpp Reader.h tokenizer.h Heap.h 
+test-Reader.o: test-Reader.cpp Reader.h tokenizer.h Heap.h 
 
 test-sizes: test-sizes.o Heap.o Cell.o StringSpace.o functions.o
 	g++ -g -o $@ $^
