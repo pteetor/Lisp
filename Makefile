@@ -7,6 +7,18 @@
 
 CPPFLAGS = -g
 
+APPS = repl
+TESTS = test-String test-Object test-Heap test-Tokenizer test-Reader test-gc
+
+apps: $(APPS)
+
+tests: $(TESTS)
+
+all: $(APPS) $(TESTS)
+
+#
+# detailed rules
+#
 repl: repl.o Object.o Heap.o String.o Reader.o Tokenizer.o functions.o
 	g++ -g -o $@ $^
 
@@ -25,11 +37,14 @@ String.o: String.cpp globals.h Object.h Heap.h
 functions.o: functions.cpp functions.h Object.h Heap.h
 
 #
+# utility
+#
+clean:
+	/bin/rm $(APPS) $(TESTS) *.o *~
+
+#
 # tests
 #
-
-tests: test-String test-Object test-Heap test-Tokenizer test-Reader test-gc
-
 test-Heap: test-Heap.o Heap.o Object.o String.o functions.o
 	g++ -g -o $@ $^
 
