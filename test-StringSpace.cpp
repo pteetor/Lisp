@@ -4,8 +4,8 @@
 
 #include <iostream>
 
+#include "Object.h"
 #include "Heap.h"
-#include "StringSpace.h"
 
 using namespace std;
 

@@ -2,6 +2,7 @@
 // Simple unit tests for Cell object class
 //
 
+#include "Object.h"
 #include "Heap.h"
 
 // ----------------------------------------------------------

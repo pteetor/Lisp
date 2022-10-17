@@ -6,13 +6,8 @@
 #include <iostream>
 
 #include "globals.h"
-#include "StringSpace.h"
-#include "Heap.h"
-
-//
-// Global variable definitions
-//
-StringSpace theSpace(1000);
+#include "Object.h"
+// No?: #include "Heap.h"
 
 //
 //  StringHead object class

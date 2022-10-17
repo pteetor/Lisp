@@ -3,8 +3,8 @@
 //
 #include <ostream>
 
-#include "StringSpace.h"
-#include "Heap.h"
+#include "Object.h"
+// No?: #include "Heap.h"
 
 //
 // Cell - constructors

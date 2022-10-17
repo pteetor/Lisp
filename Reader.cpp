@@ -3,8 +3,9 @@
 //
 #include <iostream>
 
+#include "Object.h"
 #include "Heap.h"
-#include "tokenizer.h"
+#include "Tokenizer.h"
 #include "Reader.h"
 
 Reader::Reader(Tokenizer& t, Heap& h) : tkz(t), heap(h) {

@@ -3,8 +3,8 @@
 repl
 test-StringSrc
 test-Heap
-test-reader
-test-tokenizer
+test-Reader
+test-Tokenizer
 Snippets/
 a.out
 test-StringSpace

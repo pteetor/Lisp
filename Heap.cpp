@@ -3,7 +3,7 @@
 //
 #include <iostream>
 
-#include "StringSpace.h"
+#include "Object.h"
 #include "Heap.h"
 #include "functions.h"
 

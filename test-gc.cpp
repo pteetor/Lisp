@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "globals.h"
-#include "StringSpace.h"
+#include "Object.h"
 #include "Heap.h"
 
 void report(const char* when, Heap& heap)

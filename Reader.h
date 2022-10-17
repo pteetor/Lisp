@@ -2,7 +2,7 @@
 // Lisp reader for SExpers
 //
 
-// Needs: #include "tokenizer.h"
+// Needs: #include "Tokenizer.h"
 // Needs: #include "Heap.h"
 
 class Reader {

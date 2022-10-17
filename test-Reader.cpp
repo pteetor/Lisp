@@ -4,9 +4,9 @@
 
 #include <iostream>
 #include <sstream>
-#include "StringSpace.h"
+#include "Object.h"
 #include "Heap.h"
-#include "tokenizer.h"
+#include "Tokenizer.h"
 #include "Reader.h"
 
 using namespace std;

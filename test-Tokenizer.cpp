@@ -6,7 +6,7 @@
 #include <sstream>
 #include <string>
 
-#include "tokenizer.h"
+#include "Tokenizer.h"
 
 int main()
 {

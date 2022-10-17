@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <regex>
-#include "tokenizer.h"
+#include "Tokenizer.h"
 
 Tokenizer::Tokenizer(std::istream& s) : strm(s)
 {
