@@ -36,7 +36,7 @@ public:
   Cell* alloc(char c);
   Cell* alloc(int i);
   Cell* alloc(double d);
-  Cell* alloc(StringHead* s, Tag t);  // STRING_TAG or SYMBOL_TAG
+  Cell* alloc(String* s, Tag t);  // STRING_TAG or SYMBOL_TAG
 
   Cell* cons(Cell* a, Cell* d);
 
@@ -54,8 +54,8 @@ public:
   Cell* makeList(Cell*, Cell*);
   Cell* makeList(Cell*, Cell*, Cell*);
 
-  friend Cell* linkString(Cell*, StringHead*);
-  friend Cell* linkSymbol(Cell*, StringHead*);
+  friend Cell* linkString(Cell*, String*);
+  friend Cell* linkSymbol(Cell*, String*);
 };
 
 //

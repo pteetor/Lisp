@@ -12,8 +12,6 @@ using namespace std;
 //  String management for Lisp
 //
 
-class Cell;
-
 //
 // This header immedately preceeds the body of
 // every string held in StringSpace;
@@ -23,23 +21,23 @@ class Cell;
 // Note: The character vector following this header
 // is *not* null-delimited.
 //
-struct StringHead {
+struct String {
   short int bMark;      // If non-zero, string is marked
   short int nChar;      // Number of chars in body
-  Cell* cell;           // Cell which owns this String
+  Object* cell;           // Object which owns this String
 
-  int init(const char* s, Cell* c = NULL);
-  StringHead* set(Cell* c);
+  int init(const char* s, Object* c = NULL);
+  String* set(Object* c);
 
   char* body() const;        // Pointer to body of string (following header)
   int nAlloc() const;        // Number of bytes alloc'ed to this string
-  StringHead* next() const;  // Next StringHead in StringSpace
+  String* next() const;  // Next String in StringSpace
 
-  // If this StringHead had to hold a particular string,
-  // what would be the next StringHead?
-  StringHead* next(const char* s) const;
+  // If this String had to hold a particular string,
+  // what would be the next String?
+  String* next(const char* s) const;
 
-  void copy(StringHead* other);
+  void copy(String* other);
 
   void mark();
   void unmark();
@@ -51,21 +49,21 @@ struct StringHead {
 
 // ----------------------------------------------------------
 
-extern std::ostream& operator<<(std::ostream& os, const StringHead& h);
+extern std::ostream& operator<<(std::ostream& os, const String& h);
 
 class StringSpace {
   int availBytes;
   int nStrings;
-  StringHead* start;
-  StringHead* frontier;
-  StringHead* end;
+  String* start;
+  String* frontier;
+  String* end;
   
  public:
   StringSpace(int nBytes);
   ~StringSpace();
 
-  StringHead* alloc(const char* s, Cell* c = NULL);
-  // NO: StringHead* set(Cell* c);
+  String* alloc(const char* s, Object* c = NULL);
+  // NO: String* set(Object* c);
   void compactify();
 
   void dump();
@@ -74,7 +72,7 @@ class StringSpace {
 // ----------------------------------------------------------
 
 typedef enum {
-  FREE_TAG = 0,     // Cell is on the free-list
+  FREE_TAG = 0,     // Object is on the free-list
   NIL_TAG = 2,      // Singleton nil cell
   BOOL_TAG = 4,
   CHAR_TAG = 6,
@@ -92,11 +90,11 @@ const char* tagName(Tag t);
 
 // ----------------------------------------------------------
 
-class Cell {
+class Object {
   union {
     struct {
-      Cell *car_p;
-      Cell *cdr_p;
+      Object *car_p;
+      Object *cdr_p;
     };
     struct {
       Tag tag;
@@ -105,7 +103,7 @@ class Cell {
 	char char_v;
 	long int int_v;              /* 8 bytes */
 	double double_v;
-	StringHead *strhead;         /* 8 bytes */
+	String *strhead;         /* 8 bytes */
       };
     };
   };
@@ -115,25 +113,25 @@ class Cell {
   void checkTag(Tag t);
     
 public:
-  Cell() { tag = FREE_TAG; }
+  Object() { tag = FREE_TAG; }
 
   // Question: Are these actually useful? Maybe only for testing?
-  Cell(bool b) { tag = BOOL_TAG; bool_v = b; }
-  Cell(char c) { tag = CHAR_TAG; char_v = c; }
-  Cell(int i) { tag = INT_TAG; int_v = i; }
-  Cell(double d) { tag = DOUBLE_TAG; double_v = d; }
-  Cell(Cell *a, Cell *b) {
+  Object(bool b) { tag = BOOL_TAG; bool_v = b; }
+  Object(char c) { tag = CHAR_TAG; char_v = c; }
+  Object(int i) { tag = INT_TAG; int_v = i; }
+  Object(double d) { tag = DOUBLE_TAG; double_v = d; }
+  Object(Object *a, Object *b) {
     car_p = a; cdr_p = b;
   }
 
-  Cell* setFree() { tag = FREE_TAG; return this; }
-  Cell* setNil() { tag = NIL_TAG; return this; }
-  Cell* set(bool b) { tag = BOOL_TAG; bool_v = b; return this; }
-  Cell* set(char c) { tag = CHAR_TAG; char_v = c; return this; }
-  Cell* set(int i) { tag = INT_TAG; int_v = i; return this; }
-  Cell* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
-  Cell* set(StringHead* p, Tag t);
-    Cell* set(Cell *a, Cell *d);
+  Object* setFree() { tag = FREE_TAG; return this; }
+  Object* setNil() { tag = NIL_TAG; return this; }
+  Object* set(bool b) { tag = BOOL_TAG; bool_v = b; return this; }
+  Object* set(char c) { tag = CHAR_TAG; char_v = c; return this; }
+  Object* set(int i) { tag = INT_TAG; int_v = i; return this; }
+  Object* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
+  Object* set(String* p, Tag t);
+    Object* set(Object *a, Object *d);
 
   bool isFree() const { return tag == FREE_TAG; }
   bool notFree() const { return tag != FREE_TAG; }
@@ -155,8 +153,8 @@ public:
   bool boolp() const { return tag == BOOL_TAG; }
   bool doublep() const { return tag == DOUBLE_TAG; }
 
-  bool eq(const Cell* x) { return x == this; }
-  bool neq(const Cell* x) { return x != this; }
+  bool eq(const Object* x) { return x == this; }
+  bool neq(const Object* x) { return x != this; }
 
   operator int() const {
     if (this->tag == INT_TAG) return this->int_v;
@@ -170,11 +168,11 @@ public:
     throw std::bad_cast();
   }
 
-  Cell* car() const { return car_p; }
-  Cell* cdr() const { return cdr_p; }
+  Object* car() const { return car_p; }
+  Object* cdr() const { return cdr_p; }
 
-  Cell* replaca(Cell* p) { this->car_p = p; return this; }
-  Cell* replacd(Cell* p) { this->cdr_p = p; return this; }
+  Object* replaca(Object* p) { this->car_p = p; return this; }
+  Object* replacd(Object* p) { this->cdr_p = p; return this; }
 
   void mark();
   void unmark();
@@ -184,23 +182,23 @@ public:
   long int markBit() const { return tag & MARK_BIT; }
   Tag pureTag() const { return tag & ~MARK_BIT; }
 
-  friend Cell *linkString(Cell*, StringHead*);
-  friend Cell *linkSymbol(Cell*, StringHead*);
+  friend Object *linkString(Object*, String*);
+  friend Object *linkSymbol(Object*, String*);
 
-  friend Cell *makeString(const char*);
-  friend Cell *makeSymbol(const char*);
+  friend Object *makeString(const char*);
+  friend Object *makeSymbol(const char*);
 
-  friend void printAtom(const Cell* ap, ostream& os);
-  friend void print(const Cell* c, ostream& os);
+  friend void printAtom(const Object* ap, ostream& os);
+  friend void print(const Object* c, ostream& os);
 
   void dump();
 };
 
-extern Cell *linkString(Cell* cp, StringHead* s);
-extern Cell *linkSymbol(Cell* cp, StringHead* s);
-extern Cell *makeString(const char* s);
-extern Cell *makeSymbol(const char* s);
+extern Object *linkString(Object* cp, String* s);
+extern Object *linkSymbol(Object* cp, String* s);
+extern Object *makeString(const char* s);
+extern Object *makeSymbol(const char* s);
 
-extern void printAtom(const Cell *ap, ostream& os = std::cout);
-extern void print(const Cell* p, ostream& os = std::cout);
-extern ostream& operator<<(ostream& os, const Cell& c);
+extern void printAtom(const Object *ap, ostream& os = std::cout);
+extern void print(const Object* p, ostream& os = std::cout);
+extern ostream& operator<<(ostream& os, const Object& c);

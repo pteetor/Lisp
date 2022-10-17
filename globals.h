@@ -8,10 +8,13 @@
 #include <iostream>
 #include <ostream>
 
-class Cell;
-class StringHead;
+class Object;
+class String;
 class StringSpace;
 class Heap;
 
 // NO: extern StringSpace theSpace;
 // NO: extern Heap theHeap;
+
+typedef String StringHead;
+typedef Object Cell;
