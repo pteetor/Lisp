@@ -7,8 +7,8 @@ test-Reader
 test-Tokenizer
 Snippets/
 a.out
-test-StringSpace
-test-Cell
+test-String
+test-Object
 test-sizes
 test-gc
 test-functions
