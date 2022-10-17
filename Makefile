@@ -18,7 +18,7 @@ Heap.o: Heap.cpp Heap.h Object.h
 
 Tokenizer.o: Tokenizer.cpp Tokenizer.h
 
-Reader.o: Reader.cpp Reader.h Tokenizer.h Heap.h
+Reader.o: Reader.cpp Reader.h Tokenizer.h Heap.h Object.h
 
 StringSpace.o: StringSpace.cpp globals.h Object.h Heap.h
 
