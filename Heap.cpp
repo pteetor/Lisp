@@ -126,7 +126,7 @@ Object* Heap::alloc(char c) { return alloc()->set(c); }
 Object* Heap::alloc(int i) { return alloc()->set(i); }
 Object* Heap::alloc(double d) { return alloc()->set(d); }
 
-Object* Heap::alloc(StringHead* s, Tag t)
+Object* Heap::alloc(String* s, Tag t)
 {
   return alloc()->set(s, t);
 }

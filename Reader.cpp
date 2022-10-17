@@ -15,24 +15,24 @@ Reader::Reader(Tokenizer& t, Heap& h) : tkz(t), heap(h) {
 void Reader::syntaxError(const char *msg) {
     cerr << "reader: " << msg << endl;
     exit(1);
-  }
+}
 
-Cell* Reader::parseList() {
+Object* Reader::parseList() {
 
   // Empty list?
   if (tkz.now() == RPAREN_TOK)
     return heap.nil();
     
-  Cell *car = parse();
-  Cell *head = heap.cons(car, heap.nil());
-  Cell *tail = head;
+  Object *car = parse();
+  Object *head = heap.cons(car, heap.nil());
+  Object *tail = head;
 
   tkz.next();
   while (tkz.now() != DOT_TOK)
     {
       if (tkz.now() == RPAREN_TOK)
 	    return head;
-      Cell *elem = parse();
+      Object *elem = parse();
       tail->replacd(heap.cons(elem, heap.nil()));
       tail = tail->cdr();
       tkz.next();
@@ -40,14 +40,14 @@ Cell* Reader::parseList() {
 
   // Here tail ends with: . <expr> )
   tkz.next();   // Skip dot
-  Cell *cdr = parse();
+  Object *cdr = parse();
   tail->replacd(cdr);
   if (tkz.next() != RPAREN_TOK)
     syntaxError("missing right parenthesis");
   return head;
 }
 
-Cell* Reader::parse() {
+Object* Reader::parse() {
     switch(tkz.now())
       {
       case SOF_TOK:
@@ -82,7 +82,7 @@ Cell* Reader::parse() {
 
 bool Reader::eof() { return tkz.now() == EOF_TOK; }
 
-Cell* Reader::read() {
+Object* Reader::read() {
   if (tkz.now() == SOF_TOK)
     tkz.next();
   if (tkz.now() == EOF_TOK)

@@ -23,8 +23,8 @@ int main()
 
   Interp interp;
 
-  Cell* expr = rdr.read();
-  Cell* value;
+  Object* expr = rdr.read();
+  Object* value;
 
   while (expr->nonNull())
     {

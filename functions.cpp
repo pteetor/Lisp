@@ -12,15 +12,15 @@
 // Remove an element from a list, destructively.
 // Returns pointer to modified list.
 //
-Cell* elide(Cell* list, Cell* elem)
+Object* elide(Object* list, Object* elem)
 {
   if (list->null())
     return list;
   if (list->car()->eq(elem))
     return list->cdr();
 
-  Cell* prev = list;
-  Cell* next = list->cdr();
+  Object* prev = list;
+  Object* next = list->cdr();
 
   while (!next->null()) {
     if (next->car()->eq(elem)) {
@@ -36,9 +36,9 @@ Cell* elide(Cell* list, Cell* elem)
 //
 // Length of a list
 //
-int length(Cell* list) {
+int length(Object* list) {
   int len = 0;
-  Cell *p = list;
+  Object *p = list;
   while (!p->null()) {
     ++len;
     p = p->cdr();
@@ -46,14 +46,14 @@ int length(Cell* list) {
   return len;
 }
 
-Cell* linkString(Cell* c, StringHead* s)
+Object* linkString(Object* c, String* s)
 {
   c->set(s);
   s->set(c);
   return c;
 }
 
-Cell* linkSymbol(Cell* c, StringHead* s)
+Object* linkSymbol(Object* c, String* s)
 {
   c->set(s);
   s->set(c);

@@ -12,8 +12,8 @@ void test_elide()
   StringSpace ss(1000);
   Heap heap(1000, &ss);
   
-  Cell* elem = heap.alloc(3.14);
-  Cell* list1 = heap.makeList(heap.alloc(3), elem, heap.alloc(1));
+  Object* elem = heap.alloc(3.14);
+  Object* list1 = heap.makeList(heap.alloc(3), elem, heap.alloc(1));
 
   cout << "test_elide" << endl;
   cout << "length before: " << length(list1) << endl;

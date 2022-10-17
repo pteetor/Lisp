@@ -14,6 +14,6 @@ int main() {
   cout << "sizeof(double) = " << sizeof(double) << endl;
   cout << "sizeof(void *) = " << sizeof(void *) << endl;
 
-  cout << "sizeof(Cell) = " << sizeof(Cell) << endl;
-  cout << "sizeof(Cell&) = " << sizeof(Cell&) << endl;
+  cout << "sizeof(Object) = " << sizeof(Object) << endl;
+  cout << "sizeof(Object&) = " << sizeof(Object&) << endl;
 }

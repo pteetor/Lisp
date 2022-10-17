@@ -1,5 +1,5 @@
 //
-// Implementation of Cell object class
+// Implementation of Object object class
 //
 #include <ostream>
 
@@ -7,53 +7,53 @@
 // No?: #include "Heap.h"
 
 //
-// Cell - constructors
+// Object - constructors
 //
 
 // None
 
 //
-// Cell - private methods
+// Object - private methods
 //
 
-void Cell::checkTag(Tag t) {
+void Object::checkTag(Tag t) {
   if (this->tag != t) {
     throw std::bad_cast();
   };
 }
 
 //
-// Cell - public methods
+// Object - public methods
 //
 
-Cell* Cell::set(StringHead* p, Tag t)
+Object* Object::set(String* p, Tag t)
 {
   tag = t;
   strhead = p;
   return this;
 }
 
-Cell* Cell::set(Cell *a, Cell *d)
+Object* Object::set(Object *a, Object *d)
 {
   car_p = a; cdr_p = d;
   return this;
 }
 
-void Cell::mark() {
+void Object::mark() {
   if (tag == STRING_TAG || tag == SYMBOL_TAG)
     strhead->mark();
   tag = tag | MARK_BIT;
 }
 
-void Cell::unmark() {
+void Object::unmark() {
   tag = tag & ~MARK_BIT;
 }
 
 //
-// Cell - non-member functions
+// Object - non-member functions
 //
 
-void printAtom(const Cell *ap, ostream& os) {  
+void printAtom(const Object *ap, ostream& os) {  
   switch (ap->tag) {
     case NIL_TAG:
       os << "()";
@@ -82,7 +82,7 @@ void printAtom(const Cell *ap, ostream& os) {
   }
 }
 
-void print(const Cell* p, ostream& os)
+void print(const Object* p, ostream& os)
 {
   if (p->null()) {
     os << "()";
@@ -108,12 +108,12 @@ void print(const Cell* p, ostream& os)
   }
 }
 
-ostream& operator<<(ostream& os, const Cell& c) {
+ostream& operator<<(ostream& os, const Object& c) {
   print(&c, os);
   return os;
 }
 
-void Cell::dump()
+void Object::dump()
 {
   int nUse;
   

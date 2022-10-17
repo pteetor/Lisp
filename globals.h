@@ -16,5 +16,5 @@ class Heap;
 // NO: extern StringSpace theSpace;
 // NO: extern Heap theHeap;
 
-typedef String StringHead;
-typedef Object Cell;
+// NO: typedef String StringHead;
+// NO: typedef Object Cell;
