@@ -12,8 +12,8 @@
 //
 
 Heap::Heap(int n, StringSpace *ss) {
-  nCells = n;
-  heap = new Cell[n];
+  nObjects = n;
+  heap = new Object[n];
   strings = ss;
 
   heap[0].setNil(); 
@@ -32,7 +32,7 @@ Heap::~Heap() {
   delete heap;
 }
 
-Cell* Heap::alloc() {
+Object* Heap::alloc() {
   if (pFree->eq(nil())) throw std::bad_alloc();
 
   // Double-check:
@@ -45,7 +45,7 @@ Cell* Heap::alloc() {
   return p;
 }
 
-void Heap::free(Cell* p)
+void Heap::free(Object* p)
 {
   p->setFree();
   p->replacd(pFree);
@@ -53,12 +53,12 @@ void Heap::free(Cell* p)
   ++nFree;
 }
 
-void Heap::protect(Cell* p)
+void Heap::protect(Object* p)
 {
   pProtected = cons(p, pProtected);
 }
 
-void Heap::unprotect(Cell* p)
+void Heap::unprotect(Object* p)
 {
   pProtected = elide(pProtected, p);
 }
@@ -75,8 +75,8 @@ void Heap::mark()
   nil()->mark();
 
   // The protected list is implicitly protected!
-  Cell* p = pProtected;
-  Cell* q;
+  Object* p = pProtected;
+  Object* q;
   
   while (p->neq(nil())) {
     q = p->car();   // Save car before mark() tramples on it
@@ -87,12 +87,12 @@ void Heap::mark()
 }
 
 // Mark specific cells
-void Heap::mark(Cell* p)
+void Heap::mark(Object* p)
 {
   if (p->isMarked())
     return;
 
-  Cell* q;
+  Object* q;
   
   while (p->consp()) {
     q = p->car();   // Save car before mark() tramples on it
@@ -109,7 +109,7 @@ void Heap::mark(Cell* p)
 
 // Free all unmarked cells
 void Heap::sweep() {
-  for (int i = 0; i < nCells; ++i) {
+  for (int i = 0; i < nObjects; ++i) {
     if (heap[i].isMarked())
       heap[i].unmark();
     else if (heap[i].notFree())
@@ -121,26 +121,26 @@ void Heap::sweep() {
 // Heap - public methods
 //
 
-Cell* Heap::alloc(bool b) { return alloc()->set(b); }
-Cell* Heap::alloc(char c) { return alloc()->set(c); }
-Cell* Heap::alloc(int i) { return alloc()->set(i); }
-Cell* Heap::alloc(double d) { return alloc()->set(d); }
+Object* Heap::alloc(bool b) { return alloc()->set(b); }
+Object* Heap::alloc(char c) { return alloc()->set(c); }
+Object* Heap::alloc(int i) { return alloc()->set(i); }
+Object* Heap::alloc(double d) { return alloc()->set(d); }
 
-Cell* Heap::alloc(StringHead* s, Tag t)
+Object* Heap::alloc(StringHead* s, Tag t)
 {
   return alloc()->set(s, t);
 }
 
-Cell* Heap::cons(Cell* a, Cell* d) { return alloc()->set(a, d); }
+Object* Heap::cons(Object* a, Object* d) { return alloc()->set(a, d); }
 
 void Heap::dump()
 {
     cout << "--- start heap ---" << endl;
-    cout << "nCells = " << nCells << endl;
+    cout << "nObjects = " << nObjects << endl;
     cout << "nFree = " << nFree << endl;
     cout << "pFree = " << std::hex << (long int) pFree << endl << std::dec;
     cout << "pProtected = " << std::hex << (long int) pProtected << endl << std::dec;
-    for (int i = 0; i < nCells; ++i) {
+    for (int i = 0; i < nObjects; ++i) {
       if (heap[i].notFree())
 	heap[i].dump();
     }
@@ -155,22 +155,22 @@ void Heap::gc()
   // TODO: Compactify string space
 }
 
-Cell* Heap::makeList(Cell* a)
+Object* Heap::makeList(Object* a)
 {
   return cons(a, nil());
 }
 
-Cell* Heap::makeList(Cell* a, Cell* b)
+Object* Heap::makeList(Object* a, Object* b)
 {
   return cons(a, cons(b, nil()));
 }
 
-Cell* Heap::makeList(Cell* a, Cell* b, Cell* c)
+Object* Heap::makeList(Object* a, Object* b, Object* c)
 {
   return cons(a, cons(b, cons(c, nil())));
 }
 
-Cell* Heap::makeString(const char* s)
+Object* Heap::makeString(const char* s)
 {
   auto sp = strings->alloc(s);
   auto op = alloc(sp, STRING_TAG);
@@ -178,7 +178,7 @@ Cell* Heap::makeString(const char* s)
   return op;
 }
 
-Cell* Heap::makeSymbol(const char* s)
+Object* Heap::makeSymbol(const char* s)
 {
   auto sp = strings->alloc(s);
   auto op = alloc(sp, SYMBOL_TAG);

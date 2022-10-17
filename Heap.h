@@ -12,61 +12,61 @@ using namespace std;
 // heap[0] is reserved for nil
 //
 class Heap {
-  int nCells;
+  int nObjects;
   int nFree;
-  Cell *heap;
+  Object *heap;
   StringSpace* strings;
-  Cell *pProtected;   // List of protected cells
-  Cell *pFree;
+  Object *pProtected;   // List of protected cells
+  Object *pFree;
 
-  Cell* alloc();
-  void free(Cell* p);
+  Object* alloc();
+  void free(Object* p);
   void mark();
-  void mark(Cell*);
+  void mark(Object*);
   void sweep();
   
 public:
   Heap(int n, StringSpace* strings);
   ~Heap();
 
-  int nFreeCells() { return nFree; }
+  int nFreeObjects() { return nFree; }
 
-  Cell* nil() { return &heap[0]; }
-  Cell* alloc(bool b);
-  Cell* alloc(char c);
-  Cell* alloc(int i);
-  Cell* alloc(double d);
-  Cell* alloc(String* s, Tag t);  // STRING_TAG or SYMBOL_TAG
+  Object* nil() { return &heap[0]; }
+  Object* alloc(bool b);
+  Object* alloc(char c);
+  Object* alloc(int i);
+  Object* alloc(double d);
+  Object* alloc(String* s, Tag t);  // STRING_TAG or SYMBOL_TAG
 
-  Cell* cons(Cell* a, Cell* d);
+  Object* cons(Object* a, Object* d);
 
-  void protect(Cell*);
-  void unprotect(Cell*);
+  void protect(Object*);
+  void unprotect(Object*);
   int nProtected();
   void gc();
   
   void dump();
 
-  Cell *makeString(const char*);
-  Cell *makeSymbol(const char*);
+  Object *makeString(const char*);
+  Object *makeSymbol(const char*);
 
-  Cell* makeList(Cell*);
-  Cell* makeList(Cell*, Cell*);
-  Cell* makeList(Cell*, Cell*, Cell*);
+  Object* makeList(Object*);
+  Object* makeList(Object*, Object*);
+  Object* makeList(Object*, Object*, Object*);
 
-  friend Cell* linkString(Cell*, String*);
-  friend Cell* linkSymbol(Cell*, String*);
+  friend Object* linkString(Object*, String*);
+  friend Object* linkSymbol(Object*, String*);
 };
 
 //
-// Global definitions for Cell and Heap data structures
+// Global definitions for Object and Heap data structures
 //
 
 extern void initHeap();
 
-extern Cell* alloc(bool b);
-extern Cell* alloc(char c);
-extern Cell* alloc(int i);
-extern Cell* alloc(double d);
+extern Object* alloc(bool b);
+extern Object* alloc(char c);
+extern Object* alloc(int i);
+extern Object* alloc(double d);
 
-extern Cell* cons(Cell* a, Cell* d);
+extern Object* cons(Object* a, Object* d);
