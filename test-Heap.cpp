@@ -17,23 +17,23 @@ int main() {
   cout << "heap.nil()->null() = " << heap.nil()->null() << endl;
 
   cout << endl;
-  cout << "heap.nFreeCells() = " << heap.nFreeCells() << endl;
+  cout << "heap.nFreeObjects() = " << heap.nFreeObjects() << endl;
   auto heap3 = heap.alloc(3);
   auto heap4 = heap.alloc(4);
-  cout << "heap.nFreeCells() = " << heap.nFreeCells() << endl;
+  cout << "heap.nFreeObjects() = " << heap.nFreeObjects() << endl;
   auto heapCons = heap.cons(heap3, heap4);
-  cout << "heap.nFreeCells() = " << heap.nFreeCells() << endl;
+  cout << "heap.nFreeObjects() = " << heap.nFreeObjects() << endl;
   cout << "heapCons->consp() = " << heapCons->consp() << endl;
 
   cout << endl;
   cout << "Test throwing bad_alloc" << endl;
   StringSpace uSpace(10);
   Heap uHeap(3, &uSpace);
-  cout << "uHeap.nFreeCells() = " << uHeap.nFreeCells() << endl;
+  cout << "uHeap.nFreeObjects() = " << uHeap.nFreeObjects() << endl;
   uHeap.alloc(1);
-  cout << "uHeap.nFreeCells() = " << uHeap.nFreeCells() << endl;
+  cout << "uHeap.nFreeObjects() = " << uHeap.nFreeObjects() << endl;
   uHeap.alloc(2);
-  cout << "uHeap.nFreeCells() = " << uHeap.nFreeCells() << endl;
+  cout << "uHeap.nFreeObjects() = " << uHeap.nFreeObjects() << endl;
   try {
     uHeap.alloc(3);
   }
@@ -44,7 +44,7 @@ int main() {
   //
   // These next tests use the global heap, not a local heap
   //
-  Cell* dots = heap.cons(heap.cons(heap.alloc(3), heap.alloc(2)), heap.alloc(1));
+  Object* dots = heap.cons(heap.cons(heap.alloc(3), heap.alloc(2)), heap.alloc(1));
 
   cout << endl;
   cout << "dots = " << *dots << endl;

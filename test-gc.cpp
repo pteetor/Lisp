@@ -9,7 +9,7 @@
 
 void report(const char* when, Heap& heap)
 {
-  cout << when << ": nFreeCells = " << heap.nFreeCells()
+  cout << when << ": nFreeObjects = " << heap.nFreeObjects()
        << "  nProtected = " << heap.nProtected() << endl;
 }  
 
@@ -26,15 +26,15 @@ int main()
 
   cout << endl;
   cout << "One cell, unprotected" << endl;
-  cout << "before: nFreeCells = " << heap.nFreeCells() << endl;
+  cout << "before: nFreeObjects = " << heap.nFreeObjects() << endl;
   heap.alloc(3.14);
   heap.gc();
-  cout << "after: nFreeCells = " << heap.nFreeCells() << endl;
+  cout << "after: nFreeObjects = " << heap.nFreeObjects() << endl;
 
   cout << endl;
   cout << "One cell, protected" << endl;
   report("before", heap);
-  Cell *p1 = heap.alloc(10);
+  Object *p1 = heap.alloc(10);
   heap.protect(p1);
   report("during", heap);
   heap.gc();
@@ -50,12 +50,12 @@ int main()
 
   cout << endl;
   cout << "Two cells, protected" << endl;
-  cout << "before: nFreeCells = " << heap.nFreeCells() << endl;
-  Cell *p2 = heap.alloc(20);
+  cout << "before: nFreeObjects = " << heap.nFreeObjects() << endl;
+  Object *p2 = heap.alloc(20);
   heap.protect(p2);
-  cout << "during: nFreeCells = " << heap.nFreeCells() << endl;
+  cout << "during: nFreeObjects = " << heap.nFreeObjects() << endl;
   heap.gc();
-  cout << "after: nFreeCells = " << heap.nFreeCells() << endl;
+  cout << "after: nFreeObjects = " << heap.nFreeObjects() << endl;
 
   cout << endl;
   cout << "Unprotect two cell" << endl;

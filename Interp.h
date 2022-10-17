@@ -6,5 +6,5 @@ class Interp {
  public:
   Interp() { }
 
-  Cell* eval(Cell* e) { return e; }
+  Object* eval(Object* e) { return e; }
 };

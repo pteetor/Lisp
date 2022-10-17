@@ -11,12 +11,12 @@ protected:
   Heap& heap;
 
   void syntaxError(const char *msg = "syntax error");
-  Cell *parseList();
-  Cell *parse();
+  Object *parseList();
+  Object *parse();
 
 public:
   Reader(Tokenizer& t, Heap& h);
   
   bool eof();
-  Cell *read();
+  Object *read();
 };

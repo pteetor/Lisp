@@ -10,10 +10,10 @@
 // No?: #include "Heap.h"
 
 //
-//  StringHead object class
+//  String object class
 //
 
-int StringHead::init(const char* s, Cell* c)
+int String::init(const char* s, Object* c)
 {
   bMark = false;
   nChar = strlen(s);
@@ -23,51 +23,51 @@ int StringHead::init(const char* s, Cell* c)
   return nAlloc();
 }
 
-StringHead* StringHead::set(Cell* c)
+String* String::set(Object* c)
 {
   cell = c;
   return this;
 }
 
-char* StringHead::body() const
+char* String::body() const
 {
-  return (char*) this + sizeof(StringHead);
+  return (char*) this + sizeof(String);
 }
 
-void StringHead::copy(StringHead* other)
+void String::copy(String* other)
 {
   cell = other->cell;
   nChar = other->nChar;
   memcpy(body(), other->body(), nChar);
 }
 
-StringHead* StringHead::next() const
+String* String::next() const
 {
-  return (StringHead*) (((char*) this) + nAlloc());
+  return (String*) (((char*) this) + nAlloc());
 }
 
-StringHead* StringHead::next(const char *s) const
+String* String::next(const char *s) const
 {
-  return (StringHead*) (((char*) this) + nRequired(s));
+  return (String*) (((char*) this) + nRequired(s));
 }
 
 // Total number of bytes allocated to this string
-int StringHead::nAlloc() const
+int String::nAlloc() const
 {
-  return sizeof(StringHead) + 4*((nChar + 3) / 4);
+  return sizeof(String) + 4*((nChar + 3) / 4);
 }
 
-void StringHead::mark()
+void String::mark()
 {
   bMark = true;
 }
 
-void StringHead::unmark()
+void String::unmark()
 {
   bMark = false;
 }
 
-bool StringHead::isMarked() const
+bool String::isMarked() const
 {
   return (bool) bMark;
 }
@@ -82,12 +82,12 @@ bool StringHead::isMarked() const
 // We must account for
 //   (1) The string header, and
 //   (2) Round up to word boundary
-int StringHead::nRequired(const char* s)
+int String::nRequired(const char* s)
 {
-  return sizeof(StringHead) + 4*((strlen(s) + 3) / 4);
+  return sizeof(String) + 4*((strlen(s) + 3) / 4);
 }
 
-std::ostream& operator<<(std::ostream& os, const StringHead& h)
+std::ostream& operator<<(std::ostream& os, const String& h)
 {
   os.write(h.body(), h.nChar);
   return os;
@@ -103,9 +103,9 @@ StringSpace::StringSpace(int nBytes)
 {
   availBytes = nBytes;
   nStrings = 0;
-  start = (StringHead*) new char[nBytes];
+  start = (String*) new char[nBytes];
   frontier = start;
-  end = (StringHead*) ((char*) start + nBytes);
+  end = (String*) ((char*) start + nBytes);
 }
 
 StringSpace::~StringSpace()
@@ -113,12 +113,12 @@ StringSpace::~StringSpace()
   delete start;
 }
 
-StringHead* StringSpace::alloc(const char* s, Cell* c)
+String* StringSpace::alloc(const char* s, Object* c)
 {
   // TODO: Look for duplicate string
 
-  StringHead* p = frontier;
-  StringHead* q = p->next(s);
+  String* p = frontier;
+  String* q = p->next(s);
     
   // Check for space exceeded
   if (q > end)
@@ -134,9 +134,9 @@ StringHead* StringSpace::alloc(const char* s, Cell* c)
 
 void StringSpace::compactify()
 {
-  StringHead* p = start;
-  StringHead* q;
-  StringHead* front = start;   // Temporary frontier
+  String* p = start;
+  String* q;
+  String* front = start;   // Temporary frontier
   int nDeleted = 0;
 
   for (int i = 0; i < nStrings; ++i)

@@ -2,5 +2,5 @@
 // Global functions
 //
 
-extern int length(Cell* list);
-extern Cell* elide(Cell* list, Cell* elem);
+extern int length(Object* list);
+extern Object* elide(Object* list, Object* elem);
