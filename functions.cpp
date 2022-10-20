@@ -7,7 +7,6 @@
 #include "Heap.h"
 #include "functions.h"
 
-
 //
 // Remove an element from a list, destructively.
 // Returns pointer to modified list.
@@ -46,6 +45,7 @@ int length(Object* list) {
   return len;
 }
 
+// NOT NEEDED?
 Object* linkString(Object* c, String* s)
 {
   c->set(s);
@@ -53,9 +53,25 @@ Object* linkString(Object* c, String* s)
   return c;
 }
 
+// NOT NEEDED?
 Object* linkSymbol(Object* c, String* s)
 {
   c->set(s);
   s->set(c);
   return c;
+}
+
+//
+// Search a list.
+// If 'elem' is found, return tail starting at 'elem'.
+// Otherwise, return nil.
+//
+Object* member(Object* list, Object* elem)
+{
+  while (list->nonNull()) {
+    if (list->car() == elem)
+      break;
+    list = list->cdr();
+  }
+  return list;
 }

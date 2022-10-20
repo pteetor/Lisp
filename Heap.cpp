@@ -126,9 +126,16 @@ Object* Heap::alloc(char c) { return alloc()->set(c); }
 Object* Heap::alloc(int i) { return alloc()->set(i); }
 Object* Heap::alloc(double d) { return alloc()->set(d); }
 
-Object* Heap::alloc(String* s, Tag t)
+// Allocate string object
+Object* Heap::alloc(String* s)
 {
-  return alloc()->set(s, t);
+  return alloc()->set(s);
+}
+
+// Allocate symbol object
+Object* Heap::alloc(Object* pname)
+{
+  return alloc()->set(pname);
 }
 
 Object* Heap::cons(Object* a, Object* d) { return alloc()->set(a, d); }
@@ -150,9 +157,9 @@ void Heap::dump()
 void Heap::gc()
 {
   mark();
+  // TODO: Sweep the hash table buckets, removing unmarked strings
   sweep();
-
-  // TODO: Compactify string space
+  // TODO: Compactify string space, removing marks
 }
 
 Object* Heap::makeList(Object* a)
@@ -173,15 +180,13 @@ Object* Heap::makeList(Object* a, Object* b, Object* c)
 Object* Heap::makeString(const char* s)
 {
   auto sp = strings->alloc(s);
-  auto op = alloc(sp, STRING_TAG);
+  auto op = alloc(sp);
   sp->set(op);
   return op;
 }
 
 Object* Heap::makeSymbol(const char* s)
 {
-  auto sp = strings->alloc(s);
-  auto op = alloc(sp, SYMBOL_TAG);
-  sp->set(op);
-  return op;
+  auto strobj = makeString(s);
+  return alloc(strobj);
 }

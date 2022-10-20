@@ -1,10 +1,11 @@
 //
 // Implementation of Object object class
 //
+#include <cassert>
+#include <cstring>
 #include <ostream>
 
 #include "Object.h"
-// No?: #include "Heap.h"
 
 //
 // Object - constructors
@@ -26,10 +27,23 @@ void Object::checkTag(Tag t) {
 // Object - public methods
 //
 
-Object* Object::set(String* p, Tag t)
+bool Object::equal(const char* s) const
 {
-  tag = t;
-  strhead = p;
+  assert(tag == STRING_TAG);
+  return pstring->equal(s);
+}
+
+Object* Object::set(String* p)
+{
+  tag = STRING_TAG;
+  pstring = p;
+  return this;
+}
+
+Object* Object::set(Object* s)
+{
+  tag = SYMBOL_TAG;
+  pname = s;
   return this;
 }
 
@@ -40,8 +54,10 @@ Object* Object::set(Object *a, Object *d)
 }
 
 void Object::mark() {
-  if (tag == STRING_TAG || tag == SYMBOL_TAG)
-    strhead->mark();
+  if (tag == STRING_TAG)
+    pstring->mark();
+  else if (tag == SYMBOL_TAG)
+    pname->mark();
   tag = tag | MARK_BIT;
 }
 
@@ -71,10 +87,10 @@ void printAtom(const Object *ap, ostream& os) {
       os << ap->double_v;
       break;
     case STRING_TAG:
-      os << *(ap->strhead);
+      os << *(ap->pstring);
       break;
     case SYMBOL_TAG:
-      os << *(ap->strhead);
+      os << *(ap->pname);
       break;
     default:
       os << "???";
@@ -123,22 +139,20 @@ void Object::dump()
     cout << "atom: " << tagName(pureTag()) << " (" << pureTag() << ") ";
     switch (pureTag()) {
     case STRING_TAG:
-    case SYMBOL_TAG:
-      nUse = (strhead->nChar <= 10 ? strhead->nChar : 10);
-      cout << "len " << strhead->nChar << " " << '"';
-      cout.write(strhead->body(), nUse);
-      if (nUse < strhead->nChar)
-	cout << "...";
-      cout << '"' << endl;
+      cout << "len " << pstring->nChar << " ";;
+      cout << "<";
+      pstring->write(cout, 13);
+      cout << ">";
       break;
-    default:
-      cout << endl;
+    case SYMBOL_TAG:
+      cout << *(pname->pstring);
       break;
     }
   } else {
-    cout << std::hex << "car: " << car()
-	 << "  cdr: " << cdr() << endl << std::dec;
+    cout << std::hex << "cons: [ " << car()
+	 << ", " << cdr() << " ]" << std::dec;
   }
+  cout << endl;
 }
 
 // ----------------------------------------------------------

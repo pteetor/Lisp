@@ -3,6 +3,7 @@
 //
 
 // Standard lib stuff used commonly
+#include <cassert>
 #include <stdexcept>
 #include <cstring>
 #include <iostream>
@@ -12,9 +13,3 @@ class Object;
 class String;
 class StringSpace;
 class Heap;
-
-// NO: extern StringSpace theSpace;
-// NO: extern Heap theHeap;
-
-// NO: typedef String StringHead;
-// NO: typedef Object Cell;

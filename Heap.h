@@ -6,6 +6,20 @@ using namespace std;
 
 // ----------------------------------------------------------
 
+class HashTable {
+  Heap &heap;
+  int nBuckets;
+  Object* table;
+
+public:
+  HashTable(int n);
+  ~HashTable();
+
+  Object* get(const char* p);
+
+  // LATER: Object* get(String* s);
+};
+
 //
 // Heap of cells
 //
@@ -36,7 +50,8 @@ public:
   Object* alloc(char c);
   Object* alloc(int i);
   Object* alloc(double d);
-  Object* alloc(String* s, Tag t);  // STRING_TAG or SYMBOL_TAG
+  Object* alloc(String* s);       // New string
+  Object* alloc(Object* pname);   // New symbol
 
   Object* cons(Object* a, Object* d);
 

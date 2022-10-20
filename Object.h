@@ -24,14 +24,14 @@ using namespace std;
 struct String {
   short int bMark;      // If non-zero, string is marked
   short int nChar;      // Number of chars in body
-  Object* cell;           // Object which owns this String
+  Object* cell;         // Object which owns this String
 
   int init(const char* s, Object* c = NULL);
   String* set(Object* c);
 
   char* body() const;        // Pointer to body of string (following header)
   int nAlloc() const;        // Number of bytes alloc'ed to this string
-  String* next() const;  // Next String in StringSpace
+  String* next() const;      // Next String in StringSpace
 
   // If this String had to hold a particular string,
   // what would be the next String?
@@ -42,6 +42,15 @@ struct String {
   void mark();
   void unmark();
   bool isMarked() const;
+
+  bool equal(const char* s) const;
+  String* write(std::ostream& os, int limit = -1);
+
+  // Hash value for this string
+  int hash(int mod) const;
+
+  // Hash value for an arbitrary string
+  static int hash(int mod, const char* s, int n);
 
   // Total number of bytes needed to allocate a particular string
   static int nRequired(const char* s);
@@ -82,9 +91,9 @@ typedef enum {
   SYMBOL_TAG = 14
 } TagValue;
 
-const long int MAX_TAG = 31;
+const long int MAX_TAG = (int) SYMBOL_TAG;
 
-typedef long int Tag;
+typedef long int Tag;     /* 8 bytes */
 
 const char* tagName(Tag t);
 
@@ -101,9 +110,10 @@ class Object {
       union {
 	bool bool_v;
 	char char_v;
-	long int int_v;              /* 8 bytes */
+	long int int_v;          /* 8 bytes */
 	double double_v;
-	String *strhead;         /* 8 bytes */
+	String *pstring;         /* 8 bytes */
+	Object *pname;           /* For symbols, print name */
       };
     };
   };
@@ -130,8 +140,9 @@ public:
   Object* set(char c) { tag = CHAR_TAG; char_v = c; return this; }
   Object* set(int i) { tag = INT_TAG; int_v = i; return this; }
   Object* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
-  Object* set(String* p, Tag t);
-    Object* set(Object *a, Object *d);
+  Object* set(String* p);
+  Object* set(Object* s);                // Print-name of symbol
+  Object* set(Object *a, Object *d);     // Cons cell
 
   bool isFree() const { return tag == FREE_TAG; }
   bool notFree() const { return tag != FREE_TAG; }
@@ -155,6 +166,8 @@ public:
 
   bool eq(const Object* x) { return x == this; }
   bool neq(const Object* x) { return x != this; }
+
+  bool equal(const char* s) const;
 
   operator int() const {
     if (this->tag == INT_TAG) return this->int_v;

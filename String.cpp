@@ -41,6 +41,11 @@ void String::copy(String* other)
   memcpy(body(), other->body(), nChar);
 }
 
+bool String::equal(const char* s) const
+{
+  return std::strncmp(s, body(), strlen(s)) == 0;
+}
+
 String* String::next() const
 {
   return (String*) (((char*) this) + nAlloc());
@@ -67,9 +72,34 @@ void String::unmark()
   bMark = false;
 }
 
+String* String::write(std::ostream& os, int limit)
+{
+  int n = nChar;
+  if (limit >= 0 && limit < n)
+    n = limit;
+  os.write(body(), n);
+  if (nChar > n)
+    os.write("...", 3);
+  return this;
+}
+
 bool String::isMarked() const
 {
   return (bool) bMark;
+}
+
+int String::hash(int mod) const
+{
+  return hash(mod, body(), nChar);
+}
+
+int String::hash(int mod, const char* s, int n)
+{
+  int prod = 1;
+  for (int i = 0; i < n; ++i) {
+    prod = (prod * (int) *s++) % mod;
+  }
+  return prod;
 }
 
 // ----------------------------------------------------------
