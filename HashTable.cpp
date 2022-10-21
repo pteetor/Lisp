@@ -25,6 +25,9 @@ HashTable::~HashTable()
   delete table;
 }
 
+//
+// Returns an anchor to a string
+//
 Object* HashTable::get(const char* s)
 {
   int i = String::hash(nBuckets, s, strlen(s));
@@ -36,8 +39,8 @@ Object* HashTable::get(const char* s)
     list = list->cdr();
   }
 
-  Object *p = heap.alloc(String::alloc(s));
-  table[i] = heap.alloc(p, table[i]);
+  Object *p = heap.makeAnchor(s);
+  table[i] = heap.cons(p, table[i]);
   return p;
 }
 

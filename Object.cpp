@@ -29,21 +29,31 @@ void Object::checkTag(Tag t) {
 
 bool Object::equal(const char* s) const
 {
-  assert(tag == STRING_TAG);
-  return pstring->equal(s);
+  switch (tag) {
+  case ANCHOR_TAG:
+    return pstring->equal(s);
+  case STRING_TAG:
+  case SYMBOL_TAG:
+    return panchor->pstring->equal(s);
+  default:
+    return false;
+  }
 }
 
 Object* Object::set(String* p)
 {
-  tag = STRING_TAG;
+  tag = ANCHOR_TAG;
   pstring = p;
   return this;
 }
 
-Object* Object::set(Object* s)
+Object* Object::set(Tag t, Object* s)
 {
-  tag = SYMBOL_TAG;
-  pname = s;
+  assert(t == STRING_TAG || t == SYMBOL_TAG);
+  assert(s->tag == ANCHOR_TAG);
+  
+  tag = t;
+  panchor = s;
   return this;
 }
 
@@ -54,10 +64,12 @@ Object* Object::set(Object *a, Object *d)
 }
 
 void Object::mark() {
-  if (tag == STRING_TAG)
+  if (tag == ANCHOR_TAG)
     pstring->mark();
+  if (tag == STRING_TAG)
+    panchor->mark();
   else if (tag == SYMBOL_TAG)
-    pname->mark();
+    panchor->mark();
   tag = tag | MARK_BIT;
 }
 
@@ -71,30 +83,28 @@ void Object::unmark() {
 
 void printAtom(const Object *ap, ostream& os) {  
   switch (ap->tag) {
-    case NIL_TAG:
-      os << "()";
-      break;
-    case BOOL_TAG:
-      os << (ap->bool_v ? "*T*" : "*F*");
-      break;
-    case CHAR_TAG:
-      os << ap->char_v;
-      break;
-    case INT_TAG:
-      os << ap->int_v;
-      break;
-    case DOUBLE_TAG:
-      os << ap->double_v;
-      break;
-    case STRING_TAG:
-      os << *(ap->pstring);
-      break;
-    case SYMBOL_TAG:
-      os << *(ap->pname);
-      break;
-    default:
-      os << "???";
-      break;
+  case NIL_TAG:
+    os << "()";
+    break;
+  case BOOL_TAG:
+    os << (ap->bool_v ? "*T*" : "*F*");
+    break;
+  case CHAR_TAG:
+    os << ap->char_v;
+    break;
+  case INT_TAG:
+    os << ap->int_v;
+    break;
+  case DOUBLE_TAG:
+    os << ap->double_v;
+    break;
+  case STRING_TAG:
+  case SYMBOL_TAG:
+    os << *(ap->panchor->pstring);
+    break;
+  default:
+    os << "???";
+    break;
   }
 }
 
@@ -139,13 +149,11 @@ void Object::dump()
     cout << "atom: " << tagName(pureTag()) << " (" << pureTag() << ") ";
     switch (pureTag()) {
     case STRING_TAG:
-      cout << "len " << pstring->nChar << " ";;
-      cout << "<";
-      pstring->write(cout, 13);
-      cout << ">";
-      break;
     case SYMBOL_TAG:
-      cout << *(pname->pstring);
+      cout << "len " << panchor->pstring->nChar << " ";;
+      cout << "<";
+      panchor->pstring->write(cout, 13);
+      cout << ">";
       break;
     }
   } else {
@@ -166,6 +174,7 @@ const char* tagName(const Tag t)
   case CHAR_TAG: return "char";
   case INT_TAG: return "int";
   case DOUBLE_TAG: return "dbl";
+  case ANCHOR_TAG: return "anch";
   case STRING_TAG: return "str";
   case SYMBOL_TAG: return "sym";
   default: return "???";

@@ -87,8 +87,9 @@ typedef enum {
   CHAR_TAG = 6,
   INT_TAG = 8,
   DOUBLE_TAG = 10,
-  STRING_TAG = 12,
-  SYMBOL_TAG = 14
+  ANCHOR_TAG = 12,  // Pointer into string space
+  STRING_TAG = 14,
+  SYMBOL_TAG = 16
 } TagValue;
 
 const long int MAX_TAG = (int) SYMBOL_TAG;
@@ -111,9 +112,9 @@ class Object {
 	bool bool_v;
 	char char_v;
 	long int int_v;          /* 8 bytes */
-	double double_v;
-	String *pstring;         /* 8 bytes */
-	Object *pname;           /* For symbols, print name */
+	double double_v;         /* 8 bytes */
+	Object *panchor;         /* Pointer to anchor for string */
+	String *pstring;         /* Pointer into string space - 8 bytes */
       };
     };
   };
@@ -140,8 +141,8 @@ public:
   Object* set(char c) { tag = CHAR_TAG; char_v = c; return this; }
   Object* set(int i) { tag = INT_TAG; int_v = i; return this; }
   Object* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
-  Object* set(String* p);
-  Object* set(Object* s);                // Print-name of symbol
+  Object* set(String* p);                // Anchor pointer into string space
+  Object* set(Tag t, Object* anchor);    // String or symbol
   Object* set(Object *a, Object *d);     // Cons cell
 
   bool isFree() const { return tag == FREE_TAG; }

@@ -126,16 +126,15 @@ Object* Heap::alloc(char c) { return alloc()->set(c); }
 Object* Heap::alloc(int i) { return alloc()->set(i); }
 Object* Heap::alloc(double d) { return alloc()->set(d); }
 
-// Allocate string object
 Object* Heap::alloc(String* s)
 {
   return alloc()->set(s);
 }
 
-// Allocate symbol object
-Object* Heap::alloc(Object* pname)
+// Allocate string or symbol object
+Object* Heap::alloc(Tag t, Object* s)
 {
-  return alloc()->set(pname);
+  return alloc()->set(t, s);
 }
 
 Object* Heap::cons(Object* a, Object* d) { return alloc()->set(a, d); }
@@ -177,16 +176,22 @@ Object* Heap::makeList(Object* a, Object* b, Object* c)
   return cons(a, cons(b, cons(c, nil())));
 }
 
+Object* Heap::makeAnchor(const char* s)
+{
+  String* sp = strings->alloc(s);
+  Object* ap = alloc(sp);
+  sp->set(ap);
+  return ap;
+}
+
 Object* Heap::makeString(const char* s)
 {
-  auto sp = strings->alloc(s);
-  auto op = alloc(sp);
-  sp->set(op);
-  return op;
+  auto ap = makeAnchor(s);
+  return alloc(STRING_TAG, ap);
 }
 
 Object* Heap::makeSymbol(const char* s)
 {
-  auto strobj = makeString(s);
-  return alloc(strobj);
+  auto ap = makeAnchor(s);
+  return alloc(SYMBOL_TAG, ap);
 }
