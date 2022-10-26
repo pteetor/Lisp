@@ -12,3 +12,4 @@ test-Object
 test-sizes
 test-gc
 test-functions
+test-Dict

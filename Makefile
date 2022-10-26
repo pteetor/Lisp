@@ -8,7 +8,9 @@
 CPPFLAGS = -g
 
 APPS = repl
-TESTS = test-String test-Object test-Heap test-Tokenizer test-Reader test-gc
+TESTS = test-String test-Object test-Heap test-Tokenizer test-Reader test-gc test-Dict
+
+HEAP_OBJ = Heap.o Object.o String.o
 
 apps: $(APPS)
 
@@ -33,6 +35,8 @@ Tokenizer.o: Tokenizer.cpp Tokenizer.h
 Reader.o: Reader.cpp Reader.h Tokenizer.h Heap.h Object.h
 
 String.o: String.cpp globals.h Object.h Heap.h
+
+Dict.o: Dict.cpp Dict.h Heap.h Object.h globals.h
 
 functions.o: functions.cpp functions.h Object.h Heap.h
 
@@ -84,3 +88,6 @@ test-functions: test-functions.o String.o Heap.o Object.o functions.o
 	g++ -g -o $@ $^
 
 test-functions.o: test-functions.cpp functions.h Object.h Heap.h
+
+test-Dict: test-Dict.o Dict.o $(HEAP_OBJ) functions.o
+	g++ -g -o $@ $^
