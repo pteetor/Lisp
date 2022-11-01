@@ -30,11 +30,11 @@ void Object::checkTag(Tag t) {
 bool Object::equal(const char* s) const
 {
   switch (tag) {
-  case ANCHOR_TAG:
-    return pstring->equal(s);
   case STRING_TAG:
+    return pstring->equal(s);
   case SYMBOL_TAG:
-    return panchor->pstring->equal(s);
+    // TODO: Find print-name; compare to s
+    return false;
   default:
     return false;
   }
@@ -42,35 +42,33 @@ bool Object::equal(const char* s) const
 
 Object* Object::set(String* p)
 {
-  tag = ANCHOR_TAG;
+  tag = STRING_TAG;
   pstring = p;
   return this;
 }
 
-Object* Object::set(Tag t, Object* s)
+Object* Object::set(Object* p)
 {
-  assert(t == STRING_TAG || t == SYMBOL_TAG);
-  assert(s->tag == ANCHOR_TAG);
-  
-  tag = t;
-  panchor = s;
+  tag = SYMBOL_TAG;
+  plist = p;
   return this;
 }
 
 Object* Object::set(Object *a, Object *d)
 {
-  car_p = a; cdr_p = d;
+  car_p = a;
+  cdr_p = d;
   return this;
 }
 
 void Object::mark() {
-  if (tag == ANCHOR_TAG)
-    pstring->mark();
-  if (tag == STRING_TAG)
-    panchor->mark();
-  else if (tag == SYMBOL_TAG)
-    panchor->mark();
+  Tag t = tag;
   tag = tag | MARK_BIT;
+  if (t == STRING_TAG)
+    pstring->mark();
+  else if (t == SYMBOL_TAG) {
+    plist->mark();
+  }
 }
 
 void Object::unmark() {
@@ -99,8 +97,10 @@ void printAtom(const Object *ap, ostream& os) {
     os << ap->double_v;
     break;
   case STRING_TAG:
+    os << *(ap->pstring);
+    break;
   case SYMBOL_TAG:
-    os << *(ap->panchor->pstring);
+    os << "[symbol]";   // TODO - find and print print-name property
     break;
   default:
     os << "???";
@@ -149,11 +149,13 @@ void Object::dump()
     cout << "atom: " << tagName(pureTag()) << " (" << pureTag() << ") ";
     switch (pureTag()) {
     case STRING_TAG:
-    case SYMBOL_TAG:
-      cout << "len " << panchor->pstring->nChar << " ";;
+      cout << "len " << pstring->nChar << " ";;
       cout << "<";
-      panchor->pstring->write(cout, 13);
+      pstring->write(cout, 13);
       cout << ">";
+      break;
+    case SYMBOL_TAG:
+      // TODO: Print print-name property (or "[unnamed]" if none)
       break;
     }
   } else {
@@ -174,7 +176,6 @@ const char* tagName(const Tag t)
   case CHAR_TAG: return "char";
   case INT_TAG: return "int";
   case DOUBLE_TAG: return "dbl";
-  case ANCHOR_TAG: return "anch";
   case STRING_TAG: return "str";
   case SYMBOL_TAG: return "sym";
   default: return "???";

@@ -21,7 +21,7 @@ all: $(APPS) $(TESTS)
 #
 # detailed rules
 #
-repl: repl.o Object.o Heap.o String.o Reader.o Tokenizer.o functions.o
+repl: repl.o $(HEAP_OBJ) Reader.o Tokenizer.o functions.o
 	g++ -g -o $@ $^
 
 repl.o: repl.cpp Heap.h Object.h Reader.h Tokenizer.h

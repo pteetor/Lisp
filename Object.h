@@ -87,9 +87,8 @@ typedef enum {
   CHAR_TAG = 6,
   INT_TAG = 8,
   DOUBLE_TAG = 10,
-  ANCHOR_TAG = 12,  // Pointer into string space
-  STRING_TAG = 14,
-  SYMBOL_TAG = 16
+  STRING_TAG = 12,
+  SYMBOL_TAG = 14
 } TagValue;
 
 const long int MAX_TAG = (int) SYMBOL_TAG;
@@ -100,6 +99,7 @@ const char* tagName(Tag t);
 
 // ----------------------------------------------------------
 
+// Note: LSB of 'tag field is used as the mark bit.
 class Object {
   union {
     struct {
@@ -113,8 +113,8 @@ class Object {
 	char char_v;
 	long int int_v;          /* 8 bytes */
 	double double_v;         /* 8 bytes */
-	Object *panchor;         /* Pointer to anchor for string */
 	String *pstring;         /* Pointer into string space - 8 bytes */
+	Object* plist;           /* Property list of symbol */
       };
     };
   };
@@ -141,14 +141,14 @@ public:
   Object* set(char c) { tag = CHAR_TAG; char_v = c; return this; }
   Object* set(int i) { tag = INT_TAG; int_v = i; return this; }
   Object* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
-  Object* set(String* p);                // Anchor pointer into string space
-  Object* set(Tag t, Object* anchor);    // String or symbol
+  Object* set(String* p);                // String with pointer into string space
+  Object* set(Object* p);                // Symbol with property list
   Object* set(Object *a, Object *d);     // Cons cell
 
   bool isFree() const { return tag == FREE_TAG; }
   bool notFree() const { return tag != FREE_TAG; }
 
-  // Common Lisp predicated
+  // Common Lisp predicates
   bool null() const { return tag == NIL_TAG; }
   bool symbolp() const { return tag == SYMBOL_TAG; }
   bool atom() const { return tag <= MAX_TAG; }
@@ -199,8 +199,9 @@ public:
   friend Object *linkString(Object*, String*);
   friend Object *linkSymbol(Object*, String*);
 
-  friend Object *makeString(const char*);
-  friend Object *makeSymbol(const char*);
+  // OBSOLETE - see Heap
+  // friend Object *makeString(const char*);
+  // friend Object *makeSymbol(const char*);
 
   friend void printAtom(const Object* ap, ostream& os);
   friend void print(const Object* c, ostream& os);

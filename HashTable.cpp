@@ -26,7 +26,7 @@ HashTable::~HashTable()
 }
 
 //
-// Returns an anchor to a string
+// Returns an string object
 //
 Object* HashTable::get(const char* s)
 {
@@ -39,7 +39,7 @@ Object* HashTable::get(const char* s)
     list = list->cdr();
   }
 
-  Object *p = heap.makeAnchor(s);
+  Object *p = heap.makeString(s);
   table[i] = heap.cons(p, table[i]);
   return p;
 }

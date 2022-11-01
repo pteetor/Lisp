@@ -131,13 +131,16 @@ Object* Heap::alloc(String* s)
   return alloc()->set(s);
 }
 
-// Allocate string or symbol object
-Object* Heap::alloc(Tag t, Object* s)
+// Allocate symbol object, with initial property list
+Object* Heap::alloc(Object* p)
 {
-  return alloc()->set(t, s);
+  return alloc()->set(p);
 }
 
-Object* Heap::cons(Object* a, Object* d) { return alloc()->set(a, d); }
+Object* Heap::cons(Object* a, Object* d)
+{
+  return alloc()->set(a, d);
+}
 
 void Heap::dump()
 {
@@ -176,22 +179,20 @@ Object* Heap::makeList(Object* a, Object* b, Object* c)
   return cons(a, cons(b, cons(c, nil())));
 }
 
-Object* Heap::makeAnchor(const char* s)
-{
-  String* sp = strings->alloc(s);
-  Object* ap = alloc(sp);
-  sp->set(ap);
-  return ap;
-}
-
 Object* Heap::makeString(const char* s)
 {
-  auto ap = makeAnchor(s);
-  return alloc(STRING_TAG, ap);
+  String* sp = strings->alloc(s);
+  Object* op = alloc(sp);
+  sp->set(op);
+  return op;
 }
 
 Object* Heap::makeSymbol(const char* s)
 {
-  auto ap = makeAnchor(s);
-  return alloc(SYMBOL_TAG, ap);
+  // TODO: Allocate string for print-name;
+  // create minimal prop. list with print-name;
+  // point new symbol to prop. list
+
+  Object* plist = nil();                // placeholder
+  return alloc(plist);
 }

@@ -50,8 +50,8 @@ public:
   Object* alloc(char c);
   Object* alloc(int i);
   Object* alloc(double d);
-  Object* alloc(String* s);                   // Create string anchor
-  Object* alloc(Tag t, Object* anchor);       // New string or symbol
+  Object* alloc(String* s);       // New string
+  Object* alloc(Object* p);       // New symbol, with prop. list
 
   Object* cons(Object* a, Object* d);
 
@@ -62,7 +62,6 @@ public:
   
   void dump();
 
-  Object* makeAnchor(const char*);
   Object* makeString(const char*);
   Object* makeSymbol(const char*);
 
