@@ -2,10 +2,6 @@
 // Heap management for Lisp
 //
 
-using namespace std;
-
-// ----------------------------------------------------------
-
 class HashTable {
   Heap &heap;
   int nBuckets;
@@ -21,7 +17,7 @@ public:
 };
 
 //
-// Heap of cells
+// Heap of Objects
 //
 // heap[0] is reserved for nil
 //
@@ -30,8 +26,8 @@ class Heap {
   int nFree;
   Object *heap;
   StringSpace* strings;
-  Object *pProtected;   // List of protected cells
-  Object *pFree;
+  Object *pProtected;   // List of protected spaces
+  Object *pFree;        // List of free spaces
 
   Object* alloc();
   void free(Object* p);
