@@ -13,3 +13,4 @@ test-sizes
 test-gc
 test-functions
 test-Dict
+test-HashTable

@@ -14,7 +14,7 @@
 HashTable::HashTable(Heap &h, int n) : heap(h)
 {
   nBuckets = n;
-  table = new Object[n];
+  table = new Object*[n];
   for (int i = 0; i < n; ++i) {
     table[i] = heap.nil();
   }
@@ -33,7 +33,7 @@ Object* HashTable::get(const char* s)
   int i = String::hash(nBuckets, s, strlen(s));
   Object* list = table[i];
 
-  while (list.nonNull()) {
+  while (list->nonNull()) {
     if (list->car()->equal(s))
       return list->car();
     list = list->cdr();

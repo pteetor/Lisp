@@ -5,13 +5,14 @@
 class HashTable {
   Heap &heap;
   int nBuckets;
-  Object* table;
+  Object** table;
 
 public:
-  HashTable(int n);
+  HashTable(Heap&, int);
   ~HashTable();
 
   Object* get(const char* p);
+  void sweep();
 
   // LATER: Object* get(String* s);
 };
