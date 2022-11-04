@@ -1,5 +1,5 @@
 //
-// Unit test for HashTable object
+// Unit test for StringFinder object
 //
 #include <cassert>
 
@@ -13,19 +13,18 @@ int main()
 {
   StringSpace sSpace(1000);
   Heap heap(1000, &sSpace);
-  HashTable hash(heap, 16);
 
-  Object* hello_1 = hash.get("hello");
+  Object* hello_1 = heap.makeString("hello");
   assert(hello_1->eq(hello_1));
 
   cout << "hello_1: " << std::hex << hello_1 << endl;
   
-  Object* goodbye = hash.get("goodbye");
+  Object* goodbye = heap.makeString("goodbye");
   assert(goodbye->neq(hello_1));
 
   cout << "goodbye: " << std::hex << goodbye << endl;
   
-  Object* hello_2 = hash.get("hello");
+  Object* hello_2 = heap.makeString("hello");
   assert(hello_2->eq(hello_1));
 
   cout << "hello_2: " << std::hex << hello_2 << endl;

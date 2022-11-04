@@ -11,25 +11,34 @@
 // Heap - private methods
 //
 
-Heap::Heap(int n, StringSpace *ss) {
-  nObjects = n;
-  heap = new Object[n];
+Heap::Heap(int nObj, StringSpace *ss, int nBuck) {
+  nObjects = nObj;
   strings = ss;
+  nBuckets = nBuck;
+
+  heap = new Object[nObjects];
+  hashTable = new Object*[nBuckets];
 
   heap[0].setNil(); 
   pFree = nil();
   nFree = 0;
 
   // Careful here: Don't 'free' the nil cell
-  while (--n > 0) {
-    free(&heap[n]);
+  while (--nObj > 0) {
+    free(&heap[nObj]);
   }
 
   pProtected = nil();
+
+  // Initialize the hash table
+  for (int i = 0; i < nBuckets; ++i) {
+    hashTable[i] = nil();
+  }
 }
 
 Heap::~Heap() {
   delete heap;
+  delete hashTable;
 }
 
 Object* Heap::alloc() {
@@ -179,11 +188,24 @@ Object* Heap::makeList(Object* a, Object* b, Object* c)
   return cons(a, cons(b, cons(c, nil())));
 }
 
+//
+// Returns an Object of type string
+//
 Object* Heap::makeString(const char* s)
 {
+  int i = String::hash(nBuckets, s, strlen(s));
+  Object* list = hashTable[i];
+
+  while (list->nonNull()) {
+    if (list->car()->equal(s))
+      return list->car();
+    list = list->cdr();
+  }
+
   String* sp = strings->alloc(s);
   Object* op = alloc(sp);
   sp->set(op);
+  hashTable[i] = cons(op, hashTable[i]);
   return op;
 }
 

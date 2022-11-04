@@ -1,17 +1,17 @@
 //
-// HashTable implementation
+// StringFinder implementation
 //
 // PROBLEM: This index-table-of-Objects design
 // does not easily accomodate sharing Strings
 // between string objects and symbol objects.
 //
-// E.g., should get(s) return a string object
+// E.g., should find(s) return a string object
 // or a symbol object? What should be in 'table'?
 
 #include "Object.h"
 #include "Heap.h"
 
-HashTable::HashTable(Heap &h, int n) : heap(h)
+StringFinder::StringFinder(Heap &h, int n) : heap(h)
 {
   nBuckets = n;
   table = new Object*[n];
@@ -20,15 +20,15 @@ HashTable::HashTable(Heap &h, int n) : heap(h)
   }
 }
 
-HashTable::~HashTable()
+StringFinder::~StringFinder()
 {
   delete table;
 }
 
 //
-// Returns an string object
+// Returns an Object of type string
 //
-Object* HashTable::get(const char* s)
+Object* StringFinder::find(const char* s)
 {
   int i = String::hash(nBuckets, s, strlen(s));
   Object* list = table[i];
@@ -44,7 +44,7 @@ Object* HashTable::get(const char* s)
   return p;
 }
 
-void HashTable::sweep()
+void StringFinder::sweep()
 {
   // TODO: Sweep through the buckets, eliding unmarked objects
 }

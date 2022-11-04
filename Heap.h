@@ -2,21 +2,6 @@
 // Heap management for Lisp
 //
 
-class HashTable {
-  Heap &heap;
-  int nBuckets;
-  Object** table;
-
-public:
-  HashTable(Heap&, int);
-  ~HashTable();
-
-  Object* get(const char* p);
-  void sweep();
-
-  // LATER: Object* get(String* s);
-};
-
 //
 // Heap of Objects
 //
@@ -30,6 +15,9 @@ class Heap {
   Object *pProtected;   // List of protected spaces
   Object *pFree;        // List of free spaces
 
+  int nBuckets;
+  Object** hashTable;
+
   Object* alloc();
   void free(Object* p);
   void mark();
@@ -37,7 +25,7 @@ class Heap {
   void sweep();
   
 public:
-  Heap(int n, StringSpace* strings);
+  Heap(int nObj, StringSpace* strings, int nBuck = 1024);
   ~Heap();
 
   int nFreeObjects() { return nFree; }

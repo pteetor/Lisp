@@ -8,9 +8,9 @@
 CPPFLAGS = -g
 
 APPS = repl
-TESTS = test-String test-Object test-Heap test-Tokenizer test-Reader test-gc test-Dict test-HashTable
+TESTS = test-String test-Object test-Heap test-Tokenizer test-Reader test-gc test-Dict test-StringFinder
 
-HEAP_OBJ = Heap.o Object.o HashTable.o String.o
+HEAP_OBJ = Heap.o Object.o String.o
 
 apps: $(APPS)
 
@@ -39,8 +39,6 @@ String.o: String.cpp globals.h Object.h Heap.h
 Dict.o: Dict.cpp Dict.h Heap.h Object.h globals.h
 
 functions.o: functions.cpp functions.h Object.h Heap.h
-
-HashTable.o: HashTable.cpp Heap.h Object.h
 
 #
 # utility
@@ -94,5 +92,7 @@ test-functions.o: test-functions.cpp functions.h Object.h Heap.h
 test-Dict: test-Dict.o Dict.o $(HEAP_OBJ) functions.o
 	g++ -g -o $@ $^
 
-test-HashTable: test-HashTable.o $(HEAP_OBJ) functions.o
+test-StringFinder: test-StringFinder.o $(HEAP_OBJ) functions.o
 	g++ -g -o $@ $^
+
+test-StringFinder.o: test-StringFinder.cpp $(HEAP_OBJ)
