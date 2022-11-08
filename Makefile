@@ -10,7 +10,9 @@ CPPFLAGS = -g
 APPS = repl
 TESTS = test-String test-Object test-Heap test-Tokenizer test-Reader test-gc test-Dict test-StringFinder
 
-HEAP_OBJ = Heap.o Object.o String.o
+HEAP_HDR = Heap.h ObjPool.h Object.h StringFinder.h
+
+HEAP_OBJ = Heap.o ObjPool.o Object.o StringFinder.o String.o Dict.o
 
 apps: $(APPS)
 
@@ -24,11 +26,11 @@ all: $(APPS) $(TESTS)
 repl: repl.o $(HEAP_OBJ) Reader.o Tokenizer.o functions.o
 	g++ -g -o $@ $^
 
-repl.o: repl.cpp Heap.h Object.h Reader.h Tokenizer.h
+repl.o: repl.cpp $(HEAP_HDR) Reader.h Tokenizer.h
 
-Object.o: Object.cpp Heap.h Object.h
+Object.o: Object.cpp $(HEAP_HDR)
 
-Heap.o: Heap.cpp Heap.h Object.h
+Heap.o: Heap.cpp $(HEAP_HDR)
 
 Tokenizer.o: Tokenizer.cpp Tokenizer.h
 
@@ -39,6 +41,10 @@ String.o: String.cpp globals.h Object.h Heap.h
 Dict.o: Dict.cpp Dict.h Heap.h Object.h globals.h
 
 functions.o: functions.cpp functions.h Object.h Heap.h
+
+ObjPool.o: ObjPool.cpp ObjPool.h Object.h
+
+StringFinder.o: StringFinder.cpp $(HEAP_HDR)
 
 #
 # utility

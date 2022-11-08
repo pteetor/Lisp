@@ -4,6 +4,9 @@
 
 #include "globals.h"
 #include "Object.h"
+#include "ObjPool.h"
+#include "StringFinder.h"
+#include "Dict.h"
 #include "Heap.h"
 #include "functions.h"
 

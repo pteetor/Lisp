@@ -3,7 +3,11 @@
 //
 #include <iostream>
 
+#include "globals.h"
 #include "Object.h"
+#include "ObjPool.h"
+#include "StringFinder.h"
+#include "Dict.h"
 #include "Heap.h"
 #include "functions.h"
 
@@ -11,55 +15,16 @@
 // Heap - private methods
 //
 
-Heap::Heap(int nObj, StringSpace *ss, int nBuck) {
-  nObjects = nObj;
-  strings = ss;
-  nBuckets = nBuck;
-
-  heap = new Object[nObjects];
-  hashTable = new Object*[nBuckets];
-
-  heap[0].setNil(); 
-  pFree = nil();
-  nFree = 0;
-
-  // Careful here: Don't 'free' the nil cell
-  while (--nObj > 0) {
-    free(&heap[nObj]);
-  }
-
-  pProtected = nil();
-
-  // Initialize the hash table
-  for (int i = 0; i < nBuckets; ++i) {
-    hashTable[i] = nil();
-  }
+// STOPPED EDITING HERE
+Heap::Heap(ObjPool* op, StringFinder *sf) : dict(op) {
+  obj = op;
+  finder = sf;
+  
+  pProtected = obj->nil();
 }
 
 Heap::~Heap() {
-  delete heap;
-  delete hashTable;
-}
-
-Object* Heap::alloc() {
-  if (pFree->eq(nil())) throw std::bad_alloc();
-
-  // Double-check:
-  if (nFree == 0) throw std::bad_alloc();
-
-  auto p = pFree;
-  pFree = pFree->cdr();
-
-  nFree--;
-  return p;
-}
-
-void Heap::free(Object* p)
-{
-  p->setFree();
-  p->replacd(pFree);
-  pFree = p;
-  ++nFree;
+  ;   // nop
 }
 
 void Heap::protect(Object* p)
@@ -116,60 +81,42 @@ void Heap::mark(Object* p)
   p->mark();
 }
 
-// Free all unmarked cells
-void Heap::sweep() {
-  for (int i = 0; i < nObjects; ++i) {
-    if (heap[i].isMarked())
-      heap[i].unmark();
-    else if (heap[i].notFree())
-      free(&heap[i]);
-  }
-}
-
 //
 // Heap - public methods
 //
 
-Object* Heap::alloc(bool b) { return alloc()->set(b); }
-Object* Heap::alloc(char c) { return alloc()->set(c); }
-Object* Heap::alloc(int i) { return alloc()->set(i); }
-Object* Heap::alloc(double d) { return alloc()->set(d); }
+Object* Heap::alloc(bool b) { return obj->alloc(b); }
+Object* Heap::alloc(char c) { return obj->alloc(c); }
+Object* Heap::alloc(int i) { return obj->alloc(i); }
+Object* Heap::alloc(double d) { return obj->alloc(d); }
 
 Object* Heap::alloc(String* s)
 {
-  return alloc()->set(s);
+  return obj->alloc(s);
 }
 
 // Allocate symbol object, with initial property list
 Object* Heap::alloc(Object* p)
 {
-  return alloc()->set(p);
+  return obj->alloc(p);
 }
 
 Object* Heap::cons(Object* a, Object* d)
 {
-  return alloc()->set(a, d);
+  return obj->cons(a, d);
 }
 
 void Heap::dump()
 {
-    cout << "--- start heap ---" << endl;
-    cout << "nObjects = " << nObjects << endl;
-    cout << "nFree = " << nFree << endl;
-    cout << "pFree = " << std::hex << (long int) pFree << endl << std::dec;
-    cout << "pProtected = " << std::hex << (long int) pProtected << endl << std::dec;
-    for (int i = 0; i < nObjects; ++i) {
-      if (heap[i].notFree())
-	heap[i].dump();
-    }
-    cout << "--- end   heap ---" << endl;
+  obj->dump();
+  // TODO: dump strings, maybe dump symbol table
 }
 
 void Heap::gc()
 {
   mark();
   // TODO: Sweep the hash table buckets, removing unmarked strings
-  sweep();
+  obj->sweep();
   // TODO: Compactify string space, removing marks
 }
 
@@ -193,28 +140,20 @@ Object* Heap::makeList(Object* a, Object* b, Object* c)
 //
 Object* Heap::makeString(const char* s)
 {
-  int i = String::hash(nBuckets, s, strlen(s));
-  Object* list = hashTable[i];
-
-  while (list->nonNull()) {
-    if (list->car()->equal(s))
-      return list->car();
-    list = list->cdr();
-  }
-
-  String* sp = strings->alloc(s);
-  Object* op = alloc(sp);
-  sp->set(op);
-  hashTable[i] = cons(op, hashTable[i]);
-  return op;
+  return finder->find(s);
 }
 
 Object* Heap::makeSymbol(const char* s)
 {
-  // TODO: Allocate string for print-name;
-  // create minimal prop. list with print-name;
-  // point new symbol to prop. list
+  Object* pname = makeString(s);
+  Object* symbol = dict.lookup(pname);
+  if (symbol->null()) {
+    // create minimal property list with PNAME
+    Object* plist = makeList(cons(makeString("PNAME"), pname));
+    symbol = alloc(plist);
 
-  Object* plist = nil();                // placeholder
-  return alloc(plist);
+    // Link symbol name to symbol object
+    dict.insert(pname, symbol);
+  }
+  return symbol;
 }

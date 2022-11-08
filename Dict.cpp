@@ -6,12 +6,14 @@
 //
 #include "globals.h"
 #include "Object.h"
-#include "Heap.h"
+#include "ObjPool.h"
+#include "StringFinder.h"
 #include "Dict.h"
+#include "Heap.h"
 
-Dict::Dict(Heap& h): heap(h)
+Dict::Dict(ObjPool* op) : obj(op)
 {
-  root = h.nil();
+  root = obj->nil();
 }
 
 Object* Dict::find(Object* k)
@@ -23,13 +25,13 @@ Object* Dict::find(Object* k)
 	return p;
       p = next(p);
     }
-  return heap.nil();
+  return obj->nil();
 }
 
 void Dict::insert(Object* k, Object* v)
 {
-  Object* node = heap.cons(k, v);
-  root = heap.cons(node, root);
+  Object* node = obj->cons(k, v);
+  root = obj->cons(node, root);
 }
 
 Object* Dict::key(Object* node)
@@ -40,7 +42,7 @@ Object* Dict::key(Object* node)
 Object* Dict::lookup(Object* k)
 {
   Object* p = find(k);
-  return (p->nonNull() ? value(p) : heap.nil());
+  return (p->nonNull() ? value(p) : obj->nil());
 }
 
 Object* Dict::next(Object* node)

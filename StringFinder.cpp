@@ -7,16 +7,21 @@
 //
 // E.g., should find(s) return a string object
 // or a symbol object? What should be in 'table'?
-
+//
+#include "globals.h"
 #include "Object.h"
-#include "Heap.h"
+#include "ObjPool.h"
+#include "StringFinder.h"
 
-StringFinder::StringFinder(Heap &h, int n) : heap(h)
+StringFinder::StringFinder(ObjPool* op, StringSpace* ss, int n)
 {
   nBuckets = n;
+  obj = op;
+  strings = ss;
+  
   table = new Object*[n];
   for (int i = 0; i < n; ++i) {
-    table[i] = heap.nil();
+    table[i] = obj->nil();
   }
 }
 
@@ -39,12 +44,16 @@ Object* StringFinder::find(const char* s)
     list = list->cdr();
   }
 
-  Object *p = heap.makeString(s);
-  table[i] = heap.cons(p, table[i]);
-  return p;
+  String *sp = strings->alloc(s);
+  Object *op = obj->alloc(sp);
+  sp->set(op);
+  
+  table[i] = obj->cons(op, table[i]);
+  return op;
 }
 
 void StringFinder::sweep()
 {
-  // TODO: Sweep through the buckets, eliding unmarked objects
+  // TODO: Sweep through the buckets, eliding the ones
+  // which contain unmarked strings
 }

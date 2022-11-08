@@ -2,7 +2,7 @@
 // Dict - dictionary object class
 //
 class Dict {
-  Heap& heap;
+  ObjPool* obj;
   Object* root;
 
   static Object* key(Object* node);
@@ -13,7 +13,7 @@ class Dict {
   Object* find(Object* k);
   
  public:
-  Dict(Heap& h);
+  Dict(ObjPool* op);
 
   Object* lookup(Object* k);
   void insert(Object* k, Object* v);

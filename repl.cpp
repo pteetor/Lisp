@@ -5,7 +5,11 @@
 #include <iostream>
 #include <sstream>
 
+#include "globals.h"
 #include "Object.h"
+#include "ObjPool.h"
+#include "StringFinder.h"
+#include "Dict.h"
 #include "Heap.h"
 #include "Tokenizer.h"
 #include "Reader.h"
@@ -17,8 +21,10 @@ int main()
   std::stringstream theStream(theInput);
   Tokenizer tkz(theStream);
 
+  ObjPool obj(1000);
   StringSpace ss(1000);
-  Heap aHeap(1000, &ss);
+  StringFinder sf(&obj, &ss);
+  Heap aHeap(&obj, &sf);
   Reader rdr(tkz, aHeap);
 
   Interp interp;

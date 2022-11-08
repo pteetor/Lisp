@@ -10,6 +10,8 @@
 #include <ostream>
 
 class Object;
+class ObjPool;
 class String;
 class StringSpace;
+class Dict;
 class Heap;
