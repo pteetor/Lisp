@@ -102,3 +102,8 @@ test-StringFinder: test-StringFinder.o $(HEAP_OBJ) functions.o
 	g++ -g -o $@ $^
 
 test-StringFinder.o: test-StringFinder.cpp $(HEAP_OBJ)
+
+test-symbol: test-symbol.o $(HEAP_OBJ) functions.o
+	g++ -g -o $@ $^
+
+test-symbol.o: test-symbol.cpp $(HEAP_HDR)
