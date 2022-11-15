@@ -6,6 +6,10 @@
 #include <ostream>
 
 #include "Object.h"
+#include "ObjPool.h"
+#include "StringFinder.h"
+#include "Dict.h"
+#include "Heap.h"
 
 //
 // Object - constructors
@@ -14,7 +18,7 @@
 // None
 
 //
-// Object - private methods
+// Methods
 //
 
 void Object::checkTag(Tag t) {
@@ -23,9 +27,31 @@ void Object::checkTag(Tag t) {
   };
 }
 
-//
-// Object - public methods
-//
+void Object::dump()
+{
+  int nUse;
+  
+  cout << "[ " << std::hex << this << " ]"
+       << "  mark bit: " << markBit() << endl << std::dec;
+  if (atom()) {
+    cout << "atom: " << tagName(pureTag()) << " (" << pureTag() << ") ";
+    switch (pureTag()) {
+    case STRING_TAG:
+      cout << "len " << pstring->nChar << " ";;
+      cout << "<";
+      pstring->write(cout, 13);
+      cout << ">";
+      break;
+    case SYMBOL_TAG:
+      // TODO: Print print-name property (or "[unnamed]" if none)
+      break;
+    }
+  } else {
+    cout << std::hex << "cons: [ " << car()
+	 << ", " << cdr() << " ]" << std::dec;
+  }
+  cout << endl;
+}
 
 bool Object::equal(const char* s) const
 {
@@ -33,11 +59,25 @@ bool Object::equal(const char* s) const
   case STRING_TAG:
     return pstring->equal(s);
   case SYMBOL_TAG:
-    // TODO: Find print-name; compare to s
+    // TODO: Find PNAME and compare to s
     return false;
   default:
     return false;
   }
+}
+
+Object* Object::get(Object* ind) const
+{
+  assert(symbolp());
+  assert(ind->stringp());
+
+  Object* p = plist;
+  while (p->nonNull()) {
+    if (p->car()->car()->eq(ind))
+      return p->car()->cdr();
+    p = p->cdr();
+  }
+  return p;  /* = nil */
 }
 
 Object* Object::set(String* p)
@@ -58,6 +98,15 @@ Object* Object::set(Object *a, Object *d)
 {
   car_p = a;
   cdr_p = d;
+  return this;
+}
+
+Object* Object::setprops(Object* pl)
+{
+  assert(symbolp());
+  assert(pl->consp());
+
+  plist = pl;
   return this;
 }
 
@@ -100,7 +149,7 @@ void printAtom(const Object *ap, ostream& os) {
     os << *(ap->pstring);
     break;
   case SYMBOL_TAG:
-    os << "[symbol]";   // TODO - find and print print-name property
+    os << *(ap->get(Heap::PNAME));
     break;
   default:
     os << "???";
@@ -139,31 +188,6 @@ ostream& operator<<(ostream& os, const Object& c) {
   return os;
 }
 
-void Object::dump()
-{
-  int nUse;
-  
-  cout << "[ " << std::hex << this << " ]"
-       << "  mark bit: " << markBit() << endl << std::dec;
-  if (atom()) {
-    cout << "atom: " << tagName(pureTag()) << " (" << pureTag() << ") ";
-    switch (pureTag()) {
-    case STRING_TAG:
-      cout << "len " << pstring->nChar << " ";;
-      cout << "<";
-      pstring->write(cout, 13);
-      cout << ">";
-      break;
-    case SYMBOL_TAG:
-      // TODO: Print print-name property (or "[unnamed]" if none)
-      break;
-    }
-  } else {
-    cout << std::hex << "cons: [ " << car()
-	 << ", " << cdr() << " ]" << std::dec;
-  }
-  cout << endl;
-}
 
 // ----------------------------------------------------------
 

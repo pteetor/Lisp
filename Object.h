@@ -99,7 +99,7 @@ const char* tagName(Tag t);
 
 // ----------------------------------------------------------
 
-// Note: LSB of 'tag field is used as the mark bit.
+// Note: LSB of 'tag' field is used as the mark bit.
 class Object {
   union {
     struct {
@@ -145,6 +145,9 @@ public:
   Object* set(Object* p);                // Symbol with property list
   Object* set(Object *a, Object *d);     // Cons cell
 
+  Object* getprops() { return plist; }
+  Object* setprops(Object* pl);
+
   bool isFree() const { return tag == FREE_TAG; }
   bool notFree() const { return tag != FREE_TAG; }
 
@@ -159,13 +162,12 @@ public:
   bool floatp() const { return tag == DOUBLE_TAG; }
   bool characterp() const { return tag == CHAR_TAG; }
   bool stringp() const { return tag == STRING_TAG; }
+  bool eq(const Object* x) { return x == this; }
 
   // Predicates I created
   bool nonNull() const { return tag != NIL_TAG; }
   bool boolp() const { return tag == BOOL_TAG; }
   bool doublep() const { return tag == DOUBLE_TAG; }
-
-  bool eq(const Object* x) { return x == this; }
   bool neq(const Object* x) { return x != this; }
 
   bool equal(const char* s) const;
@@ -182,8 +184,10 @@ public:
     throw std::bad_cast();
   }
 
+  // Common Lisp functions
   Object* car() const { return car_p; }
   Object* cdr() const { return cdr_p; }
+  Object* get(Object* ind) const;
 
   Object* replaca(Object* p) { this->car_p = p; return this; }
   Object* replacd(Object* p) { this->cdr_p = p; return this; }
@@ -196,12 +200,8 @@ public:
   long int markBit() const { return tag & MARK_BIT; }
   Tag pureTag() const { return tag & ~MARK_BIT; }
 
-  friend Object *linkString(Object*, String*);
-  friend Object *linkSymbol(Object*, String*);
-
-  // OBSOLETE - see Heap
-  // friend Object *makeString(const char*);
-  // friend Object *makeSymbol(const char*);
+  // friend Object *linkString(Object*, String*);
+  // friend Object *linkSymbol(Object*, String*);
 
   friend void printAtom(const Object* ap, ostream& os);
   friend void print(const Object* c, ostream& os);

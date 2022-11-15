@@ -7,6 +7,10 @@
 // #include "Heap.h"
 #include "functions.h"
 
+
+//
+// Constructor
+//
 ObjPool::ObjPool(int nObj) {
   nObjects = nObj;
 
@@ -65,6 +69,16 @@ void ObjPool::mark(Object* p)
 
   // Here, *p is an unmarked atom
   p->mark();
+}
+
+Object* ObjPool::setprop(Object* sym, Object* ind, Object* val)
+{
+  assert(sym->symbolp());
+  assert(ind->stringp());
+
+  Object* pair = cons(ind, val);
+  sym->setprops(cons(pair, sym->getprops()));
+  return sym;
 }
 
 // Free all unmarked cells

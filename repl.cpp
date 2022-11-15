@@ -27,7 +27,7 @@ int main()
   Heap aHeap(&obj, &sf);
   Reader rdr(tkz, aHeap);
 
-  Interp interp;
+  EchoInterp interp;
 
   Object* expr = rdr.read();
   Object* value;

@@ -44,4 +44,9 @@ public:
   Object* makeList(Object*);
   Object* makeList(Object*, Object*);
   Object* makeList(Object*, Object*, Object*);
+
+  //
+  // Global constants provided by the Heap
+  //
+  static Object* PNAME;
 };

@@ -12,15 +12,22 @@
 #include "functions.h"
 
 //
-// Heap - private methods
+// Global constants defined by Heap
+//
+Object* Heap::PNAME = NULL;
+
+//
+// Heap methods
 //
 
-// STOPPED EDITING HERE
 Heap::Heap(ObjPool* op, StringFinder *sf) : dict(op) {
   obj = op;
   finder = sf;
   
   pProtected = obj->nil();
+
+  // Populate global constants
+  PNAME = makeString("PNAME");
 }
 
 Heap::~Heap() {
@@ -149,7 +156,7 @@ Object* Heap::makeSymbol(const char* s)
   Object* symbol = dict.lookup(pname);
   if (symbol->null()) {
     // create minimal property list with PNAME
-    Object* plist = makeList(cons(makeString("PNAME"), pname));
+    Object* plist = makeList(cons(PNAME, pname));
     symbol = alloc(plist);
 
     // Link symbol name to symbol object
