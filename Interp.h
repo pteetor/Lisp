@@ -4,14 +4,18 @@
 
 class AbstInterp {
 public:
-  virtual Object* eval(Object* e);
+
+  // Evaluation an expression, where
+  //   e = expression
+  //   a = association list or dictionary
+  virtual Object* eval(Object* e, Object* a);
 };
 
 class EchoInterp {
  public:
   EchoInterp() { }
 
-  Object* eval(Object* e) { return e; }
+  Object* eval(Object* e, Object* a) { return e; }
 };
 
 class SimpleInterp {
@@ -19,5 +23,5 @@ class SimpleInterp {
 
 public:
   SimpleInterp(Heap& h);
-  Object* eval(Object* e);
+  Object* eval(Object* e, Object* a);
 };

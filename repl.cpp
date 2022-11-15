@@ -24,18 +24,18 @@ int main()
   ObjPool obj(1000);
   StringSpace ss(1000);
   StringFinder sf(&obj, &ss);
-  Heap aHeap(&obj, &sf);
-  Reader rdr(tkz, aHeap);
+  Heap heap(&obj, &sf);
+  Reader rdr(tkz, heap);
 
-  EchoInterp interp;
+  SimpleInterp interp(heap);
 
   Object* expr = rdr.read();
   Object* value;
 
   while (expr->nonNull())
     {
-      value = interp.eval(expr);  // TODO: give global dictionary; get updated dict.
-      print(expr);
+      value = interp.eval(expr, heap.nil());
+      print(value);
       cout << endl;
       expr = rdr.read();
     }

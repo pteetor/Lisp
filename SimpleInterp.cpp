@@ -16,7 +16,7 @@ SimpleInterp::SimpleInterp(Heap& h) : heap(h)
   // nop
 }
 
-Object* SimpleInterp::eval(Object* e)
+Object* SimpleInterp::eval(Object* e, Object* a)
 {
   // TBD
   return heap.nil();
