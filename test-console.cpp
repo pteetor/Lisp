@@ -1,5 +1,5 @@
 //
-// Test of Tokenizer class
+// Test the Tokenizer when reading from console
 //
 
 #include <iostream>
@@ -10,13 +10,9 @@
 
 int main()
 {
-  std::string theString = "( \n (lambda (a b) (+ a b)) two \"dogs and cats\" \n )";
-  std::stringstream strm(theString);
+  std::cout << "Enter:" << std::endl;
 
-  std::cout << "Input is: " << theString << std::endl;
-  std::cout << "Tokens are:" << std::endl;
-
-  Tokenizer tkzr(strm);
+  Tokenizer tkzr(std::cin);
   Token t = tkzr.now();
 
   while (t != EOF_TOK)

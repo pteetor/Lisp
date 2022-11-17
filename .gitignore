@@ -16,3 +16,4 @@ test-Dict
 test-StringTable
 test-StringFinder
 test-symbol
+test-console

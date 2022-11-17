@@ -18,6 +18,19 @@ SimpleInterp::SimpleInterp(Heap& h) : heap(h)
 
 Object* SimpleInterp::eval(Object* e, Object* a)
 {
-  // TBD
-  return heap.nil();
+  if (e->atom()) {
+    if (e->symbolp()) {
+      // TODO: Throw undefined-variable error
+      return heap.nil();
+    } else {
+      return e;
+    }
+  } else {
+    // cons case
+    // TODO: Interpret function call
+    return heap.nil();
+  }
+
+  // TODO: Throw internal error?
+  heap.nil();
 }

@@ -86,12 +86,22 @@ Object* Reader::parse() {
 bool Reader::eof() { return tkz.now() == EOF_TOK; }
 
 Object* Reader::read() {
-  if (tkz.now() == SOF_TOK)
-    tkz.next();
+
+  // Move to first token of the expression
+  tkz.next();
+
+  // Does that exhaust theinput?
   if (tkz.now() == EOF_TOK)
     return heap.nil();
+  
   auto p = parse();
-  if (tkz.next() != EOF_TOK)
-    syntaxError("extra stuff after s-expr");
+
+  // QUESTION: How can we check that entire
+  // input line (from console) is consumed
+  // and no trailing crud remains?
+  // (Answer?: Let tokenizer return newlines;
+  //  read-ahead one toke and
+  //  check that it's either newline or EOF.)
+
   return p;
 }

@@ -148,4 +148,3 @@ const char* Tokenizer::text()
 {
   return tokenText;
 }
-

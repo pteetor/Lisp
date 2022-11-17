@@ -109,3 +109,8 @@ test-symbol: test-symbol.o $(HEAP_OBJ) functions.o
 	g++ -g -o $@ $^
 
 test-symbol.o: test-symbol.cpp $(HEAP_HDR)
+
+test-console: test-console.o Tokenizer.o
+	g++ -o $@ $^
+
+test-console.o: test-console.cpp Tokenizer.h

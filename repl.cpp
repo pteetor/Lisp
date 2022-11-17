@@ -17,9 +17,12 @@
 
 int main()
 {
-  std::string theInput = "( (lambda (x y) (+ x (* 2 y))) 10 3.14)";
-  std::stringstream theStream(theInput);
-  Tokenizer tkz(theStream);
+  // Useful for testing:
+  // std::string theInput = "( (lambda (x y) (+ x (* 2 y))) 10 3.14)";
+  // std::stringstream theStream(theInput);
+  // Tokenizer tkz(theStream);
+
+  Tokenizer tkz(cin);
 
   ObjPool obj(1000);
   StringSpace ss(1000);
