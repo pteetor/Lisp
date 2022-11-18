@@ -48,6 +48,8 @@ StringFinder.o: StringFinder.cpp $(HEAP_HDR)
 
 SimpleInterp.o: SimpleInterp.cpp Interp.h $(HEAP_HDR)
 
+ConsoleBuffer.o: ConsoleBuffer.cpp ConsoleBuffer.h
+
 #
 # utility
 #
@@ -114,3 +116,6 @@ test-console: test-console.o Tokenizer.o
 	g++ -o $@ $^
 
 test-console.o: test-console.cpp Tokenizer.h
+
+test-ConsoleBuffer: test-ConsoleBuffer.o ConsoleBuffer.o
+	g++ -o $@ $^
