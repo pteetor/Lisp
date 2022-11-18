@@ -53,7 +53,3 @@ protected:
   void traceOn() { trace = true; }
   void traceOff() { trace = false; }
 };
-
-// TODO:
-//   class ReplTokenizer
-//   class FileTokenizer
