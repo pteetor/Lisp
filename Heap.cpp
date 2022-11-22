@@ -15,6 +15,7 @@
 // Global constants defined by Heap
 //
 Object* Heap::PNAME = NULL;
+Object* Heap::APVAL = NULL;
 
 //
 // Heap methods
@@ -28,10 +29,11 @@ Heap::Heap(ObjPool* op, StringFinder *sf) : dict(op) {
 
   // Populate global constants
   PNAME = makeString("PNAME");
+  APVAL = makeString("APVAL");
 }
 
 Heap::~Heap() {
-  ;   // nop
+  ;   // nop for now
 }
 
 void Heap::protect(Object* p)
@@ -102,6 +104,11 @@ Object* Heap::alloc(String* s)
   return obj->alloc(s);
 }
 
+Object* Heap::alloc(Function* p)
+{
+  return obj->alloc(p);
+}
+
 // Allocate symbol object, with initial property list
 Object* Heap::alloc(Object* p)
 {
@@ -163,4 +170,9 @@ Object* Heap::makeSymbol(const char* s)
     dict.insert(pname, symbol);
   }
   return symbol;
+}
+
+Object* Heap::setprop(Object* sym, Object* ind, Object* val)
+{
+  return obj->setprop(sym, ind, val);
 }

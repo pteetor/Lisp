@@ -8,29 +8,48 @@
 #include "StringFinder.h"
 #include "Dict.h"
 #include "Heap.h"
+#include "functions.h"
 
 #include "Interp.h"
 
 SimpleInterp::SimpleInterp(Heap& h) : heap(h)
 {
-  // nop
+  defineRunTimeFunctions(heap);
 }
 
-Object* SimpleInterp::eval(Object* e, Object* a)
+Object* SimpleInterp::apply(Object* fn, Object* args, Object* env)
 {
-  if (e->atom()) {
-    if (e->symbolp()) {
-      // TODO: Throw undefined-variable error
-      return heap.nil();
-    } else {
-      return e;
-    }
-  } else {
-    // cons case
-    // TODO: Interpret function call
-    return heap.nil();
+  // TODO
+  return heap.nil();
+}
+
+Object* SimpleInterp::eval(Object* e, Object* env)
+{
+  if (e->symbolp()) {
+    // TODO: Consult 'env' before global definition
+    Object* val = e->get(Heap::APVAL);
+    if (val->null())
+      throw std::invalid_argument("undefined variable");
+    return val;
+  } else if (e->atom()) {
+    return e;
+  } else {   // cons case
+    Object* fn = eval(e->car(), env);
+    // TODO: Don't eval args if fn is a macro!
+    Object* args = evlis(e->cdr(), env);
+    return apply(fn, args, env);
   }
 
-  // TODO: Throw internal error?
+  // Just to keep C++ compiler happy
   heap.nil();
+}
+
+Object* SimpleInterp::evlis(Object* ls, Object* env)
+{
+  if (ls->null())
+    return ls;
+  else {
+    return heap.cons(eval(ls->car(), env),
+		     evlis(ls->cdr(), env) );
+  }
 }

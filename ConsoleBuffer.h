@@ -20,4 +20,5 @@ class ConsoleBuffer {
   bool more();   // True if non-white-space remains on line
   char next();
   char now();
+  bool eof() const;
 };

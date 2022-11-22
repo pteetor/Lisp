@@ -21,7 +21,10 @@ class EchoInterp {
 class SimpleInterp {
   Heap& heap;
 
+  Object* evlis(Object* ls, Object* env);
+
 public:
   SimpleInterp(Heap& h);
-  Object* eval(Object* e, Object* a);
+  Object* eval(Object* e, Object* env);
+  Object* apply(Object* fn, Object* args, Object* env);
 };

@@ -88,7 +88,8 @@ typedef enum {
   INT_TAG = 8,
   DOUBLE_TAG = 10,
   STRING_TAG = 12,
-  SYMBOL_TAG = 14
+  FUNCTION_TAG = 14,
+  SYMBOL_TAG = 16
 } TagValue;
 
 const long int MAX_TAG = (int) SYMBOL_TAG;
@@ -111,10 +112,11 @@ class Object {
       union {
 	bool bool_v;
 	char char_v;
-	long int int_v;          /* 8 bytes */
-	double double_v;         /* 8 bytes */
-	String *pstring;         /* Pointer into string space - 8 bytes */
-	Object* plist;           /* Property list of symbol */
+	long int int_v;          // 8 bytes
+	double double_v;         // 8 bytes
+	String* pstring;         // Pointer into string space - 8 bytes
+	Function* pfunction;
+	Object* plist;           // Property list of symbol
       };
     };
   };
@@ -142,6 +144,7 @@ public:
   Object* set(int i) { tag = INT_TAG; int_v = i; return this; }
   Object* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
   Object* set(String* p);                // String with pointer into string space
+  Object* set(Function* f);              // Function wrapper
   Object* set(Object* p);                // Symbol with property list
   Object* set(Object *a, Object *d);     // Cons cell
 
@@ -162,6 +165,7 @@ public:
   bool floatp() const { return tag == DOUBLE_TAG; }
   bool characterp() const { return tag == CHAR_TAG; }
   bool stringp() const { return tag == STRING_TAG; }
+  bool functionp() const { return tag == FUNCTION_TAG; }
   bool eq(const Object* x) { return x == this; }
 
   // Predicates I created

@@ -25,6 +25,11 @@ char ConsoleBuffer::ahead()
     return '\0';
 }
 
+bool ConsoleBuffer::eof() const
+{
+  return (nChar == 0) && bEOF;
+}
+
 bool ConsoleBuffer::more()
 {
   char* q = pBuf;
@@ -70,17 +75,36 @@ void ConsoleBuffer::prompt()
     cout << "> ";  
 }
 
+//
+// Refill our line buffer until
+//   - Newline (which is saved in buffer), or
+//   - Buffer is full, or
+//   - End-of-file
+//
 bool ConsoleBuffer::refill()
 {
+  pBuf = buffer;
+  nChar = 0;
+  
+  if (bEOF)
+    return false;
+ 
   prompt();
-  if (cin.getline(buffer, MAX_CHARS)) {
-    nChar = cin.gcount() - 1;   // Don't include null char
-  } else {
-    bEOF = true;
-    nChar = 0;
+
+  char* p = buffer;  
+  char ch;
+
+  for (int i = 0; i < MAX_CHARS; ++i) {
+    cin.get(ch);
+    if (cin.eof()) {
+      bEOF = true;
+      break;
+    }
+    *p++ = ch;
+    nChar++;
+    if (ch == '\n')
+      break;
   }
 
-  pBuf = buffer;
   return !bEOF;
 }
- 

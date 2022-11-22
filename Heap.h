@@ -27,6 +27,7 @@ public:
   Object* alloc(int i);
   Object* alloc(double d);
   Object* alloc(String* s);       // New string
+  Object* alloc(Function* p);     // New built-in function
   Object* alloc(Object* p);       // New symbol, with prop. list
 
   Object* cons(Object* a, Object* d);
@@ -45,8 +46,11 @@ public:
   Object* makeList(Object*, Object*);
   Object* makeList(Object*, Object*, Object*);
 
+  Object* setprop(Object* sym, Object* ind, Object* val);
+
   //
   // Global constants provided by the Heap
   //
   static Object* PNAME;
+  static Object* APVAL;
 };

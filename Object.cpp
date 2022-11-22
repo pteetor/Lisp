@@ -87,6 +87,13 @@ Object* Object::set(String* p)
   return this;
 }
 
+Object* Object::set(Function* p)
+{
+  tag = FUNCTION_TAG;
+  pfunction = p;
+  return this;
+}
+
 Object* Object::set(Object* p)
 {
   tag = SYMBOL_TAG;

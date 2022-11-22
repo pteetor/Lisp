@@ -15,3 +15,5 @@ class String;
 class StringSpace;
 class Dict;
 class Heap;
+
+typedef Object* Function(Object* a, Heap& heap);
