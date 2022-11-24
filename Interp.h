@@ -20,8 +20,17 @@ class EchoInterp {
 
 class SimpleInterp {
   Heap& heap;
+  Object* globalEnv;
+
+  void defineGlobalFunctions();
 
   Object* evlis(Object* ls, Object* env);
+
+  // Functions for environments
+  Object* newEnv(Object* parent);
+  Object* define(Object* env, Object* symbol, Object* value);
+  Object* define(Object* env, const char* symbol, Function* fun);
+  Object* get(Object* env, Object* symbol);
 
 public:
   SimpleInterp(Heap& h);

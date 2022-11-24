@@ -78,29 +78,3 @@ Object* member(Object* list, Object* elem)
   }
   return list;
 }
-
-// ----------------------------------------------------------
-
-//
-// User-visible run time functions
-//
-
-Object* sum_f(Object* args, Heap& heap)
-{
-  double sum = 0.0;
-
-  while (args->nonNull())
-    {
-      sum += (double) *(args->car());
-      args = args->cdr();
-    }
-
-  return heap.alloc(sum);
-}
-
-void defineRunTimeFunctions(Heap& heap)
-{
-  Object *sym = heap.makeSymbol("+");
-  Object* f = heap.alloc(sum_f);
-  heap.setprop(sym, Heap::APVAL, f);
-}
