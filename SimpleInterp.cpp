@@ -15,7 +15,7 @@
 
 SimpleInterp::SimpleInterp(Heap& h) : heap(h)
 {
-  globalEnv = newEnv(heap.nil());
+  globalEnv = emptyEnv(heap.nil());
   defineGlobalFunctions();
 }
 
@@ -44,21 +44,21 @@ Object* SimpleInterp::eval(Object* e, Object* env)
   return apply(fn, args, env);
 }
 
-Object* SimpleInterp::define(Object* env, Object* symbol, Object* value)
+Object* SimpleInterp::bind(Object* env, Object* symbol, Object* value)
 {
   Object* pair = heap.cons(symbol, value);
   env->replaca(heap.cons(pair, env->car()));
   return env;
 }
 
-Object* SimpleInterp::define(Object* env, const char* symbol, NativeFunction* fun)
+Object* SimpleInterp::bind(Object* env, const char* symbol, NativeFunction* fun)
 {
-  return define(env, heap.makeSymbol(symbol), heap.alloc(fun));
+  return bind(env, heap.makeSymbol(symbol), heap.alloc(fun));
 }
 
 void SimpleInterp::defineGlobalFunctions()
 {
-  define(globalEnv, "+", sum_f);
+  bind(globalEnv, "+", sum_f);
 }
 
 Object* SimpleInterp::evlis(Object* ls, Object* env)
@@ -88,7 +88,7 @@ Object* SimpleInterp::get(Object* env, Object* symbol)
   return heap.nil();
 }
 
-Object* SimpleInterp::newEnv(Object* parent)
+Object* SimpleInterp::emptyEnv(Object* parent)
 {
   return heap.cons(heap.nil(), parent);
 }

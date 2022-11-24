@@ -27,9 +27,9 @@ class SimpleInterp {
   Object* evlis(Object* ls, Object* env);
 
   // Functions for environments
-  Object* newEnv(Object* parent);
-  Object* define(Object* env, Object* symbol, Object* value);
-  Object* define(Object* env, const char* symbol, NativeFunction* fun);
+  Object* emptyEnv(Object* parent);
+  Object* bind(Object* env, Object* symbol, Object* value);
+  Object* bind(Object* env, const char* symbol, NativeFunction* fun);
   Object* get(Object* env, Object* symbol);
 
 public:
