@@ -26,9 +26,9 @@ public:
   Object* alloc(char c);
   Object* alloc(int i);
   Object* alloc(double d);
-  Object* alloc(String* s);       // New string
-  Object* alloc(Function* p);     // New built-in function
-  Object* alloc(Object* p);       // New symbol, with prop. list
+  Object* alloc(String* s);             // New string
+  Object* alloc(NativeFunction* p);     // New built-in function
+  Object* alloc(Object* p);             // New symbol, with prop. list
 
   Object* cons(Object* a, Object* d);
 

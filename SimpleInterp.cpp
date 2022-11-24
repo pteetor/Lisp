@@ -9,7 +9,7 @@
 #include "Dict.h"
 #include "Heap.h"
 #include "functions.h"
-#include "userFunctions.h"
+#include "nativeFunctions.h"
 
 #include "Interp.h"
 
@@ -51,9 +51,9 @@ Object* SimpleInterp::define(Object* env, Object* symbol, Object* value)
   return env;
 }
 
-Object* SimpleInterp::define(Object* env, const char* symbol, Function* fun)
+Object* SimpleInterp::define(Object* env, const char* symbol, NativeFunction* fun)
 {
-  return define(env, makeSymbol(symbol), heap.alloc(fun));
+  return define(env, heap.makeSymbol(symbol), heap.alloc(fun));
 }
 
 void SimpleInterp::defineGlobalFunctions()

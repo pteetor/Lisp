@@ -87,7 +87,7 @@ Object* Object::set(String* p)
   return this;
 }
 
-Object* Object::set(Function* p)
+Object* Object::set(NativeFunction* p)
 {
   tag = FUNCTION_TAG;
   pfunction = p;

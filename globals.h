@@ -16,4 +16,4 @@ class StringSpace;
 class Dict;
 class Heap;
 
-typedef Object* Function(Object* a, Heap& heap);
+typedef Object* NativeFunction(Object* a, Heap& heap);

@@ -104,7 +104,7 @@ Object* Heap::alloc(String* s)
   return obj->alloc(s);
 }
 
-Object* Heap::alloc(Function* p)
+Object* Heap::alloc(NativeFunction* p)
 {
   return obj->alloc(p);
 }

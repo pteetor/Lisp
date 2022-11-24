@@ -29,7 +29,7 @@ class SimpleInterp {
   // Functions for environments
   Object* newEnv(Object* parent);
   Object* define(Object* env, Object* symbol, Object* value);
-  Object* define(Object* env, const char* symbol, Function* fun);
+  Object* define(Object* env, const char* symbol, NativeFunction* fun);
   Object* get(Object* env, Object* symbol);
 
 public:

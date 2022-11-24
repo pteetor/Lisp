@@ -9,7 +9,7 @@
 #include "Dict.h"
 #include "Heap.h"
 #include "functions.h"
-#include "userFunctions.h"
+#include "nativeFunctions.h"
 
 Object* sum_f(Object* args, Heap& heap)
 {

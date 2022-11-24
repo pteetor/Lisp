@@ -27,7 +27,7 @@ all: $(APPS) $(TESTS)
 #
 # detailed rules
 #
-repl: repl.o $(HEAP_OBJ) Reader.o Tokenizer.o functions.o SimpleInterp.o
+repl: repl.o $(HEAP_OBJ) Reader.o Tokenizer.o functions.o $(INTERP_OBJ)
 	g++ -g -o $@ $^
 
 repl.o: repl.cpp $(HEAP_HDR) Reader.h Tokenizer.h

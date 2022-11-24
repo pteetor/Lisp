@@ -115,7 +115,7 @@ class Object {
 	long int int_v;          // 8 bytes
 	double double_v;         // 8 bytes
 	String* pstring;         // Pointer into string space - 8 bytes
-	Function* pfunction;
+	NativeFunction* pfunction;
 	Object* plist;           // Property list of symbol
       };
     };
@@ -144,12 +144,12 @@ public:
   Object* set(int i) { tag = INT_TAG; int_v = i; return this; }
   Object* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
   Object* set(String* p);                // String with pointer into string space
-  Object* set(Function* f);              // Function wrapper
+  Object* set(NativeFunction* f);        // Wrapper for native functions
   Object* set(Object* p);                // Symbol with property list
   Object* set(Object *a, Object *d);     // Cons cell
 
-  Object* getprops() { return plist; }
-  Object* setprops(Object* pl);
+  Object* getprops() { return plist; }   // OBSOLETE
+  Object* setprops(Object* pl);          // OBSOLETE
 
   bool isFree() const { return tag == FREE_TAG; }
   bool notFree() const { return tag != FREE_TAG; }
@@ -171,6 +171,7 @@ public:
   // Predicates I created
   bool nonNull() const { return tag != NIL_TAG; }
   bool boolp() const { return tag == BOOL_TAG; }
+  bool charp() const { return tag == CHAR_TAG; }
   bool doublep() const { return tag == DOUBLE_TAG; }
   bool neq(const Object* x) { return x != this; }
 
@@ -191,7 +192,7 @@ public:
   // Common Lisp functions
   Object* car() const { return car_p; }
   Object* cdr() const { return cdr_p; }
-  Object* get(Object* ind) const;
+  Object* get(Object* ind) const;          // OBSOLETE
 
   Object* replaca(Object* p) { this->car_p = p; return this; }
   Object* replacd(Object* p) { this->cdr_p = p; return this; }
