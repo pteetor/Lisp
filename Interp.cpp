@@ -13,19 +13,19 @@
 
 #include "Interp.h"
 
-SimpleInterp::SimpleInterp(Heap& h) : heap(h)
+Interp::Interp(Heap& h) : heap(h)
 {
   globalEnv = emptyEnv(heap.nil());
   defineGlobalFunctions();
 }
 
-Object* SimpleInterp::apply(Object* fn, Object* args, Object* env)
+Object* Interp::apply(Object* fn, Object* args, Object* env)
 {
   // TODO
   return heap.nil();
 }
 
-Object* SimpleInterp::eval(Object* e, Object* env)
+Object* Interp::eval(Object* e, Object* env)
 {
   if (e->symbolp()) {
     // TODO: Consult 'env' before global definition
@@ -44,24 +44,24 @@ Object* SimpleInterp::eval(Object* e, Object* env)
   return apply(fn, args, env);
 }
 
-Object* SimpleInterp::bind(Object* env, Object* symbol, Object* value)
+Object* Interp::bind(Object* env, Object* symbol, Object* value)
 {
   Object* pair = heap.cons(symbol, value);
   env->replaca(heap.cons(pair, env->car()));
   return env;
 }
 
-Object* SimpleInterp::bind(Object* env, const char* symbol, NativeFunction* fun)
+Object* Interp::bind(Object* env, const char* symbol, NativeFunction* fun)
 {
   return bind(env, heap.makeSymbol(symbol), heap.alloc(fun));
 }
 
-void SimpleInterp::defineGlobalFunctions()
+void Interp::defineGlobalFunctions()
 {
   bind(globalEnv, "+", sum_f);
 }
 
-Object* SimpleInterp::evlis(Object* ls, Object* env)
+Object* Interp::evlis(Object* ls, Object* env)
 {
   if (ls->null())
     return ls;
@@ -71,7 +71,7 @@ Object* SimpleInterp::evlis(Object* ls, Object* env)
   }
 }
 
-Object* SimpleInterp::get(Object* env, Object* symbol)
+Object* Interp::get(Object* env, Object* symbol)
 {
   Object* p;
   
@@ -88,7 +88,7 @@ Object* SimpleInterp::get(Object* env, Object* symbol)
   return heap.nil();
 }
 
-Object* SimpleInterp::emptyEnv(Object* parent)
+Object* Interp::emptyEnv(Object* parent)
 {
   return heap.cons(heap.nil(), parent);
 }

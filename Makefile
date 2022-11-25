@@ -16,7 +16,7 @@ HEAP_OBJ = Heap.o ObjPool.o Object.o StringFinder.o String.o Dict.o
 
 INTERP_HDR = Interp.h nativeFunctions.h
 
-INTERP_OBJ = SimpleInterp.o nativeFunctions.o
+INTERP_OBJ = Interp.o nativeFunctions.o
 
 apps: $(APPS)
 
@@ -50,7 +50,7 @@ ObjPool.o: ObjPool.cpp ObjPool.h Object.h
 
 StringFinder.o: StringFinder.cpp $(HEAP_HDR)
 
-SimpleInterp.o: SimpleInterp.cpp $(INTERP_HDR) $(HEAP_HDR)
+Interp.o: Interp.cpp $(INTERP_HDR) $(HEAP_HDR)
 
 ConsoleBuffer.o: ConsoleBuffer.cpp ConsoleBuffer.h
 

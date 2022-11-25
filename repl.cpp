@@ -30,7 +30,7 @@ int main()
   Heap heap(&obj, &sf);
   Reader rdr(tkz, heap);
 
-  SimpleInterp interp(heap);
+  Interp interp(heap);
 
   Object* expr = rdr.read();
   Object* value;

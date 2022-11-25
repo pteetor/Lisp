@@ -18,7 +18,7 @@ class EchoInterp {
   Object* eval(Object* e, Object* a) { return e; }
 };
 
-class SimpleInterp {
+class Interp {
   Heap& heap;
   Object* globalEnv;
 
@@ -33,7 +33,7 @@ class SimpleInterp {
   Object* get(Object* env, Object* symbol);
 
 public:
-  SimpleInterp(Heap& h);
+  Interp(Heap& h);
   Object* eval(Object* e, Object* env);
   Object* apply(Object* fn, Object* args, Object* env);
 };
