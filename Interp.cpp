@@ -25,23 +25,32 @@ Object* Interp::apply(Object* fn, Object* args, Object* env)
   return heap.nil();
 }
 
-Object* Interp::eval(Object* e, Object* env)
+void Interp::eval()
 {
-  if (e->symbolp()) {
+  Object* expr = heap.down(1);
+  Object* env = heap.down(0);
+  
+  if (expr->symbolp()) {
     // TODO: Consult 'env' before global definition
-    Object* val = get(globalEnv, e);
+    Object* val = get(globalEnv, expr);
     if (val->null())
       throw std::invalid_argument("undefined variable");
-    return val->cdr();
-  } else if (e->atom()) {
-    return e;
+    heap.push(val->cdr());
+    heap.collapse(2);
+    return;
+  } else if (expr->atom()) {
+    return;
   }
 
-  // Here, e is a cons cell
-  Object* fn = eval(e->car(), env);
-  // TODO: Don't eval args if fn is a macro!
-  Object* args = evlis(e->cdr(), env);
-  return apply(fn, args, env);
+  // Here, expr is a cons cell.
+  // First, evaluate function
+  heap.push(expr->car());
+  heap.push(env);
+  eval();
+
+  // TODO:
+  //   - If function, eval args
+  //   - Invoke apply() with args
 }
 
 Object* Interp::bind(Object* env, Object* symbol, Object* value)
@@ -53,7 +62,9 @@ Object* Interp::bind(Object* env, Object* symbol, Object* value)
 
 Object* Interp::bind(Object* env, const char* symbol, NativeFunction* fun)
 {
-  return bind(env, heap.makeSymbol(symbol), heap.alloc(fun));
+  // FIX: return bind(env, heap.makeSymbol(symbol), heap.alloc(fun));
+  // TEMP:
+  return heap.nil();
 }
 
 void Interp::defineGlobalFunctions()
@@ -63,12 +74,9 @@ void Interp::defineGlobalFunctions()
 
 Object* Interp::evlis(Object* ls, Object* env)
 {
-  if (ls->null())
-    return ls;
-  else {
-    return heap.cons(eval(ls->car(), env),
-		     evlis(ls->cdr(), env) );
-  }
+  // TBD
+  // PLACE HOLDER:
+  return heap.nil();
 }
 
 Object* Interp::get(Object* env, Object* symbol)

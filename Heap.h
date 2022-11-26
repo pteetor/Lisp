@@ -6,9 +6,13 @@
 // Heap management
 //
 class Heap {
+  static const int STACK_SIZE = 1000;
+  
   ObjPool* obj;
   StringFinder* finder;
-  Dict dict;
+  Object* dict;               // List of <key,value> pairs
+  Object* stack[STACK_SIZE];
+  Object** sp;
   
   Object *pProtected;   // List of protected spaces
 
@@ -21,7 +25,9 @@ public:
 
   int nFreeObjects() { return obj->nFreeObjects(); }
 
-  Object* nil() { return obj->nil(); }
+  Object* nil() const { return obj->nil(); }
+
+  // Q: Should these be 'void' functions? They leave their value on the stack
   Object* alloc(bool b);
   Object* alloc(char c);
   Object* alloc(int i);
@@ -30,8 +36,29 @@ public:
   Object* alloc(NativeFunction* p);     // New built-in function
   Object* alloc(Object* p);             // New symbol, with prop. list
 
-  Object* cons(Object* a, Object* d);
+  Object* cons(Object* a, Object* d);   // Obsolete??
+  void cons();                          // Stack-arguments version
 
+  // Stack functions
+  void collapse(int n);
+  Object* down(int n);
+  void drop(int n);
+  Object** newFrame() const;
+  Object* push(Object* p);
+  Object* pop();
+  Object* top() const;
+
+  // Dictionary methods
+  // The dictionary maps strings to symbols
+  static Object* key(Object* node);
+  static Object* value(Object* node);
+  static Object* next(Object* node);
+
+  Object* find(Object* k);    // Find <key,value> pair within the dictionary; or nil
+  bool lookupSymbol();        // Given <string> on stack, translate to corresponding symbol
+  void insertSymbol();        // Given <string,symbol> on stack, insert into dict
+
+  // Object protection methods - need for global symbols
   void protect(Object*);
   void unprotect(Object*);
   int nProtected();
@@ -39,18 +66,19 @@ public:
   
   void dump();
 
-  Object* makeString(const char*);
-  Object* makeSymbol(const char*);
+  void makeString(const char*);                 // Leave result on stack
+  void makeSymbol(const char*);                 // Leave result on stack
 
-  Object* makeList(Object*);
-  Object* makeList(Object*, Object*);
-  Object* makeList(Object*, Object*, Object*);
+  Object* makeList(Object*);                    // Obsolete??
+  Object* makeList(Object*, Object*);           // Obsolete??
+  Object* makeList(Object*, Object*, Object*);  // Obsolete??
+  void makeList(int n);                         // Stack-arguments version
 
-  Object* setprop(Object* sym, Object* ind, Object* val);
+  Object* setprop(Object* sym, Object* ind, Object* val);   // OBSOLETE
 
   //
   // Global constants provided by the Heap
   //
-  static Object* PNAME;
-  static Object* APVAL;
+  static Object* PNAME;     // OBSOLETE
+  static Object* APVAL;     // OBSOLETE
 };

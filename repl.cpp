@@ -30,17 +30,15 @@ int main()
   Heap heap(&obj, &sf);
   Reader rdr(tkz, heap);
 
-  Interp interp(heap);
+  EchoInterp interp(heap);
 
-  Object* expr = rdr.read();
-  Object* value;
-
-  while (expr->nonNull())
+  while (rdr.read())
     {
-      value = interp.eval(expr, heap.nil());
-      print(value);
+      heap.push(heap.nil());
+      interp.eval();
+      print(heap.top());
       cout << endl;
-      expr = rdr.read();
+      heap.pop();
     }
 
   exit(0);

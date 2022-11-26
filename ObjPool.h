@@ -26,7 +26,7 @@ public:
   void mark(Object*);
   void sweep();
 
-  Object* nil() { return &heap[0]; }
+  Object* nil() const { return &heap[0]; }
   Object* alloc(bool b);
   Object* alloc(char c);
   Object* alloc(int i);

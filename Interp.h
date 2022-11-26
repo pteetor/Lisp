@@ -5,17 +5,17 @@
 class AbstInterp {
 public:
 
-  // Evaluation an expression, where
-  //   e = expression
-  //   a = association list or dictionary
-  virtual Object* eval(Object* e, Object* a);
+  // Evaluation an expression, where stack is <expr, env>
+  virtual void eval();
 };
 
 class EchoInterp {
+  Heap& heap;
+  
  public:
-  EchoInterp() { }
+  EchoInterp(Heap& h) : heap(h) { }
 
-  Object* eval(Object* e, Object* a) { return e; }
+  void eval() { return; }
 };
 
 class Interp {
@@ -34,6 +34,7 @@ class Interp {
 
 public:
   Interp(Heap& h);
-  Object* eval(Object* e, Object* env);
+  void eval();
+  
   Object* apply(Object* fn, Object* args, Object* env);
 };

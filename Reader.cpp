@@ -6,7 +6,7 @@
 #include "Object.h"
 #include "ObjPool.h"
 #include "StringFinder.h"
-#include "Dict.h"
+// #include "Dict.h"
 #include "Heap.h"
 #include "Tokenizer.h"
 #include "Reader.h"
@@ -20,88 +20,102 @@ void Reader::syntaxError(const char *msg) {
     exit(1);
 }
 
-Object* Reader::parseList() {
+void Reader::parseList() {
 
   // Empty list?
-  if (tkz.now() == RPAREN_TOK)
-    return heap.nil();
-    
-  Object *car = parse();
-  Object *head = heap.cons(car, heap.nil());
-  Object *tail = head;
+  if (tkz.now() == RPAREN_TOK) {
+    heap.push(heap.nil());
+    return;
+  }
+
+  // Create head of list: cons(elem1, nil)
+  parse();
+  heap.push(heap.nil());
+  heap.cons();
+
+  // Save head for returning
+  Object* head = heap.top();
 
   tkz.next();
   while (tkz.now() != DOT_TOK)
     {
       if (tkz.now() == RPAREN_TOK)
-	    return head;
-      Object *elem = parse();
-      tail->replacd(heap.cons(elem, heap.nil()));
-      tail = tail->cdr();
+	return;
+
+      // Create one-element list of next parse()
+      parse();
+      heap.makeList(1);
+
+      // Append to existing tail, and it becomes new tail
+      heap.down(1)->replacd(heap.top());
+      heap.collapse(1);
       tkz.next();
     }
 
   // Here tail ends with: . <expr> )
   tkz.next();   // Skip dot
-  Object *cdr = parse();
-  tail->replacd(cdr);
+  parse();
+  heap.down(1)->replacd(heap.top());
+  heap.drop(2);
+
   if (tkz.next() != RPAREN_TOK)
     syntaxError("missing right parenthesis");
-  return head;
+
+  heap.push(head);
 }
 
-Object* Reader::parse() {
+void Reader::parse() {
     switch(tkz.now())
       {
       case SOF_TOK:
-	syntaxError("start-of-file?");   // Tokenizer screwed up?
+	syntaxError("start-of-file?");            // Tokenizer screwed up?
       case EOF_TOK:
 	syntaxError("unexpected end-of-input");   // Incomplete expression
       case DOT_TOK:
 	syntaxError("unexpected dot");
       case LPAREN_TOK:
 	tkz.next();
-	return parseList();
+	parseList();
+	break;
       case RPAREN_TOK:
 	syntaxError("unexpected right parenthesis");
       case CHAR_TOK:
 	syntaxError();   // TODO - Handle this
       case INT_TOK:
-	return heap.alloc(std::atoi(tkz.text())); break;
+	heap.alloc(std::atoi(tkz.text()));
+	break;
       case DOUBLE_TOK:
-	return heap.alloc(std::atof(tkz.text())); break;
+	heap.alloc(std::atof(tkz.text()));
+	break;
       case STRING_TOK:
-	return heap.makeString(tkz.text()); break;
+	heap.makeString(tkz.text());
+	break;
       case SYMBOL_TOK:
-	return heap.makeSymbol(tkz.text()); break;
+	heap.makeSymbol(tkz.text());
+	break;
 
       default:
 	syntaxError("weird token");
       }
-
-    // Keep compiler happy
-    return heap.nil();
 }
 
 bool Reader::eof() { return tkz.now() == EOF_TOK; }
 
-Object* Reader::read() {
+bool Reader::read() {
 
   // Move to first token of the expression
   tkz.next();
 
-  // Does that exhaust theinput?
+  // Does that exhaust the input?
   if (tkz.now() == EOF_TOK)
-    return heap.nil();
+    return false;
   
-  auto p = parse();
+  parse();
 
   // QUESTION: How can we check that entire
   // input line (from console) is consumed
   // and no trailing crud remains?
-  // (Answer?: Let tokenizer return newlines;
-  //  read-ahead one toke and
-  //  check that it's either newline or EOF.)
+  // (Answer: Read input via ConsoleBuffer object)
 
-  return p;
+  return true;
 }

@@ -7,29 +7,29 @@
 #include "Object.h"
 #include "ObjPool.h"
 #include "StringFinder.h"
-#include "Dict.h"
+// #include "Dict.h"
 #include "Heap.h"
 #include "functions.h"
 
 //
 // Global constants defined by Heap
 //
-Object* Heap::PNAME = NULL;
-Object* Heap::APVAL = NULL;
+Object* Heap::PNAME = NULL;   // OBSOLETE
+Object* Heap::APVAL = NULL;   // OBSOLETE
 
 //
 // Heap methods
 //
 
-Heap::Heap(ObjPool* op, StringFinder *sf) : dict(op) {
-  obj = op;
-  finder = sf;
-  
+Heap::Heap(ObjPool* op, StringFinder *sf) : obj(op), finder(sf)
+{
+  dict = obj->nil();
+  sp = stack;
   pProtected = obj->nil();
 
   // Populate global constants
-  PNAME = makeString("PNAME");
-  APVAL = makeString("APVAL");
+  // PNAME = makeString("PNAME");   // OBSOLETE
+  // APVAL = makeString("APVAL");   // OBSOLETE
 }
 
 Heap::~Heap() {
@@ -51,17 +51,19 @@ int Heap::nProtected()
   return length(pProtected);
 }
 
-// Mark all protected cells
+// Mark all Objects currently in use
 void Heap::mark()
 {
   // Nil is implicitly protected!
   nil()->mark();
 
+  // TODO: Mark everything on the stack
+
   // The protected list is implicitly protected!
   Object* p = pProtected;
   Object* q;
   
-  while (p->neq(nil())) {
+  while (p->nonNull()) {
     q = p->car();   // Save car before mark() tramples on it
     p->mark();
     mark(q);
@@ -94,30 +96,37 @@ void Heap::mark(Object* p)
 // Heap - public methods
 //
 
-Object* Heap::alloc(bool b) { return obj->alloc(b); }
-Object* Heap::alloc(char c) { return obj->alloc(c); }
-Object* Heap::alloc(int i) { return obj->alloc(i); }
-Object* Heap::alloc(double d) { return obj->alloc(d); }
+Object* Heap::alloc(bool b)   { return push(obj->alloc(b)); }
+Object* Heap::alloc(char c)   { return push(obj->alloc(c)); }
+Object* Heap::alloc(int i)    { return push(obj->alloc(i)); }
+Object* Heap::alloc(double d) { return push(obj->alloc(d)); }
 
 Object* Heap::alloc(String* s)
 {
-  return obj->alloc(s);
+  return push(obj->alloc(s));
 }
 
 Object* Heap::alloc(NativeFunction* p)
 {
-  return obj->alloc(p);
+  return push(obj->alloc(p));
 }
 
 // Allocate symbol object, with initial property list
 Object* Heap::alloc(Object* p)
 {
-  return obj->alloc(p);
+  return push(obj->alloc(p));
+}
+
+// Stack-argument version
+void Heap::cons()
+{
+  push(obj->cons(down(1), down(0)));
+  collapse(2);
 }
 
 Object* Heap::cons(Object* a, Object* d)
 {
-  return obj->cons(a, d);
+  return push(obj->cons(a, d));
 }
 
 void Heap::dump()
@@ -149,30 +158,143 @@ Object* Heap::makeList(Object* a, Object* b, Object* c)
   return cons(a, cons(b, cons(c, nil())));
 }
 
+// Create new list frop top N objects
+// Stack action: <e1, ..., eN> -> cons(e1, cons(e2, ..., cons(eN,nil)...))
+void Heap::makeList(int n)
+{
+  push(nil());
+  while (n-- > 0)
+    cons();
+}
+
 //
 // Returns an Object of type string
+// Stack action: <> -> <string>
 //
-Object* Heap::makeString(const char* s)
+void Heap::makeString(const char* s)
 {
-  return finder->find(s);
+  push(finder->find(s));
 }
 
-Object* Heap::makeSymbol(const char* s)
+// Stack action: <> -> <symbol>
+void Heap::makeSymbol(const char* s)
 {
-  Object* pname = makeString(s);
-  Object* symbol = dict.lookup(pname);
-  if (symbol->null()) {
-    // create minimal property list with PNAME
-    Object* plist = makeList(cons(PNAME, pname));
-    symbol = alloc(plist);
+  makeString(s);
+  if (lookupSymbol())
+    return;
 
-    // Link symbol name to symbol object
-    dict.insert(pname, symbol);
-  }
-  return symbol;
+  alloc(nil());
+  insertSymbol();
+  collapse(1);     // Remove string, retain symbol
 }
 
+// OBSOLETE
 Object* Heap::setprop(Object* sym, Object* ind, Object* val)
 {
   return obj->setprop(sym, ind, val);
+}
+
+// ----------------------------------------------------------
+
+//
+// Stack functions
+//
+
+void Heap::collapse(int n)
+{
+  Object* temp = pop();
+  sp -= n;
+  push(temp);
+}
+
+Object* Heap::down(int n)
+{
+  return *(sp - n - 1);
+}
+
+void Heap::drop(int n)
+{
+  sp -= n;
+}
+
+Object** Heap::newFrame() const
+{
+  return sp;
+}
+
+Object* Heap::push(Object* p)
+{
+  *sp++ = p;
+  return p;
+}
+
+Object* Heap::pop()
+{
+  return *(--sp);
+}
+
+Object* Heap::top() const
+{
+  return *(sp - 1);
+}
+
+// ----------------------------------------------------------
+
+//
+// Dicionary methods
+//
+// The dictionary maps strings into symbols
+//
+
+Object* Heap::find(Object* k)
+{
+  Object* p = dict;
+  while (p->nonNull())
+    {
+      if (key(p)->eq(k))
+	return p;
+      p = next(p);
+    }
+  return obj->nil();
+}
+
+// <string, symbol> on stack
+// Insert <string, symbol> pair into dictionary
+// Stack action: unchanged
+void Heap::insertSymbol()
+{
+  cons(down(1), down(0));     // Create <string,symbol> pair
+  push(dict);
+  cons();                     // Create new head of dict list
+  dict = pop();
+}
+
+Object* Heap::key(Object* node)
+{
+  return node->car()->car();
+}
+
+// Stack action:
+//   - If not found: <string> -> <string>
+//   - If found: <string> -> <symbol>
+bool Heap::lookupSymbol()
+{
+  Object* p = find(top());
+  if (p->null())
+    return false;
+  else {
+    pop();
+    push(p->cdr());
+    return true;
+  }
+}
+
+Object* Heap::next(Object* node)
+{
+  return node->cdr();
+}
+
+Object* Heap::value(Object* node)
+{
+  return node->car()->cdr();
 }

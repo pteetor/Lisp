@@ -8,11 +8,11 @@
 CPPFLAGS = -g
 
 APPS = repl
-TESTS = test-String test-Object test-Heap test-Tokenizer test-Reader test-gc test-Dict test-StringFinder
+TESTS = test-String test-Object test-Heap test-Tokenizer test-Reader test-gc test-StringFinder
 
 HEAP_HDR = globals.h Heap.h ObjPool.h Object.h StringFinder.h
 
-HEAP_OBJ = Heap.o ObjPool.o Object.o StringFinder.o String.o Dict.o
+HEAP_OBJ = Heap.o ObjPool.o Object.o StringFinder.o String.o
 
 INTERP_HDR = Interp.h nativeFunctions.h
 
@@ -42,7 +42,7 @@ Reader.o: Reader.cpp Reader.h Tokenizer.h Heap.h Object.h
 
 String.o: String.cpp globals.h Object.h Heap.h
 
-Dict.o: Dict.cpp Dict.h Heap.h Object.h globals.h
+## Dict.o: Dict.cpp Dict.h Heap.h Object.h globals.h
 
 functions.o: functions.cpp functions.h Object.h Heap.h
 
@@ -80,7 +80,7 @@ test-Tokenizer: test-Tokenizer.o Tokenizer.o
 
 test-Tokenizer.o: test-Tokenizer.cpp Tokenizer.h
 
-test-Reader: test-Reader.o Reader.o Tokenizer.o Object.o Heap.o String.o functions.o
+test-Reader: test-Reader.o Reader.o Tokenizer.o $(HEAP_OBJ) functions.o
 	g++ -o test-Reader $^
 
 test-Reader.o: test-Reader.cpp Reader.h Tokenizer.h Heap.h 
@@ -105,8 +105,8 @@ test-functions: test-functions.o String.o Heap.o Object.o functions.o
 
 test-functions.o: test-functions.cpp functions.h Object.h Heap.h
 
-test-Dict: test-Dict.o Dict.o $(HEAP_OBJ) functions.o
-	g++ -g -o $@ $^
+## test-Dict: test-Dict.o Dict.o $(HEAP_OBJ) functions.o
+## 	g++ -g -o $@ $^
 
 test-StringFinder: test-StringFinder.o $(HEAP_OBJ) functions.o
 	g++ -g -o $@ $^

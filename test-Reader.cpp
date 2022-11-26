@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 #include "Object.h"
+#include "ObjPool.h"
+#include "StringFinder.h"
 #include "Heap.h"
 #include "Tokenizer.h"
 #include "Reader.h"
@@ -16,21 +18,25 @@ int main() {
 
   std::cout << "Input is: " << theInput << std::endl;
 
+  ObjPool pool(1000);
   StringSpace space(1000);
-  Heap heap(1000, &space);
+  StringFinder finder(&pool, &space);
+  Heap heap(&pool, &finder);
   
   std::stringstream theStream(theInput);
   Tokenizer tkz(theStream);
   Reader rdr(tkz, heap);
 
   tkz.traceOn();
-  auto se = rdr.read();
+  bool ok = rdr.read();
 
-  cout << endl;
-  heap.dump();
+  if (ok) {
+    cout << endl;
+    heap.dump();
   
-  print(se);
-  cout << endl;
+    print(heap.top());
+    cout << endl;
+  }
   
   return(0);
 }
