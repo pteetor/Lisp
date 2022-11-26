@@ -17,6 +17,7 @@ Interp::Interp(Heap& h) : heap(h)
 {
   globalEnv = emptyEnv(heap.nil());
   defineGlobalFunctions();
+  heap.protect(globalEnv);
 }
 
 Object* Interp::apply(Object* fn, Object* args, Object* env)
@@ -25,11 +26,12 @@ Object* Interp::apply(Object* fn, Object* args, Object* env)
   return heap.nil();
 }
 
-void Interp::eval()
+//
+// Careful: This assumes that 'expr' and 'env' are protected,
+// e.g., by being in the stack.
+//
+void Interp::eval(Object* expr, Object* env)
 {
-  Object* expr = heap.down(1);
-  Object* env = heap.down(0);
-  
   if (expr->symbolp()) {
     // TODO: Consult 'env' before global definition
     Object* val = get(globalEnv, expr);
@@ -44,27 +46,55 @@ void Interp::eval()
 
   // Here, expr is a cons cell.
   // First, evaluate function
-  heap.push(expr->car());
+  eval(expr->car(), env);
+  Object* fn = heap.top();
+
+  // TODO: branch on function vs macro, native vs lambda
+
+  // FOR NOW, ASSUME native function
+  Object** frame = heap.newFrame();
+  int nArgs = evalFrame(expr->cdr(), env);
+
+  // Invoke native function
+  fn->call(nArgs, frame, heap);
+
+  // Remove everything except function result
+  heap.collapse(nArgs + 1);
+}
+
+int Interp::evalFrame(Object* args, Object* env)
+{
+  int n = 0;
+  while (args->nonNull())
+    {
+      eval(args->car(), env);
+      ++n;
+      args = args->cdr();
+    }
+  return n;
+}
+
+// Stack action: <env, symbol, value> -> <env>
+void Interp::bind()
+{
+  Object* env = heap.down(2);
+  
+  heap.cons();        // Create <symbol, value> pair
+
+  // Prepend new pair to pairs list of env (in car of env)
+  heap.push(env->car());
+  heap.cons();
+
+  // Update env's pointer to its pairs list
+  env->replaca(heap.pop());
+}
+
+void Interp::bind(Object* env, const char* symbol, NativeFunction* fun)
+{
   heap.push(env);
-  eval();
-
-  // TODO:
-  //   - If function, eval args
-  //   - Invoke apply() with args
-}
-
-Object* Interp::bind(Object* env, Object* symbol, Object* value)
-{
-  Object* pair = heap.cons(symbol, value);
-  env->replaca(heap.cons(pair, env->car()));
-  return env;
-}
-
-Object* Interp::bind(Object* env, const char* symbol, NativeFunction* fun)
-{
-  // FIX: return bind(env, heap.makeSymbol(symbol), heap.alloc(fun));
-  // TEMP:
-  return heap.nil();
+  heap.makeSymbol(symbol);
+  heap.alloc(fun);
+  bind();
 }
 
 void Interp::defineGlobalFunctions()

@@ -5,8 +5,8 @@
 class AbstInterp {
 public:
 
-  // Evaluation an expression, where stack is <expr, env>
-  virtual void eval();
+  // Evaluation an expression
+  virtual void eval(Object* expr, Object* env);
 };
 
 class EchoInterp {
@@ -15,7 +15,7 @@ class EchoInterp {
  public:
   EchoInterp(Heap& h) : heap(h) { }
 
-  void eval() { return; }
+  void eval(Object* expr, Object*) { heap.push(expr);; }
 };
 
 class Interp {
@@ -24,17 +24,18 @@ class Interp {
 
   void defineGlobalFunctions();
 
+  int evalFrame(Object* args, Object* env);
   Object* evlis(Object* ls, Object* env);
 
   // Functions for environments
   Object* emptyEnv(Object* parent);
-  Object* bind(Object* env, Object* symbol, Object* value);
-  Object* bind(Object* env, const char* symbol, NativeFunction* fun);
+  void bind();
+  void bind(Object* env, const char* symbol, NativeFunction* fun);
   Object* get(Object* env, Object* symbol);
 
 public:
   Interp(Heap& h);
-  void eval();
+  void eval(Object* expr, Object* env);
   
   Object* apply(Object* fn, Object* args, Object* env);
 };

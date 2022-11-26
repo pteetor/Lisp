@@ -21,6 +21,13 @@
 // Methods
 //
 
+void Object::call(int nArgs, Object** frame, Heap& heap)
+{
+  assert(functionp());
+
+  (pfunction)(nArgs, frame, heap);
+}
+
 void Object::checkTag(Tag t) {
   if (this->tag != t) {
     throw std::bad_cast();
@@ -156,7 +163,7 @@ void printAtom(const Object *ap, ostream& os) {
     os << *(ap->pstring);
     break;
   case SYMBOL_TAG:
-    os << *(ap->get(Heap::PNAME));
+    os << "[symbol]";
     break;
   default:
     os << "???";

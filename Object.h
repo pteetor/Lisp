@@ -205,6 +205,8 @@ public:
   long int markBit() const { return tag & MARK_BIT; }
   Tag pureTag() const { return tag & ~MARK_BIT; }
 
+  void call(int nArgs, Object** frame, Heap& heap);
+
   // friend Object *linkString(Object*, String*);
   // friend Object *linkSymbol(Object*, String*);
 

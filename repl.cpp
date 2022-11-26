@@ -34,8 +34,7 @@ int main()
 
   while (rdr.read())
     {
-      heap.push(heap.nil());
-      interp.eval();
+      interp.eval(heap.top(), heap.nil());
       print(heap.top());
       cout << endl;
       heap.pop();

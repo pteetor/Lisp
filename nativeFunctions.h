@@ -1,4 +1,4 @@
 //
 // User-callable run time functions
 //
-Object* sum_f(Object* args, Heap& heap);
+void sum_f(int nArgs, Object** frame, Heap& heap);

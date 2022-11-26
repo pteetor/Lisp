@@ -11,15 +11,14 @@
 #include "functions.h"
 #include "nativeFunctions.h"
 
-Object* sum_f(Object* args, Heap& heap)
+void sum_f(int nArgs, Object** frame, Heap& heap)
 {
   double sum = 0.0;
 
-  while (args->nonNull())
+  for (int i = 0; i < nArgs; ++i)
     {
-      sum += (double) *(args->car());
-      args = args->cdr();
+      sum += (double) *(frame[i]);
     }
 
-  return heap.alloc(sum);
+  heap.alloc(sum);
 }
