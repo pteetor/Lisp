@@ -75,10 +75,4 @@ public:
   Object* makeList(Object*, Object*);           // Obsolete??
   Object* makeList(Object*, Object*, Object*);  // Obsolete??
   void makeList(int n);                         // Stack-arguments version
-
-  //
-  // Global constants provided by the Heap
-  //
-  static Object* PNAME;     // OBSOLETE
-  static Object* APVAL;     // OBSOLETE
 };

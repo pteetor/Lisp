@@ -11,12 +11,6 @@
 #include "functions.h"
 
 //
-// Global constants defined by Heap
-//
-Object* Heap::PNAME = NULL;   // OBSOLETE
-Object* Heap::APVAL = NULL;   // OBSOLETE
-
-//
 // Heap methods
 //
 
