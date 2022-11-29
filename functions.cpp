@@ -48,22 +48,6 @@ int length(Object* list) {
   return len;
 }
 
-// NOT NEEDED?
-Object* linkString(Object* c, String* s)
-{
-  c->set(s);
-  s->set(c);
-  return c;
-}
-
-// NOT NEEDED?
-Object* linkSymbol(Object* c, String* s)
-{
-  c->set(s);
-  s->set(c);
-  return c;
-}
-
 //
 // Search a list.
 // If 'elem' is found, return tail starting at 'elem'.

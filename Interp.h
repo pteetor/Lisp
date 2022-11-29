@@ -3,25 +3,34 @@
 //
 
 class AbstInterp {
-public:
-
-  // Evaluation an expression
-  virtual void eval(Object* expr, Object* env);
-};
-
-class EchoInterp {
+protected:
   Heap& heap;
   
- public:
-  EchoInterp(Heap& h) : heap(h) { }
+public:
+  AbstInterp(Heap& h);
+  virtual ~AbstInterp();
 
-  void eval(Object* expr, Object*) { heap.push(expr);; }
+  // Evaluation - Explicit expression and environment
+  virtual void eval(Object* expr, Object* env) = 0;
+
+  // Evaluation - Implicit <expr, env> on top of stack
+  void eval();
 };
 
-class Interp {
-  Heap& heap;
-  Object* globalEnv;
+class EchoInterp: public AbstInterp {
 
+public:
+  EchoInterp(Heap& h) : AbstInterp(h) { }
+
+  void eval(Object* expr, Object*) { heap.push(expr); }
+};
+
+class Interp: public AbstInterp {
+  static Object* globalSymbols;
+  static Object* globalEnv;
+
+  void defineGlobalSymbol(Object**, const char*);
+  void defineGlobalSymbols();
   void defineGlobalFunctions();
 
   int evalFrame(Object* args, Object* env);
@@ -35,7 +44,26 @@ class Interp {
 
 public:
   Interp(Heap& h);
+
   void eval(Object* expr, Object* env);
+  void eval(Object* expr);
+  void eval();
   
   Object* apply(Object* fn, Object* args, Object* env);
+
+  friend void dumpGlobalSymbols();
 };
+
+// ----------------------------------------------------------
+
+//
+// Global symbols used by interpreter
+//
+
+extern Object* S_PLUS;
+extern Object* S_LAMBDA;
+
+//
+// Global functions
+//
+extern void dumpGlobalSymbols();

@@ -50,7 +50,9 @@ void Object::dump()
       cout << ">";
       break;
     case SYMBOL_TAG:
-      // TODO: Print print-name property (or "[unnamed]" if none)
+      cout << "<";
+      print(pname);
+      cout << ">";
       break;
     }
   } else {
@@ -66,25 +68,10 @@ bool Object::equal(const char* s) const
   case STRING_TAG:
     return pstring->equal(s);
   case SYMBOL_TAG:
-    // TODO: Find PNAME and compare to s
-    return false;
+    return pname->pstring->equal(s);
   default:
     return false;
   }
-}
-
-Object* Object::get(Object* ind) const
-{
-  assert(symbolp());
-  assert(ind->stringp());
-
-  Object* p = plist;
-  while (p->nonNull()) {
-    if (p->car()->car()->eq(ind))
-      return p->car()->cdr();
-    p = p->cdr();
-  }
-  return p;  /* = nil */
 }
 
 Object* Object::set(String* p)
@@ -104,7 +91,7 @@ Object* Object::set(NativeFunction* p)
 Object* Object::set(Object* p)
 {
   tag = SYMBOL_TAG;
-  plist = p;
+  pname = p;
   return this;
 }
 
@@ -115,22 +102,13 @@ Object* Object::set(Object *a, Object *d)
   return this;
 }
 
-Object* Object::setprops(Object* pl)
-{
-  assert(symbolp());
-  assert(pl->consp());
-
-  plist = pl;
-  return this;
-}
-
 void Object::mark() {
   Tag t = tag;
   tag = tag | MARK_BIT;
   if (t == STRING_TAG)
     pstring->mark();
   else if (t == SYMBOL_TAG) {
-    plist->mark();
+    pname->mark();
   }
 }
 
@@ -163,10 +141,10 @@ void printAtom(const Object *ap, ostream& os) {
     os << *(ap->pstring);
     break;
   case SYMBOL_TAG:
-    os << "[symbol]";
+    os << *(ap->pname->pstring);
     break;
   default:
-    os << "???";
+    os << "[unknown-atom]";
     break;
   }
 }

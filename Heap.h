@@ -41,11 +41,13 @@ public:
 
   // Stack functions
   void collapse(int n);
+  void collapseFrame(Object** fp);
   Object* down(int n);
   void drop(int n);
   Object** newFrame() const;
   Object* push(Object* p);
   Object* pop();
+  Object* popFrame(Object** fp);
   Object* top() const;
 
   // Dictionary methods
@@ -73,8 +75,6 @@ public:
   Object* makeList(Object*, Object*);           // Obsolete??
   Object* makeList(Object*, Object*, Object*);  // Obsolete??
   void makeList(int n);                         // Stack-arguments version
-
-  Object* setprop(Object* sym, Object* ind, Object* val);   // OBSOLETE
 
   //
   // Global constants provided by the Heap

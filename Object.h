@@ -114,9 +114,9 @@ class Object {
 	char char_v;
 	long int int_v;          // 8 bytes
 	double double_v;         // 8 bytes
-	String* pstring;         // Pointer into string space - 8 bytes
+	String* pstring;         // Content of string
+	Object* pname;           // Print name of symbol
 	NativeFunction* pfunction;
-	Object* plist;           // Property list of symbol
       };
     };
   };
@@ -144,12 +144,9 @@ public:
   Object* set(int i) { tag = INT_TAG; int_v = i; return this; }
   Object* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
   Object* set(String* p);                // String with pointer into string space
+  Object* set(Object* pname);            // Symbol with print-name
   Object* set(NativeFunction* f);        // Wrapper for native functions
-  Object* set(Object* p);                // Symbol with property list
   Object* set(Object *a, Object *d);     // Cons cell
-
-  Object* getprops() { return plist; }   // OBSOLETE
-  Object* setprops(Object* pl);          // OBSOLETE
 
   bool isFree() const { return tag == FREE_TAG; }
   bool notFree() const { return tag != FREE_TAG; }
@@ -192,7 +189,6 @@ public:
   // Common Lisp functions
   Object* car() const { return car_p; }
   Object* cdr() const { return cdr_p; }
-  Object* get(Object* ind) const;          // OBSOLETE
 
   Object* replaca(Object* p) { this->car_p = p; return this; }
   Object* replacd(Object* p) { this->cdr_p = p; return this; }
@@ -207,17 +203,12 @@ public:
 
   void call(int nArgs, Object** frame, Heap& heap);
 
-  // friend Object *linkString(Object*, String*);
-  // friend Object *linkSymbol(Object*, String*);
-
   friend void printAtom(const Object* ap, ostream& os);
   friend void print(const Object* c, ostream& os);
 
   void dump();
 };
 
-extern Object *linkString(Object* cp, String* s);
-extern Object *linkSymbol(Object* cp, String* s);
 extern Object *makeString(const char* s);
 extern Object *makeSymbol(const char* s);
 

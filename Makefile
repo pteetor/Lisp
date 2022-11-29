@@ -125,3 +125,8 @@ test-console.o: test-console.cpp Tokenizer.h
 
 test-ConsoleBuffer: test-ConsoleBuffer.o ConsoleBuffer.o
 	g++ -o $@ $^
+
+test-eval: test-eval.o $(HEAP_OBJ) $(INTERP_OBJ) functions.o nativeFunctions.o
+	g++ -o $@ $^
+
+test-eval.o: test-eval.cpp $(HEAP_HDR) $(INTERP_HDR)

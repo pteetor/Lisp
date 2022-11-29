@@ -36,8 +36,6 @@ public:
 
   Object* cons(Object* a, Object* d);
 
-  Object* setprop(Object* sym, Object* ind, Object* val);
-
   Object* makeList(Object*);
   Object* makeList(Object*, Object*);
   Object* makeList(Object*, Object*, Object*);

@@ -37,7 +37,7 @@ int main()
       interp.eval(heap.top(), heap.nil());
       print(heap.top());
       cout << endl;
-      heap.pop();
+      heap.drop(2);
     }
 
   exit(0);

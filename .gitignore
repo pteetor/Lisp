@@ -18,3 +18,4 @@ test-StringFinder
 test-symbol
 test-console
 test-ConsoleBuffer
+test-eval

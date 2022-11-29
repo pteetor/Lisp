@@ -71,16 +71,6 @@ void ObjPool::mark(Object* p)
   p->mark();
 }
 
-Object* ObjPool::setprop(Object* sym, Object* ind, Object* val)
-{
-  assert(sym->symbolp());
-  assert(ind->stringp());
-
-  Object* pair = cons(ind, val);
-  sym->setprops(cons(pair, sym->getprops()));
-  return sym;
-}
-
 // Free all unmarked cells
 void ObjPool::sweep() {
   for (int i = 0; i < nObjects; ++i) {

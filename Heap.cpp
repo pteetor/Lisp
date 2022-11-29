@@ -7,7 +7,6 @@
 #include "Object.h"
 #include "ObjPool.h"
 #include "StringFinder.h"
-// #include "Dict.h"
 #include "Heap.h"
 #include "functions.h"
 
@@ -26,10 +25,6 @@ Heap::Heap(ObjPool* op, StringFinder *sf) : obj(op), finder(sf)
   dict = obj->nil();
   sp = stack;
   pProtected = obj->nil();
-
-  // Populate global constants
-  // PNAME = makeString("PNAME");   // OBSOLETE
-  // APVAL = makeString("APVAL");   // OBSOLETE
 }
 
 Heap::~Heap() {
@@ -183,15 +178,9 @@ void Heap::makeSymbol(const char* s)
   if (lookupSymbol())
     return;
 
-  alloc(nil());
+  alloc(top());
   insertSymbol();
   collapse(1);     // Remove string, retain symbol
-}
-
-// OBSOLETE
-Object* Heap::setprop(Object* sym, Object* ind, Object* val)
-{
-  return obj->setprop(sym, ind, val);
 }
 
 // ----------------------------------------------------------
@@ -204,6 +193,16 @@ void Heap::collapse(int n)
 {
   Object* temp = pop();
   sp -= n;
+  push(temp);
+}
+
+//
+// Replace entire frame with current top of stack
+//
+void Heap::collapseFrame(Object** fp)
+{
+  Object* temp = top();
+  sp = fp;
   push(temp);
 }
 
@@ -233,6 +232,16 @@ Object* Heap::pop()
   return *(--sp);
 }
 
+//
+// Pop stack, collapse frame, and return popped value
+//
+Object* Heap::popFrame(Object** fp)
+{
+  Object* temp = pop();
+  sp = fp;
+  return temp;
+}
+
 Object* Heap::top() const
 {
   return *(sp - 1);
@@ -252,7 +261,7 @@ Object* Heap::find(Object* k)
   while (p->nonNull())
     {
       if (key(p)->eq(k))
-	return p;
+	return p->car();
       p = next(p);
     }
   return obj->nil();
