@@ -72,7 +72,6 @@ class StringSpace {
   ~StringSpace();
 
   String* alloc(const char* s, Object* c = NULL);
-  // NO: String* set(Object* c);
   void compactify();
 
   void dump();

@@ -36,10 +36,11 @@ void Object::checkTag(Tag t) {
 
 void Object::dump()
 {
-  int nUse;
+  static const char* indent = "  ";
   
   cout << "[ " << std::hex << this << " ]"
        << "  mark bit: " << markBit() << endl << std::dec;
+  cout << indent;
   if (atom()) {
     cout << "atom: " << tagName(pureTag()) << " (" << pureTag() << ") ";
     switch (pureTag()) {
@@ -187,9 +188,9 @@ const char* tagName(const Tag t)
 {
   switch (t) {
   case NIL_TAG: return "nil";
-  case FREE_TAG: return "free";
-  case BOOL_TAG: return "bool";
-  case CHAR_TAG: return "char";
+  case FREE_TAG: return "fre";
+  case BOOL_TAG: return "bol";
+  case CHAR_TAG: return "chr";
   case INT_TAG: return "int";
   case DOUBLE_TAG: return "dbl";
   case STRING_TAG: return "str";

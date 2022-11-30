@@ -51,6 +51,7 @@ public:
   
   Object* apply(Object* fn, Object* args, Object* env);
 
+  friend void dumpGlobalEnv();
   friend void dumpGlobalSymbols();
 };
 
@@ -67,3 +68,4 @@ extern Object* S_LAMBDA;
 // Global functions
 //
 extern void dumpGlobalSymbols();
+extern void dumpGlobalEnv();

@@ -95,6 +95,11 @@ Object* Heap::alloc(String* s)
   return push(obj->alloc(s));
 }
 
+Object* Heap::alloc(const char* s)
+{
+  return push(finder->find(s));
+}
+
 Object* Heap::alloc(NativeFunction* p)
 {
   return push(obj->alloc(p));

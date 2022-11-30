@@ -130,3 +130,8 @@ test-eval: test-eval.o $(HEAP_OBJ) $(INTERP_OBJ) functions.o nativeFunctions.o
 	g++ -o $@ $^
 
 test-eval.o: test-eval.cpp $(HEAP_HDR) $(INTERP_HDR)
+
+test-lists: test-lists.o $(HEAP_OBJ) functions.o
+	g++ -o $@ $^
+
+test-lists.o: test-lists.cpp $(HEAP_HDR)

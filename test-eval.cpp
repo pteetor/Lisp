@@ -22,6 +22,14 @@ int main()
   Heap heap(&obj, &sf);
   Interp interp(heap);
 
+  // DEBUG
+  cout << "LAMBDA = " << *S_LAMBDA << endl;
+  cout << "S_PLUS = " << *S_PLUS << endl;
+
+  // DEBUG
+  dumpGlobalSymbols();
+  dumpGlobalEnv();
+
   auto nil = heap.nil();
 
   // nil evaluates to nil
@@ -49,9 +57,6 @@ int main()
     auto result = heap.popFrame(fp);
     assert(result->eq(foo));    
   }
-
-  // DEBUG
-  dumpGlobalSymbols();
 
   // Global symbols evaluate to themselves
   {

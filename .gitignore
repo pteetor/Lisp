@@ -19,3 +19,4 @@ test-symbol
 test-console
 test-ConsoleBuffer
 test-eval
+test-lists

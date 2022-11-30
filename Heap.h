@@ -33,6 +33,7 @@ public:
   Object* alloc(int i);
   Object* alloc(double d);
   Object* alloc(String* s);             // New string
+  Object* alloc(const char* s);
   Object* alloc(NativeFunction* p);     // New built-in function
   Object* alloc(Object* p);             // New symbol, with prop. list
 

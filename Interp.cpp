@@ -99,10 +99,10 @@ void Interp::eval(Object* expr, Object* env)
 {
   if (expr->symbolp()) {
     // TODO: Consult 'env' before global definition
-    Object* val = get(globalEnv, expr);
-    if (val->null())
+    Object* pair = get(globalEnv, expr);
+    if (pair->null())
       throw std::invalid_argument("undefined variable");
-    heap.push(val->cdr());
+    heap.push(pair->cdr());
     return;
   }
 
@@ -148,11 +148,12 @@ int Interp::evalFrame(Object* args, Object* env)
 void Interp::bind()
 {
   Object* env = heap.down(2);
+  Object* pairs = env->car();
   
   heap.cons();        // Create <symbol, value> pair
 
   // Prepend new pair to pairs list of env (in car of env)
-  heap.push(env->car());
+  heap.push(pairs);
   heap.cons();
 
   // Update env's pointer to its pairs list
@@ -199,15 +200,11 @@ Object* Interp::evlis(Object* ls, Object* env)
 
 Object* Interp::get(Object* env, Object* symbol)
 {
-  Object* p;
-  
   while (env->nonNull())
     {
-      p = env->car();
-      while (p->nonNull()) {
-	if (p->car()->eq(symbol))
-	  return p->car();
-	p = p->cdr();
+      for (Object* pairs = env->car(); pairs->nonNull(); pairs = pairs->cdr()) {
+	if (pairs->car()->car()->eq(symbol))
+	  return pairs->car();
       }
       env = env->cdr();
     }
@@ -224,13 +221,19 @@ Object* Interp::emptyEnv(Object* parent)
 //
 // Friend functions
 //
-void dumpGlobalSymbols()
+void dumpGlobalEnv()
 {
-  Object* p;
+  Object* pairs = Interp::globalEnv->car();
 
-  for (p = Interp::globalEnv; p->nonNull(); p = p->cdr())
+  for (Object* p = pairs; p->nonNull(); p = p->cdr())
     {
       print(p->car()->car());
       std::cout << std::endl;
     }
+}
+
+void dumpGlobalSymbols()
+{
+  print(Interp::globalSymbols);
+  cout << endl;
 }

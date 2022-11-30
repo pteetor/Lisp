@@ -14,9 +14,14 @@
 void sum_f(int nArgs, Object** args, Heap& heap)
 {
   double sum = 0.0;
+  double arg;
 
   for (int i = 0; i < nArgs; ++i)
     {
+      // DEBUG
+      arg = (double) *(args[i]);
+      cout << i << "=" << arg << endl;
+      
       sum += (double) *(args[i]);
     }
 

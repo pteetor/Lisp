@@ -32,6 +32,7 @@ public:
   Object* alloc(int i);
   Object* alloc(double d);
   Object* alloc(String* s);       // New string
+  // Object* alloc(const char* s);   // Convenience function
   Object* alloc(Object* p);       // New symbol, with prop. list
 
   Object* cons(Object* a, Object* d);

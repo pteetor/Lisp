@@ -14,6 +14,7 @@
 #include "Tokenizer.h"
 #include "Reader.h"
 #include "Interp.h"
+#include "nativeFunctions.h"
 
 int main()
 {
@@ -30,11 +31,11 @@ int main()
   Heap heap(&obj, &sf);
   Reader rdr(tkz, heap);
 
-  EchoInterp interp(heap);
+  Interp interp(heap);
 
   while (rdr.read())
     {
-      interp.eval(heap.top(), heap.nil());
+      interp.eval(heap.top());
       print(heap.top());
       cout << endl;
       heap.drop(2);
