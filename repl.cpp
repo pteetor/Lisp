@@ -35,6 +35,7 @@ int main()
 
   while (rdr.read())
     {
+      cout << "Evaluating: " << *(heap.top()) << endl;
       interp.eval(heap.top());
       print(heap.top());
       cout << endl;

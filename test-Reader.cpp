@@ -32,7 +32,7 @@ int main() {
 
   if (ok) {
     cout << endl;
-    heap.dump();
+    // heap.dump();
   
     print(heap.top());
     cout << endl;

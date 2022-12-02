@@ -20,7 +20,16 @@ void Reader::syntaxError(const char *msg) {
     exit(1);
 }
 
+//
+// <list>  ->  ( )
+//         ->  ( <sexpr> <tail>
+//
+// <tail>  ->  )
+//         ->  . <sexpr> )
+//         ->  <sexpr> <tail> )
+//
 void Reader::parseList() {
+  int n = 0;
 
   // Empty list?
   if (tkz.now() == RPAREN_TOK) {
@@ -28,40 +37,31 @@ void Reader::parseList() {
     return;
   }
 
-  // Create head of list: cons(elem1, nil)
+  // Parse first element of list
   parse();
-  heap.push(heap.nil());
-  heap.cons();
-
-  // Save head for returning
-  Object* head = heap.top();
+  n++;
 
   tkz.next();
   while (tkz.now() != DOT_TOK)
     {
-      if (tkz.now() == RPAREN_TOK)
+      if (tkz.now() == RPAREN_TOK) {
+	heap.push(heap.nil());
+	heap.cons(n);
 	return;
+      }
 
-      // Create one-element list of next parse()
       parse();
-      heap.makeList(1);
-
-      // Append to existing tail, and it becomes new tail
-      heap.down(1)->replacd(heap.top());
-      heap.collapse(1);
+      n++;
       tkz.next();
     }
 
   // Here tail ends with: . <expr> )
   tkz.next();   // Skip dot
   parse();
-  heap.down(1)->replacd(heap.top());
-  heap.drop(2);
+  heap.cons(n);
 
   if (tkz.next() != RPAREN_TOK)
     syntaxError("missing right parenthesis");
-
-  heap.push(head);
 }
 
 void Reader::parse() {

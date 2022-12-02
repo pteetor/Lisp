@@ -118,6 +118,12 @@ void Heap::cons()
   collapse(2);
 }
 
+void Heap::cons(int n)
+{
+  while (n-- > 0)
+    cons();
+}
+
 Object* Heap::cons(Object* a, Object* d)
 {
   return push(obj->cons(a, d));

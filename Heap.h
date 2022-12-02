@@ -37,8 +37,9 @@ public:
   Object* alloc(NativeFunction* p);     // New built-in function
   Object* alloc(Object* p);             // New symbol, with prop. list
 
-  Object* cons(Object* a, Object* d);   // Obsolete??
-  void cons();                          // Stack-arguments version
+  void cons();                          // Implicit car & cdr on stack
+  void cons(int n);                     // Perform N cons() calls
+  Object* cons(Object* a, Object* d);   // Explicit car & cdr
 
   // Stack functions
   void collapse(int n);
