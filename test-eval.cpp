@@ -14,6 +14,11 @@ using namespace std;
 #include "Heap.h"
 #include "Interp.h"
 
+void nl()
+{
+  cout << endl;
+}
+
 int main()
 {
   ObjPool obj(1000);
@@ -74,6 +79,34 @@ int main()
     auto result = heap.pop();
     print(result); cout << endl;
     assert(result->functionp());
+  }
+
+  // Does "+" distinguish integers from doubles?
+  {
+    heap.makeSymbol("+");
+    heap.alloc(1);
+    heap.alloc(1);
+    heap.makeList(3);
+    interp.eval(heap.top());
+
+    print(heap.top()); nl();
+    cout << "That " << (heap.top()->integerp() ? "is" : "is not")
+	 << " an integer" << endl;
+    heap.drop(2);
+  }
+
+  // Ditto
+  {
+    heap.makeSymbol("+");
+    heap.alloc(1.0);
+    heap.alloc(1.0);
+    heap.makeList(3);
+    interp.eval(heap.top());
+
+    print(heap.top()); nl();
+    cout << "That " << (heap.top()->integerp() ? "is" : "is not")
+	 << " an integer" << endl;
+    heap.drop(2);
   }
 
   cout << "All tests passed" << endl;

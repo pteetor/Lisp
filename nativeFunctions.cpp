@@ -13,17 +13,25 @@
 
 void sum_f(int nArgs, Object** args, Heap& heap)
 {
-  double sum = 0.0;
-  double arg;
+  int i_sum = 0;
+  int i = 0;
 
-  for (int i = 0; i < nArgs; ++i)
+  while (i < nArgs && args[i]->integerp())
     {
-      // DEBUG
-      arg = (double) *(args[i]);
-      cout << i << "=" << arg << endl;
-      
-      sum += (double) *(args[i]);
+      i_sum += (int) *(args[i++]);
     }
 
-  heap.alloc(sum);
+  if (i == nArgs) {
+    heap.alloc(i_sum);
+    return;
+  }
+  
+  double d_sum = i_sum;
+
+  while (i < nArgs)
+    {
+      d_sum += (double) *(args[i++]);
+    }
+
+  heap.alloc(d_sum);
 }
