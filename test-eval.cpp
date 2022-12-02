@@ -24,7 +24,6 @@ int main()
 
   // DEBUG
   cout << "LAMBDA = " << *S_LAMBDA << endl;
-  cout << "S_PLUS = " << *S_PLUS << endl;
 
   // DEBUG
   dumpGlobalSymbols();
@@ -45,6 +44,7 @@ int main()
     heap.push(nil);
     interp.eval();
     double result = (double) *(heap.pop());
+    cout << result << endl;
     assert(result == 3.14);
   }
 
@@ -55,14 +55,25 @@ int main()
     heap.push(nil);
     interp.eval();
     auto result = heap.popFrame(fp);
+    print(result); cout << endl;
     assert(result->eq(foo));    
   }
 
   // Global symbols evaluate to themselves
   {
-    interp.eval(S_PLUS);
+    heap.makeSymbol("pi");
+    interp.eval(heap.pop());
     auto result = heap.pop();
-    assert(result->eq(S_PLUS));
+    print(result); cout << endl;
+    assert((double) *result == 3.1415926);
+  }
+
+  {
+    heap.makeSymbol("+");
+    interp.eval(heap.pop());
+    auto result = heap.pop();
+    print(result); cout << endl;
+    assert(result->functionp());
   }
 
   cout << "All tests passed" << endl;

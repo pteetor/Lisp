@@ -6,7 +6,6 @@
 #include "Object.h"
 #include "ObjPool.h"
 #include "StringFinder.h"
-// #include "Dict.h"
 #include "Heap.h"
 #include "functions.h"
 #include "nativeFunctions.h"
@@ -14,10 +13,10 @@
 #include "Interp.h"
 
 //
-// Global symbols
+// Interpreter symbols
 //
-Object* S_PLUS;
 Object* S_LAMBDA;
+Object* S_LET;
 
 //
 // Global variables
@@ -49,11 +48,11 @@ void AbstInterp::eval()
 Interp::Interp(Heap& h) : AbstInterp(h)
 {
   globalSymbols = heap.nil();
-  defineGlobalSymbols();
+  createSymbols();
   heap.protect(globalSymbols);
 
   globalEnv = emptyEnv(heap.nil());
-  defineGlobalFunctions();
+  populateGlobalEnv();
   heap.protect(globalEnv);
 }
 
@@ -161,34 +160,20 @@ void Interp::bind()
   heap.drop(1);
 }
 
+void Interp::bind(Object* env, const char* symbol, double x)
+{
+  heap.push(env);
+  heap.makeSymbol(symbol);
+  heap.alloc(x);
+  bind();
+}
+
 void Interp::bind(Object* env, const char* symbol, NativeFunction* fun)
 {
   heap.push(env);
   heap.makeSymbol(symbol);
   heap.alloc(fun);
   bind();
-}
-
-void Interp::defineGlobalFunctions()
-{
-  bind(globalEnv, "+", sum_f);
-}
-
-void Interp::defineGlobalSymbol(Object** var, const char* str)
-{
-  heap.makeSymbol(str);
-  *var = heap.top();
-
-  // Append to list of global symbols
-  heap.push(globalSymbols);
-  heap.cons();
-  globalSymbols = heap.pop();
-}
-
-void Interp::defineGlobalSymbols()
-{
-  defineGlobalSymbol(&S_LAMBDA, "lambda");
-  defineGlobalSymbol(&S_PLUS, "+");
 }
 
 Object* Interp::evlis(Object* ls, Object* env)
@@ -219,6 +204,37 @@ Object* Interp::emptyEnv(Object* parent)
 // ----------------------------------------------------------
 
 //
+// Interpreter symbols and the global environment
+//
+
+// The interpreter needs some semantic symbols
+void Interp::createSymbols()
+{
+  createSymbol(&S_LAMBDA, "lambda");
+  createSymbol(&S_LET, "let");
+}
+
+void Interp::createSymbol(Object** var, const char* str)
+{
+  heap.makeSymbol(str);
+  *var = heap.top();
+
+  // Append to list of protected symbols
+  heap.push(globalSymbols);
+  heap.cons();
+  globalSymbols = heap.pop();
+}
+
+void Interp::populateGlobalEnv()
+{
+  bind(globalEnv, "+", sum_f);
+
+  bind(globalEnv, "pi", 3.1415926);
+}
+
+// ----------------------------------------------------------
+
+//
 // Friend functions
 //
 void dumpGlobalEnv()
@@ -227,7 +243,7 @@ void dumpGlobalEnv()
 
   for (Object* p = pairs; p->nonNull(); p = p->cdr())
     {
-      print(p->car()->car());
+      print(p->car());
       std::cout << std::endl;
     }
 }

@@ -91,11 +91,10 @@ Object* ObjPool::alloc(String* s)
   return alloc()->set(s);
 }
 
-// Object* ObjPool::alloc(const char* s)
-// {
-//   String* p = MAKE A STRING;
-//   return alloc()->set(p);
-// }
+Object* ObjPool::alloc(NativeFunction* f)
+{
+  return alloc()->set(f);
+}
 
 // Allocate symbol object, with initial property list
 Object* ObjPool::alloc(Object* p)

@@ -26,12 +26,16 @@ public:
 };
 
 class Interp: public AbstInterp {
+
+  // List of semantic symbols used by interpreter
   static Object* globalSymbols;
+
+  // Global environment of pre-defined objects
   static Object* globalEnv;
 
-  void defineGlobalSymbol(Object**, const char*);
-  void defineGlobalSymbols();
-  void defineGlobalFunctions();
+  void createSymbol(Object**, const char*);
+  void createSymbols();
+  void populateGlobalEnv();
 
   int evalFrame(Object* args, Object* env);
   Object* evlis(Object* ls, Object* env);
@@ -39,6 +43,7 @@ class Interp: public AbstInterp {
   // Functions for environments
   Object* emptyEnv(Object* parent);
   void bind();
+  void bind(Object* env, const char* symbol, double x);
   void bind(Object* env, const char* symbol, NativeFunction* fun);
   Object* get(Object* env, Object* symbol);
 
@@ -58,11 +63,12 @@ public:
 // ----------------------------------------------------------
 
 //
-// Global symbols used by interpreter
+// Global symbols used by interpreter and unit tests
 //
 
 extern Object* S_PLUS;
 extern Object* S_LAMBDA;
+extern Object* S_PI;
 
 //
 // Global functions

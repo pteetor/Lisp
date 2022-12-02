@@ -141,6 +141,9 @@ void printAtom(const Object *ap, ostream& os) {
   case STRING_TAG:
     os << *(ap->pstring);
     break;
+  case FUNCTION_TAG:
+    os << "<function>";
+    break;
   case SYMBOL_TAG:
     os << *(ap->pname->pstring);
     break;
