@@ -1,4 +1,7 @@
 //
 // User-callable run time functions
 //
-void sum_f(int nArgs, Object** frame, Heap& heap);
+void diff_f(int, Object**, Heap&);
+void div_f(int, Object**, Heap&);
+void prod_f(int, Object**, Heap&);
+void sum_f(int, Object**, Heap&);

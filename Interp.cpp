@@ -227,6 +227,9 @@ void Interp::createSymbol(Object** var, const char* str)
 
 void Interp::populateGlobalEnv()
 {
+  bind(globalEnv, "-", diff_f);
+  bind(globalEnv, "/", div_f);
+  bind(globalEnv, "*", prod_f);
   bind(globalEnv, "+", sum_f);
 
   bind(globalEnv, "pi", 3.1415926);
