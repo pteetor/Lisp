@@ -36,10 +36,20 @@ int main()
   while (rdr.read())
     {
       cout << "Evaluating: " << *(heap.top()) << endl;
-      interp.eval(heap.top());
-      print(heap.top());
-      cout << endl;
-      heap.drop(2);
+
+      try {
+	interp.eval(heap.top());
+	print(heap.top());
+	cout << endl;
+	heap.drop(2);
+      } catch (const LispEx ex) {
+	cerr << "Lisp exception: " << ex.what() << endl;
+	// TODO: Reset the heap, esp'ly the stack
+	// e.g., heap.reset();
+      } catch (...) {
+	cerr << "Caught generic exception" << endl;
+	exit(1);
+      }
     }
 
   exit(0);

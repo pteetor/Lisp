@@ -3,10 +3,10 @@
 //
 #include <iostream>
 
+#include "globals.h"
 #include "Object.h"
 #include "ObjPool.h"
 #include "StringFinder.h"
-// #include "Dict.h"
 #include "Heap.h"
 #include "Tokenizer.h"
 #include "Reader.h"

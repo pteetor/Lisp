@@ -2,8 +2,6 @@
 // Low-level objects for Lisp: atoms, strings, cons'es, symbols
 //
 
-#include "globals.h"
-
 using namespace std;
 
 // ----------------------------------------------------------
@@ -176,13 +174,13 @@ public:
   operator int() const {
     if (this->tag == INT_TAG) return this->int_v;
     if (this->tag == DOUBLE_TAG) return (int) this->double_v;
-    throw std::bad_cast();
+    throw LispEx(I3);
   }
 
   operator double() const {
     if (this->tag == DOUBLE_TAG) return this->double_v;
     if (this->tag == INT_TAG) return (double) this->int_v;
-    throw std::bad_cast();
+    throw LispEx(I3);
   }
 
   // Common Lisp functions

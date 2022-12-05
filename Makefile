@@ -16,7 +16,7 @@ HEAP_OBJ = Heap.o ObjPool.o Object.o StringFinder.o String.o
 
 INTERP_HDR = Interp.h nativeFunctions.h
 
-INTERP_OBJ = Interp.o nativeFunctions.o
+INTERP_OBJ = Interp.o nativeFunctions.o LispEx.o
 
 apps: $(APPS)
 
@@ -55,6 +55,8 @@ Interp.o: Interp.cpp $(INTERP_HDR) $(HEAP_HDR)
 ConsoleBuffer.o: ConsoleBuffer.cpp ConsoleBuffer.h
 
 nativeFunctions.o: nativeFunctions.cpp nativeFunctions.h $(HEAP_HDR)
+
+LispEx.o: LispEx.cpp globals.h
 
 #
 # utility

@@ -5,6 +5,7 @@
 #include <cstring>
 #include <ostream>
 
+#include "globals.h"
 #include "Object.h"
 #include "ObjPool.h"
 #include "StringFinder.h"

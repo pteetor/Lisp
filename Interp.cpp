@@ -100,7 +100,7 @@ void Interp::eval(Object* expr, Object* env)
     // TODO: Consult 'env' before global definition
     Object* pair = get(globalEnv, expr);
     if (pair->null())
-      throw std::invalid_argument("undefined variable");
+      throw LispEx(A8);
     heap.push(pair->cdr());
     return;
   }

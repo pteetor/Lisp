@@ -31,10 +31,12 @@ ObjPool::~ObjPool() {
 }
 
 Object* ObjPool::alloc() {
-  if (pFree->eq(nil())) throw std::bad_alloc();
+  if (pFree->eq(nil()))
+    throw LispEx(GC1);
 
   // Double-check:
-  if (nFree == 0) throw std::bad_alloc();
+  if (nFree == 0)
+    throw LispEx(GC1);
 
   Object* p = pFree;
   pFree = pFree->cdr();
