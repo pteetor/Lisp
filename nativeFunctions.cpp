@@ -14,7 +14,7 @@
 void diff_f(int nArgs, Object** args, Heap& heap)
 {
   if (nArgs == 0)
-    throw std::invalid_argument("too few arguments");
+    throw LispEx(F3);
 
   double diff = (double) *(args[0]);
 
@@ -33,7 +33,7 @@ void diff_f(int nArgs, Object** args, Heap& heap)
 void div_f(int nArgs, Object** args, Heap& heap)
 {
   if (nArgs == 0)
-    throw std::invalid_argument("too few arguments");
+    throw LispEx(F3);
 
   double div = (double) *(args[0]);
 

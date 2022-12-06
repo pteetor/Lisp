@@ -152,7 +152,7 @@ String* StringSpace::alloc(const char* s, Object* c)
     
   // Check for space exceeded
   if (q > end)
-    throw std::bad_alloc();
+    throw LispEx(GC1);
 
   p->init(s, c);
 

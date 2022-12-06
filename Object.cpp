@@ -31,7 +31,7 @@ void Object::call(int nArgs, Object** frame, Heap& heap)
 
 void Object::checkTag(Tag t) {
   if (this->tag != t) {
-    throw std::bad_cast();
+    throw std::bad_cast();   // Generic error - should never happen
   };
 }
 
