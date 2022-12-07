@@ -6,7 +6,7 @@
 #include <regex>
 #include "Tokenizer.h"
 
-Tokenizer::Tokenizer(std::istream& s) : strm(s)
+Tokenizer::Tokenizer(std::istream& s)
 {
   ch = 0;
   eof = false;
@@ -33,8 +33,8 @@ Token Tokenizer::traceToken(Token t) {
 
 bool Tokenizer::nextCh()
 {
-  strm.get(ch);
-  eof = strm.eof();
+  ch = buffer.next();
+  eof = buffer.eof();
   return !eof;
 }
 

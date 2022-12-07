@@ -14,9 +14,9 @@ HEAP_HDR = globals.h Heap.h ObjPool.h Object.h StringFinder.h
 
 HEAP_OBJ = Heap.o ObjPool.o Object.o StringFinder.o String.o
 
-INTERP_HDR = Interp.h nativeFunctions.h
+INTERP_HDR = Interp.h nativeFunctions.h Tokenizer.h ConsoleBuffer.h Reader.h
 
-INTERP_OBJ = Interp.o nativeFunctions.o LispEx.o
+INTERP_OBJ = Interp.o nativeFunctions.o LispEx.o Tokenizer.o ConsoleBuffer.o Reader.o
 
 apps: $(APPS)
 
@@ -27,7 +27,7 @@ all: $(APPS) $(TESTS)
 #
 # detailed rules
 #
-repl: repl.o $(HEAP_OBJ) Reader.o Tokenizer.o functions.o $(INTERP_OBJ)
+repl: repl.o $(HEAP_OBJ) $(INTERP_OBJ) functions.o
 	g++ -g -o $@ $^
 
 repl.o: repl.cpp $(HEAP_HDR) Reader.h Tokenizer.h

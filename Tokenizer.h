@@ -2,6 +2,8 @@
 // Classes to support Lisp reader
 //
 
+#include "ConsoleBuffer.h"
+
 typedef enum TokenEnum {
   SOF_TOK = 0,
   EOF_TOK,
@@ -24,7 +26,7 @@ public:
 
 class Tokenizer: public AbstTokenizer {
 protected:
-  std::istream& strm;
+  ConsoleBuffer buffer;
   char ch;              // Next character to use
   bool eof;             // true when input exhausted
   Token token;          // The most-recently scanned token
