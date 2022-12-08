@@ -233,6 +233,8 @@ void Interp::populateGlobalEnv()
   bind(globalEnv, "+", sum_f);
 
   bind(globalEnv, "pi", 3.1415926);
+
+  bind(globalEnv, "sqrt", sqrt_f);
 }
 
 // ----------------------------------------------------------

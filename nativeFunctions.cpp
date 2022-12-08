@@ -1,6 +1,7 @@
 //
 // User-visible run time functions
 //
+#include <cmath>
 
 #include "globals.h"
 #include "Object.h"
@@ -60,6 +61,16 @@ void prod_f(int nArgs, Object** args, Heap& heap)
     }
 
   heap.alloc(prod);
+}
+
+void sqrt_f(int nArgs, Object** args, Heap& heap)
+{
+  if (nArgs < 1)
+    throw LispEx(F3);
+  if (nArgs > 1)
+    throw LispEx(F2);
+
+  heap.alloc(sqrt((double) *(args[0])));
 }
 
 void sum_f(int nArgs, Object** args, Heap& heap)
