@@ -29,6 +29,20 @@ void Object::call(int nArgs, Object** frame, Heap& heap)
   (pfunction)(nArgs, frame, heap);
 }
 
+Object* Object::car() const
+{
+  if (notFree() && !consp())
+    throw LispEx(X1);
+  return car_p;
+}
+
+Object* Object::cdr() const
+{
+  if (notFree() && !consp())
+    throw LispEx(X2);
+  return cdr_p;
+}
+
 void Object::checkTag(Tag t) {
   if (this->tag != t) {
     throw std::bad_cast();   // Generic error - should never happen

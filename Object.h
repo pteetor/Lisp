@@ -184,8 +184,8 @@ public:
   }
 
   // Common Lisp functions
-  Object* car() const { return car_p; }
-  Object* cdr() const { return cdr_p; }
+  Object* car() const;
+  Object* cdr() const;
 
   Object* replaca(Object* p) { this->car_p = p; return this; }
   Object* replacd(Object* p) { this->cdr_p = p; return this; }

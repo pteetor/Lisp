@@ -234,6 +234,9 @@ void Interp::populateGlobalEnv()
 
   bind(globalEnv, "pi", 3.1415926);
 
+  bind(globalEnv, "car", car_f);
+  bind(globalEnv, "cdr", cdr_f);
+  bind(globalEnv, "cons", cons_f);
   bind(globalEnv, "sqrt", sqrt_f);
 }
 

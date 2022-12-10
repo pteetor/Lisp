@@ -22,6 +22,10 @@ const char* LispEx::what() const throw ()
     return "GC1. Fatal error in garbage collection";
   case I3:
     return "I3. Numeric conversion error";
+  case X1:
+    return "X1. car: Not a cons cell";
+  case X2:
+    return "X2: cdr: Not a cons cell";
   default:
     return "Holy cow! An exception!";
   }

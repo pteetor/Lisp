@@ -56,7 +56,11 @@ typedef enum ExceptionCodeEnum {
   R3,
   R4,
   R5,
-  R6
+  R6,
+
+  // Local errors
+  X1,     // car of atom
+  X2      // cdr of atom
 } ExceptionCode;
 
 struct LispEx : public std::exception {

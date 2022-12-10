@@ -12,6 +12,36 @@
 #include "functions.h"
 #include "nativeFunctions.h"
 
+void car_f(int nArgs, Object** args, Heap& heap)
+{
+  if (nArgs < 1)
+    throw LispEx(F3);
+  if (nArgs > 1)
+    throw LispEx(F2);
+
+  heap.push(args[0]->car());
+}
+
+void cdr_f(int nArgs, Object** args, Heap& heap)
+{
+  if (nArgs < 1)
+    throw LispEx(F3);
+  if (nArgs > 1)
+    throw LispEx(F2);
+
+  heap.push(args[0]->cdr());
+}
+
+void cons_f(int nArgs, Object** args, Heap& heap)
+{
+  if (nArgs < 2)
+    throw LispEx(F3);
+  if (nArgs > 2)
+    throw LispEx(F2);
+
+  heap.cons(args[0], args[1]);
+}
+
 void diff_f(int nArgs, Object** args, Heap& heap)
 {
   if (nArgs == 0)
