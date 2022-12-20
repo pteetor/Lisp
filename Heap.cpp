@@ -7,6 +7,7 @@
 #include "Object.h"
 #include "ObjPool.h"
 #include "StringFinder.h"
+#include "Frame.h"
 #include "Heap.h"
 #include "functions.h"
 
@@ -194,6 +195,9 @@ void Heap::makeSymbol(const char* s)
 // Stack functions
 //
 
+//
+// Collapse the top N items on the stack,
+// replacing them with the current stack-top
 void Heap::collapse(int n)
 {
   Object* temp = pop();
@@ -202,15 +206,35 @@ void Heap::collapse(int n)
 }
 
 //
-// Replace entire frame with current top of stack
+// Collapse the top N items on the stack,
+// replacing them with 'value'
 //
-void Heap::collapseFrame(Object** fp)
+void Heap::collapse(int n, Object* value)
 {
-  Object* temp = top();
-  sp = fp;
-  push(temp);
+  sp -= n;
+  push(value);
 }
 
+//
+// Collapse stack frame, replacing it with current stack-top
+//
+void Heap::collapse(Frame& f)
+{
+  collapse(f, top());
+}
+
+//
+// Collapse stack frame, replacing it with 'value'
+//
+void Heap::collapse(Frame& f, Object* value)
+{
+  sp = f.argvec;
+  push(value);
+}
+
+//
+// Note: down(0) == top()
+//
 Object* Heap::down(int n)
 {
   return *(sp - n - 1);
@@ -221,9 +245,24 @@ void Heap::drop(int n)
   sp -= n;
 }
 
-Object** Heap::newFrame() const
+Frame Heap::newFrame(int n) const
 {
-  return sp;
+  return Frame(n, sp);
+}
+
+Frame Heap::newFrame(Object* arg0)
+{
+  Frame f = newFrame(1);
+  push(arg0);
+  return f;
+}
+
+Frame Heap::newFrame(Object* arg0, Object* arg1)
+{
+  Frame f = newFrame(2);
+  push(arg0);
+  push(arg1);
+  return f;
 }
 
 Object* Heap::push(Object* p)
@@ -237,14 +276,10 @@ Object* Heap::pop()
   return *(--sp);
 }
 
-//
-// Pop stack, collapse frame, and return popped value
-//
-Object* Heap::popFrame(Object** fp)
+void Heap::replace(Object* newTop, int n)
 {
-  Object* temp = pop();
-  sp = fp;
-  return temp;
+  drop(n);
+  push(newTop);
 }
 
 Object* Heap::top() const

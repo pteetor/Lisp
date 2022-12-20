@@ -10,107 +10,140 @@
 #include "Dict.h"
 #include "Heap.h"
 #include "functions.h"
+#include "Frame.h"
 #include "nativeFunctions.h"
 
-void car_f(int nArgs, Object** args, Heap& heap)
+void car_f(Frame& f, Heap& heap)
 {
-  if (nArgs < 1)
-    throw LispEx(F3);
-  if (nArgs > 1)
-    throw LispEx(F2);
+  f.checkNArgs(1);
+  Object* arg = f.arg(0);
 
-  heap.push(args[0]->car());
+  if (arg->atom() && arg->notFree())
+    throw LispEx(X1);
+
+  // heap.push(arg->car());
+  heap.collapse(f, arg->car());
 }
 
-void cdr_f(int nArgs, Object** args, Heap& heap)
+void cdr_f(Frame& f, Heap& heap)
 {
-  if (nArgs < 1)
-    throw LispEx(F3);
-  if (nArgs > 1)
-    throw LispEx(F2);
+  f.checkNArgs(1);
+  Object* arg = f.arg(0);
 
-  heap.push(args[0]->cdr());
+  if (arg->atom() && arg->notFree())
+    throw LispEx(X1);
+
+  heap.collapse(f, arg->cdr());
 }
 
-void cons_f(int nArgs, Object** args, Heap& heap)
+void cons_f(Frame& f, Heap& heap)
 {
-  if (nArgs < 2)
-    throw LispEx(F3);
-  if (nArgs > 2)
-    throw LispEx(F2);
-
-  heap.cons(args[0], args[1]);
+  f.checkNArgs(2);
+  heap.cons(f.arg(0), f.arg(1));
+  heap.collapse(f);
 }
 
-void diff_f(int nArgs, Object** args, Heap& heap)
+void diff_f(Frame& f, Heap& heap)
 {
+  int nArgs = f.nArgs();
+  
   if (nArgs == 0)
     throw LispEx(F3);
 
-  double diff = (double) *(args[0]);
+  double diff = (double) *(f.arg(0));
 
   if (nArgs == 1) {
     diff = -(diff);
   } else {
     for (int i = 1; i < nArgs; ++i)
       {
-	diff -= (double) *(args[i]);
+	diff -= (double) *(f.arg(i));
       }
   }
 
   heap.alloc(diff);
+  heap.collapse(f);
 }
 
-void div_f(int nArgs, Object** args, Heap& heap)
+void div_f(Frame& f, Heap& heap)
 {
+  int nArgs = f.nArgs();
   if (nArgs == 0)
     throw LispEx(F3);
 
-  double div = (double) *(args[0]);
+  double div = (double) *(f.arg(0));
 
   if (nArgs == 1) {
     div = 1.0 / div;
   } else {
     for (int i = 1; i < nArgs; ++i)
       {
-	div /= (double) *(args[i]);
+	div /= (double) *(f.arg(i));
       }
   }
 
   heap.alloc(div);
+  heap.collapse(f);
 }
 
-void prod_f(int nArgs, Object** args, Heap& heap)
+void list_f(Frame& f, Heap& heap)
 {
+  int nArgs = f.nArgs();
+  
+  heap.push(heap.nil());
+
+  // Loop invariant: Top of stack is the tail of the list so far
+  while (nArgs > 0) {
+    heap.cons(f.arg(--nArgs), heap.top());
+    heap.collapse(1);
+  }
+
+  heap.collapse(f);
+}
+
+void prod_f(Frame& f, Heap& heap)
+{
+  int nArgs = f.nArgs();
+  if (nArgs == 0)
+    throw LispEx(F3);
+    
   double prod = 1.0;
   int i = 0;
 
   while (i < nArgs)
     {
-      prod *= (double) *(args[i++]);
+      prod *= (double) *(f.arg(i++));
     }
 
   heap.alloc(prod);
+  heap.collapse(f);
 }
 
-void sqrt_f(int nArgs, Object** args, Heap& heap)
+void quote_f(Frame& f, Object* env, Heap& heap)
 {
-  if (nArgs < 1)
-    throw LispEx(F3);
-  if (nArgs > 1)
-    throw LispEx(F2);
-
-  heap.alloc(sqrt((double) *(args[0])));
+  f.checkNArgs(1);
+  heap.collapse(f, f.arg(0)->car());
 }
 
-void sum_f(int nArgs, Object** args, Heap& heap)
+void sqrt_f(Frame& f, Heap& heap)
 {
+  f.checkNArgs(1);
+  heap.alloc(sqrt((double) *(f.arg(0))));
+  heap.collapse(f);
+}
+
+void sum_f(Frame& f, Heap& heap)
+{
+  int nArgs = f.nArgs();
   int i_sum = 0;
   int i = 0;
 
-  while (i < nArgs && args[i]->integerp())
+  if (nArgs == 0)
+    throw LispEx(F3);
+
+  while (i < nArgs && f.arg(i)->integerp())
     {
-      i_sum += (int) *(args[i++]);
+      i_sum += (int) *(f.arg(i++));
     }
 
   if (i == nArgs) {
@@ -122,7 +155,7 @@ void sum_f(int nArgs, Object** args, Heap& heap)
 
   while (i < nArgs)
     {
-      d_sum += (double) *(args[i++]);
+      d_sum += (double) *(f.arg(i++));
     }
 
   heap.alloc(d_sum);

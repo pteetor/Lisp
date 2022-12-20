@@ -42,15 +42,23 @@ public:
   Object* cons(Object* a, Object* d);   // Explicit car & cdr
 
   // Stack functions
-  void collapse(int n);
-  void collapseFrame(Object** fp);
   Object* down(int n);
   void drop(int n);
-  Object** newFrame() const;
   Object* push(Object* p);
   Object* pop();
-  Object* popFrame(Object** fp);
+
   Object* top() const;
+  void replace(Object* newTop, int n = 1);
+
+  // Frame functions
+  Frame newFrame(int n) const;
+  Frame newFrame(Object* arg0);
+  Frame newFrame(Object* arg0, Object* arg1);
+  
+  void collapse(int n);
+  void collapse(int n, Object* value);
+  void collapse(Frame& f);
+  void collapse(Frame& f, Object* value);
 
   // Dictionary methods
   // The dictionary maps strings to symbols

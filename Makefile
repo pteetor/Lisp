@@ -14,9 +14,9 @@ HEAP_HDR = globals.h Heap.h ObjPool.h Object.h StringFinder.h
 
 HEAP_OBJ = Heap.o ObjPool.o Object.o StringFinder.o String.o
 
-INTERP_HDR = Interp.h nativeFunctions.h Tokenizer.h ConsoleBuffer.h Reader.h
+INTERP_HDR = Interp.h nativeFunctions.h Tokenizer.h ConsoleBuffer.h Reader.h Frame.h
 
-INTERP_OBJ = Interp.o nativeFunctions.o LispEx.o Tokenizer.o ConsoleBuffer.o Reader.o
+INTERP_OBJ = Interp.o nativeFunctions.o LispEx.o Tokenizer.o ConsoleBuffer.o Reader.o Frame.o
 
 apps: $(APPS)
 
@@ -57,6 +57,8 @@ ConsoleBuffer.o: ConsoleBuffer.cpp ConsoleBuffer.h
 nativeFunctions.o: nativeFunctions.cpp nativeFunctions.h $(HEAP_HDR)
 
 LispEx.o: LispEx.cpp globals.h
+
+Frame.o: Frame.cpp Frame.h globals.h
 
 #
 # utility

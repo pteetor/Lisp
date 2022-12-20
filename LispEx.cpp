@@ -14,6 +14,8 @@ const char* LispEx::what() const throw ()
   switch (code) {
   case A8:
     return "A8. Undefined variable";
+  case A9:
+    return "A9. Function object has no definition";
   case F2:
     return "F2. Argument list too long";
   case F3:

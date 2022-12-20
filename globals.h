@@ -16,7 +16,11 @@ class StringSpace;
 class Dict;
 class Heap;
 
-typedef void NativeFunction(int nArgs, Object** args, Heap& heap);
+class Frame;
+class Interp;
+
+typedef void NativeFunction(Frame& f, Heap& heap);
+typedef void NativeMacro(Frame& f, Object* env, Heap& heap);
 
 typedef enum ExceptionCodeEnum {
   // Interpreter errors

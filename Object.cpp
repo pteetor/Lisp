@@ -22,24 +22,36 @@
 // Methods
 //
 
-void Object::call(int nArgs, Object** frame, Heap& heap)
+bool Object::callablep() const
+{
+  return tag == FUNCTION_TAG || tag == MACRO_TAG;
+}
+
+void Object::callFunction(Frame& f, Heap& heap)
 {
   assert(functionp());
 
-  (pfunction)(nArgs, frame, heap);
+  (function_p)(f, heap);
+}
+
+void Object::callMacro(Frame& f, Object* env, Heap& heap)
+{
+  assert(macrop());
+  
+  (macro_p)(f, env, heap);
 }
 
 Object* Object::car() const
 {
-  if (notFree() && !consp())
-    throw LispEx(X1);
+  assert(consp() || isFree());
+
   return car_p;
 }
 
 Object* Object::cdr() const
 {
-  if (notFree() && !consp())
-    throw LispEx(X2);
+  assert(consp() || isFree());
+
   return cdr_p;
 }
 
@@ -67,7 +79,7 @@ void Object::dump()
       break;
     case SYMBOL_TAG:
       cout << "<";
-      print(pname);
+      print(pname_p);
       cout << ">";
       break;
     }
@@ -84,10 +96,16 @@ bool Object::equal(const char* s) const
   case STRING_TAG:
     return pstring->equal(s);
   case SYMBOL_TAG:
-    return pname->pstring->equal(s);
+    return pname_p->pstring->equal(s);
   default:
     return false;
   }
+}
+
+Object* Object::pname() const
+{
+  assert(stringp());
+  return pname_p;
 }
 
 Object* Object::set(String* p)
@@ -100,14 +118,21 @@ Object* Object::set(String* p)
 Object* Object::set(NativeFunction* p)
 {
   tag = FUNCTION_TAG;
-  pfunction = p;
+  function_p = p;
+  return this;
+}
+
+Object* Object::set(NativeMacro* p)
+{
+  tag = MACRO_TAG;
+  macro_p = p;
   return this;
 }
 
 Object* Object::set(Object* p)
 {
   tag = SYMBOL_TAG;
-  pname = p;
+  pname_p = p;
   return this;
 }
 
@@ -124,7 +149,7 @@ void Object::mark() {
   if (t == STRING_TAG)
     pstring->mark();
   else if (t == SYMBOL_TAG) {
-    pname->mark();
+    pname_p->mark();
   }
 }
 
@@ -160,7 +185,7 @@ void printAtom(const Object *ap, ostream& os) {
     os << "<function>";
     break;
   case SYMBOL_TAG:
-    os << *(ap->pname->pstring);
+    os << *(ap->pname_p->pstring);
     break;
   default:
     os << "[unknown-atom]";

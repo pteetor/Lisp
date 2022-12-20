@@ -77,18 +77,28 @@ class StringSpace {
 
 // ----------------------------------------------------------
 
+// Note: These must be even numbers (LSB = 0).
 typedef enum {
-  FREE_TAG = 0,     // Object is on the free-list
-  NIL_TAG = 2,      // Singleton nil cell
+
+  // Atomic data items
+  NIL_TAG = 0,      // Singleton nil cell
   BOOL_TAG = 4,
   CHAR_TAG = 6,
   INT_TAG = 8,
   DOUBLE_TAG = 10,
   STRING_TAG = 12,
-  FUNCTION_TAG = 14,
-  SYMBOL_TAG = 16
+
+  // Typed pointers:
+  //   - Tag in first word
+  //   - Machine pointer in second word
+  FREE_TAG = 16,         // Pointer in free list
+  FUNCTION_TAG = 18,     // Pointer to native function
+  MACRO_TAG = 20,        // Pointer to native macro
+  CLOSURE_TAG = 22,      // Pointer to <expr,env> pair
+  SYMBOL_TAG = 24        // Pointer to PNAME
 } TagValue;
 
+const long int MAX_CONSTANT_TAG = (int) STRING_TAG;
 const long int MAX_TAG = (int) SYMBOL_TAG;
 
 typedef long int Tag;     /* 8 bytes */
@@ -97,7 +107,8 @@ const char* tagName(Tag t);
 
 // ----------------------------------------------------------
 
-// Note: LSB of 'tag' field is used as the mark bit.
+// Note: LSB of 'tag' field is used as the mark bit,
+// so valid tags must be even numbers.
 class Object {
   union {
     struct {
@@ -109,11 +120,14 @@ class Object {
       union {
 	bool bool_v;
 	char char_v;
-	long int int_v;          // 8 bytes
-	double double_v;         // 8 bytes
-	String* pstring;         // Content of string
-	Object* pname;           // Print name of symbol
-	NativeFunction* pfunction;
+	long int int_v;              // 8 bytes
+	double double_v;             // 8 bytes
+	String* pstring;             // Pointer to contents of string
+
+	NativeFunction* function_p;   // Pointer to C++ function (function)
+	NativeMacro* macro_p;         // Pointer to C++ function (macro)
+	Object* closure_p;            // Pointer to <expr,env> pair
+	Object* pname_p;              // Pointer to PNAME
       };
     };
   };
@@ -143,10 +157,17 @@ public:
   Object* set(String* p);                // String with pointer into string space
   Object* set(Object* pname);            // Symbol with print-name
   Object* set(NativeFunction* f);        // Wrapper for native functions
+  Object* set(NativeMacro* p);           // Wrapper for native macros
   Object* set(Object *a, Object *d);     // Cons cell
 
   bool isFree() const { return tag == FREE_TAG; }
   bool notFree() const { return tag != FREE_TAG; }
+
+  // Access to typed pointers
+  void callFunction(Frame& f, Heap& heap);
+  void callMacro(Frame& f, Object* env, Heap& heap);
+  Object* closure() const;
+  Object* pname() const;
 
   // Common Lisp predicates
   bool null() const { return tag == NIL_TAG; }
@@ -161,13 +182,16 @@ public:
   bool stringp() const { return tag == STRING_TAG; }
   bool functionp() const { return tag == FUNCTION_TAG; }
   bool eq(const Object* x) { return x == this; }
+  bool constantp() const { return tag <= MAX_CONSTANT_TAG; }
 
   // Predicates I created
-  bool nonNull() const { return tag != NIL_TAG; }
   bool boolp() const { return tag == BOOL_TAG; }
+  bool callablep() const;
   bool charp() const { return tag == CHAR_TAG; }
   bool doublep() const { return tag == DOUBLE_TAG; }
+  bool macrop() const { return tag == MACRO_TAG; }
   bool neq(const Object* x) { return x != this; }
+  bool nonNull() const { return tag != NIL_TAG; }
 
   bool equal(const char* s) const;
 
@@ -198,7 +222,7 @@ public:
   long int markBit() const { return tag & MARK_BIT; }
   Tag pureTag() const { return tag & ~MARK_BIT; }
 
-  void call(int nArgs, Object** frame, Heap& heap);
+
 
   friend void printAtom(const Object* ap, ostream& os);
   friend void print(const Object* c, ostream& os);

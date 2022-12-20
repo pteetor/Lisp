@@ -1,11 +1,17 @@
 //
 // User-callable run time functions
 //
-void car_f(int, Object**, Heap&);
-void cdr_f(int, Object**, Heap&);
-void cons_f(int, Object**, Heap&);
-void diff_f(int, Object**, Heap&);
-void div_f(int, Object**, Heap&);
-void prod_f(int, Object**, Heap&);
-void sqrt_f(int, Object**, Heap&);
-void sum_f(int, Object**, Heap&);
+NativeFunction car_f;
+NativeFunction cdr_f;
+NativeFunction cons_f;
+NativeFunction diff_f;
+NativeFunction div_f;
+NativeFunction list_f;
+NativeFunction prod_f;
+NativeFunction sqrt_f;
+NativeFunction sum_f;
+
+//
+// User-callable run time macros
+//
+NativeMacro quote_f;

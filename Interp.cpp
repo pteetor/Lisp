@@ -10,6 +10,7 @@
 #include "functions.h"
 #include "nativeFunctions.h"
 
+#include "Frame.h"
 #include "Interp.h"
 
 //
@@ -17,118 +18,124 @@
 //
 Object* S_LAMBDA;
 Object* S_LET;
+Object* S_QUOTE;
 
 //
 // Global variables
 //
-Object* Interp::globalSymbols = NULL;
+Object* Interp::interpSymbols = NULL;
 Object* Interp::globalEnv = NULL;
 
 // ----------------------------------------------------------
 
-AbstInterp::AbstInterp(Heap& h) : heap(h)
+Interp::Interp(Heap& h) : heap(h)
 {
-  // nop
-}
-
-AbstInterp::~AbstInterp()
-{
-  // nop
-}
-
-void AbstInterp::eval()
-{
-  Object* expr = heap.down(1);
-  Object* env = heap.down(0);
-  eval(expr, env);
-}
-
-// ----------------------------------------------------------
-
-Interp::Interp(Heap& h) : AbstInterp(h)
-{
-  globalSymbols = heap.nil();
+  interpSymbols = heap.nil();
   createSymbols();
-  heap.protect(globalSymbols);
+  heap.protect(interpSymbols);
 
   globalEnv = emptyEnv(heap.nil());
   populateGlobalEnv();
   heap.protect(globalEnv);
 }
 
-Object* Interp::apply(Object* fn, Object* args, Object* env)
-{
-  // TODO
-  return heap.nil();
-}
-
 //
-// Eval() with implicit parameters on stack.
+// Eval() with explict expr and env
 //
-// Stack action: <expr, env> -> <expr, env, value>
-//
-void Interp::eval()
-{
-  AbstInterp::eval();
-}
-
-//
-// eval() with
-//   - Explicit expression, assumed to be protected
-//   - Implicit environment: the global environment
-//
-// Stack action: <> -> <value>
-//
-void Interp::eval(Object* expr)
-{
-  eval(expr, globalEnv);
-}
-
-//
-// Eval() with
-//   - Explicit expression
-//   - Explicit environment
-//
-// Careful: This assumes that 'expr' and 'env' are protected,
-// e.g., by being in the stack.
-//
-// Stack action: <> -> <value>
+// Stack action: <...> -> <..., value>
 //
 void Interp::eval(Object* expr, Object* env)
 {
+  Frame f = heap.newFrame(expr, env);
+  eval(f);
+}
+
+//
+// eval() with implicit parameters on stack.
+// Stack action: <..., expr, env> -> <..., value>
+//
+void Interp::eval(Frame& f) {
+  Object* expr = f.arg(0);
+  Object* env = f.arg(1);
+
   if (expr->symbolp()) {
     // TODO: Consult 'env' before global definition
     Object* pair = get(globalEnv, expr);
     if (pair->null())
       throw LispEx(A8);
-    heap.push(pair->cdr());
+    heap.collapse(f, pair->cdr());
     return;
   }
 
   if (expr->atom()) {
-    heap.push(expr);
+    heap.collapse(f, expr);
     return;
   }
 
-  // Here, expr is a cons cell, representing a function application
-  // Build a frame of the evaluated function andarguments
-  Object** fp = heap.newFrame();
- 
-  // First, evaluate function
-  eval(expr->car(), env);
-  Object* fn = heap.top();
+  // Here, expr is a cons cell, representing a function application.
+  // Evaluate the car() to find the function.
+  Object* fn = expr->car();
 
-  // TODO: branch on function vs macro, native vs lambda
+  //
+  // Evaluate the function until we get something callable
+  //
+  // Cases to handle:
+  //   - symbol: dereference it
+  //   - cons: evaluate it
+  //   - constant: fail
+  //
+  // Loop invariant: Top of stack is a (possible) function
+  //
+  while (!fn->callablep()) {
+    if (fn->symbolp()) {
+      Object* pair = get(env, fn);
+      if (pair->null())
+	throw LispEx(A8);
+      fn = pair->cdr();
+    } else if (fn->consp()) {
+      Frame f2 = heap.newFrame(fn, env);
+      eval(f2);
+      fn = heap.pop();
+    } else if (fn->constantp()) {
+      throw LispEx(A9);
+    } else {
+      throw LispEx(A9);  // Should never happen
+    }
+  }
 
-  // FOR NOW, ASSUME native function
+  // Begin building a simple call-frame:
+  //   - Function first (on the bottom)
+  //   - Args vector above that
 
-  int nArgs = evalFrame(expr->cdr(), env);
+  Frame fp = heap.newFrame(3);
+  heap.push(fn);
+  heap.push(expr->cdr());
+  heap.push(env);
+  apply(fp);
+  heap.collapse(f);
+}
 
-  // Invoke native function
-  fn->call(nArgs, fp + 1, heap);
-
-  // Collapse function and args, leaving result
-  heap.collapseFrame(fp);
+void Interp::apply(Frame& f)
+{
+  Object* fn = f.arg(0);
+  Object* args = f.arg(1);
+  Object* env = f.arg(3);
+  
+  if (fn->macrop()) {                        // Native macro
+    Frame f2 = heap.newFrame(args);
+    fn->callMacro(f2, env, heap);
+    heap.collapse(f, heap.top());
+  } else if (fn->functionp()) {              // Native function
+    int nArgs = length(args);
+    Frame f2 = heap.newFrame(nArgs);
+    evalFrame(args, env);
+    fn->callFunction(f2, heap);
+    heap.collapse(f);
+  }
+  // LATER: if fn is a closure, apply it to args
+  else {
+    throw LispEx(A9);    // Should never happen
+  }
 }
 
 int Interp::evalFrame(Object* args, Object* env)
@@ -176,6 +183,14 @@ void Interp::bind(Object* env, const char* symbol, NativeFunction* fun)
   bind();
 }
 
+void Interp::bind(Object* env, Object* symbol, NativeMacro* mac)
+{
+  heap.push(env);
+  heap.push(symbol);
+  heap.alloc(mac);
+  bind();
+}
+
 Object* Interp::evlis(Object* ls, Object* env)
 {
   // TBD
@@ -212,6 +227,7 @@ void Interp::createSymbols()
 {
   createSymbol(&S_LAMBDA, "lambda");
   createSymbol(&S_LET, "let");
+  createSymbol(&S_QUOTE, "quote");
 }
 
 void Interp::createSymbol(Object** var, const char* str)
@@ -220,13 +236,15 @@ void Interp::createSymbol(Object** var, const char* str)
   *var = heap.top();
 
   // Append to list of protected symbols
-  heap.push(globalSymbols);
+  heap.push(interpSymbols);
   heap.cons();
-  globalSymbols = heap.pop();
+  interpSymbols = heap.pop();
 }
 
 void Interp::populateGlobalEnv()
 {
+  bind(globalEnv, S_QUOTE, quote_f);
+  
   bind(globalEnv, "-", diff_f);
   bind(globalEnv, "/", div_f);
   bind(globalEnv, "*", prod_f);
@@ -237,6 +255,7 @@ void Interp::populateGlobalEnv()
   bind(globalEnv, "car", car_f);
   bind(globalEnv, "cdr", cdr_f);
   bind(globalEnv, "cons", cons_f);
+  bind(globalEnv, "list", list_f);
   bind(globalEnv, "sqrt", sqrt_f);
 }
 
@@ -256,8 +275,8 @@ void dumpGlobalEnv()
     }
 }
 
-void dumpGlobalSymbols()
+void dumpInterpSymbols()
 {
-  print(Interp::globalSymbols);
+  print(Interp::interpSymbols);
   cout << endl;
 }

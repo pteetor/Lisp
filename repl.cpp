@@ -38,10 +38,10 @@ int main()
       cout << "Evaluating: " << *(heap.top()) << endl;
 
       try {
-	interp.eval(heap.top());
+	interp.eval(heap.pop(), Interp::globalEnv);
 	print(heap.top());
 	cout << endl;
-	heap.drop(2);
+	heap.drop(1);
       } catch (const LispEx ex) {
 	cerr << "Lisp exception: " << ex.what() << endl;
 	// TODO: Reset the heap, esp'ly the stack

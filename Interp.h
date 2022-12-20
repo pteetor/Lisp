@@ -2,36 +2,21 @@
 // Semantic interpreter for Lisp
 //
 
-class AbstInterp {
-protected:
+class EchoInterp {
   Heap& heap;
-  
+
 public:
-  AbstInterp(Heap& h);
-  virtual ~AbstInterp();
+  EchoInterp(Heap& h) : heap(h) { }
 
-  // Evaluation - Explicit expression and environment
-  virtual void eval(Object* expr, Object* env) = 0;
-
-  // Evaluation - Implicit <expr, env> on top of stack
   void eval();
-};
-
-class EchoInterp: public AbstInterp {
-
-public:
-  EchoInterp(Heap& h) : AbstInterp(h) { }
-
   void eval(Object* expr, Object*) { heap.push(expr); }
 };
 
-class Interp: public AbstInterp {
+class Interp {
+  Heap& heap;
 
   // List of semantic symbols used by interpreter
-  static Object* globalSymbols;
-
-  // Global environment of pre-defined objects
-  static Object* globalEnv;
+  static Object* interpSymbols;
 
   void createSymbol(Object**, const char*);
   void createSymbols();
@@ -45,19 +30,32 @@ class Interp: public AbstInterp {
   void bind();
   void bind(Object* env, const char* symbol, double x);
   void bind(Object* env, const char* symbol, NativeFunction* fun);
+  void bind(Object* env, Object* symbol, NativeMacro* mac);
   Object* get(Object* env, Object* symbol);
 
 public:
   Interp(Heap& h);
 
-  void eval(Object* expr, Object* env);
-  void eval(Object* expr);
-  void eval();
-  
-  Object* apply(Object* fn, Object* args, Object* env);
+  // eval() with implicit arguments on the stack.
+  // Stack action: <..., expr, env> -> <...., value>
+  void eval(Frame& h);
 
+  // eval() with explicit arguments, which need not be protected.
+  // Stack action: <...> -> <..., value>
+  void eval(Object* expr, Object* env);
+
+  // Given a stack frame with three arguments:
+  //   - Function
+  //   - List of unevaluated arguments
+  //   - Environment
+  // Apply the function to the arguments
+  void apply(Frame& f);
+
+  // Global environment of pre-defined objects
+  static Object* globalEnv;
+  
   friend void dumpGlobalEnv();
-  friend void dumpGlobalSymbols();
+  friend void dumpInterpSymbols();
 };
 
 // ----------------------------------------------------------
