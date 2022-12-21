@@ -33,6 +33,7 @@ public:
   Object* alloc(double d);
   Object* alloc(String* s);       // New string
   Object* alloc(NativeFunction* f);
+  Object* alloc(NativeMacro* m);
   Object* alloc(Object* p);       // New symbol, with prop. list
 
   Object* cons(Object* a, Object* d);

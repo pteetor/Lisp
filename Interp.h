@@ -63,13 +63,17 @@ public:
 //
 // Global symbols used by interpreter and unit tests
 //
-
-extern Object* S_PLUS;
+extern Object* S_QUOTE;
 extern Object* S_LAMBDA;
+
+//
+// Global symbols used by unit tests
+//
+extern Object* S_PLUS;
 extern Object* S_PI;
 
 //
 // Global functions
 //
-extern void dumpGlobalSymbols();
+extern void dumpInterpSymbols();
 extern void dumpGlobalEnv();

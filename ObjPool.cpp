@@ -98,6 +98,11 @@ Object* ObjPool::alloc(NativeFunction* f)
   return alloc()->set(f);
 }
 
+Object* ObjPool::alloc(NativeMacro* m)
+{
+  return alloc()->set(m);
+}
+
 // Allocate symbol object, with initial property list
 Object* ObjPool::alloc(Object* p)
 {

@@ -181,8 +181,17 @@ void printAtom(const Object *ap, ostream& os) {
   case STRING_TAG:
     os << *(ap->pstring);
     break;
+  case FREE_TAG:
+    os << "[free]";
+    break;
   case FUNCTION_TAG:
-    os << "<function>";
+    os << "[function]";
+    break;
+  case MACRO_TAG:
+    os << "[macro]";
+    break;
+  case CLOSURE_TAG:
+    os << "[closure]";
     break;
   case SYMBOL_TAG:
     os << *(ap->pname_p->pstring);

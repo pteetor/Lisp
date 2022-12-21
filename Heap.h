@@ -35,6 +35,7 @@ public:
   Object* alloc(String* s);             // New string
   Object* alloc(const char* s);
   Object* alloc(NativeFunction* p);     // New built-in function
+  Object* alloc(NativeMacro* m);        // New built-in macro
   Object* alloc(Object* p);             // New symbol, with prop. list
 
   void cons();                          // Implicit car & cdr on stack

@@ -12,6 +12,7 @@ using namespace std;
 #include "ObjPool.h"
 #include "StringFinder.h"
 #include "Heap.h"
+#include "Frame.h"
 #include "Interp.h"
 
 void nl()
@@ -28,10 +29,11 @@ int main()
   Interp interp(heap);
 
   // DEBUG
+  cout << "QUOTE = " << *S_QUOTE << endl;
   cout << "LAMBDA = " << *S_LAMBDA << endl;
 
   // DEBUG
-  dumpGlobalSymbols();
+  dumpInterpSymbols();
   dumpGlobalEnv();
 
   auto nil = heap.nil();
@@ -45,20 +47,21 @@ int main()
 
   // Constants evaluate to themselves
   {
+    Frame f = heap.newFrame(2);
     heap.alloc(3.14);
     heap.push(nil);
-    heap.push(Interp::globalEnv);
-    interp.eval();
+    interp.eval(f);
     double result = (double) *(heap.pop());
     cout << result << endl;
     assert(result == 3.14);
   }
 
   {
+    Frame f = heap.newFrame(2);
     heap.makeString("Foo");
     auto foo = heap.top();
     heap.push(nil);
-    interp.eval();
+    interp.eval(f);
     auto result = heap.pop();
     print(result); cout << endl;
     assert(result->eq(foo));    
@@ -66,18 +69,20 @@ int main()
 
   // Global symbols evaluate to themselves
   {
+    Frame f = heap.newFrame(2);
     heap.makeSymbol("pi");
     heap.push(Interp::globalEnv);
-    interp.eval();
+    interp.eval(f);
     auto result = heap.pop();
     print(result); cout << endl;
     assert((double) *result == 3.1415926);
   }
 
   {
+    Frame f = heap.newFrame(2);
     heap.makeSymbol("+");
     heap.push(Interp::globalEnv);
-    interp.eval();
+    interp.eval(f);
     auto result = heap.pop();
     print(result); cout << endl;
     assert(result->functionp());

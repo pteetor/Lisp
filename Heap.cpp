@@ -106,6 +106,11 @@ Object* Heap::alloc(NativeFunction* p)
   return push(obj->alloc(p));
 }
 
+Object* Heap::alloc(NativeMacro* m)
+{
+  return push(obj->alloc(m));
+}
+
 // Allocate symbol object, with initial property list
 Object* Heap::alloc(Object* p)
 {

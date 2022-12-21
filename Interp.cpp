@@ -16,9 +16,9 @@
 //
 // Interpreter symbols
 //
+Object* S_QUOTE;
 Object* S_LAMBDA;
 Object* S_LET;
-Object* S_QUOTE;
 
 //
 // Global variables
@@ -225,9 +225,9 @@ Object* Interp::emptyEnv(Object* parent)
 // The interpreter needs some semantic symbols
 void Interp::createSymbols()
 {
+  createSymbol(&S_QUOTE, "quote");
   createSymbol(&S_LAMBDA, "lambda");
   createSymbol(&S_LET, "let");
-  createSymbol(&S_QUOTE, "quote");
 }
 
 void Interp::createSymbol(Object** var, const char* str)

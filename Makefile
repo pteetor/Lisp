@@ -117,7 +117,7 @@ test-StringFinder: test-StringFinder.o $(HEAP_OBJ) functions.o
 
 test-StringFinder.o: test-StringFinder.cpp $(HEAP_OBJ)
 
-test-symbol: test-symbol.o $(HEAP_OBJ) functions.o
+test-symbol: test-symbol.o $(HEAP_OBJ) LispEx.o Frame.o functions.o
 	g++ -g -o $@ $^
 
 test-symbol.o: test-symbol.cpp $(HEAP_HDR)
@@ -130,7 +130,7 @@ test-console.o: test-console.cpp Tokenizer.h
 test-ConsoleBuffer: test-ConsoleBuffer.o ConsoleBuffer.o
 	g++ -o $@ $^
 
-test-eval: test-eval.o $(HEAP_OBJ) $(INTERP_OBJ) functions.o nativeFunctions.o
+test-eval: test-eval.o $(HEAP_OBJ) $(INTERP_OBJ) functions.o
 	g++ -o $@ $^
 
 test-eval.o: test-eval.cpp $(HEAP_HDR) $(INTERP_HDR)
