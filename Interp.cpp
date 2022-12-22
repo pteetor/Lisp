@@ -119,7 +119,7 @@ void Interp::apply(Frame& f)
 {
   Object* fn = f.arg(0);
   Object* args = f.arg(1);
-  Object* env = f.arg(3);
+  Object* env = f.arg(2);
   
   if (fn->macrop()) {                        // Native macro
     Frame f2 = heap.newFrame(args);
@@ -241,6 +241,8 @@ void Interp::createSymbol(Object** var, const char* str)
   interpSymbols = heap.pop();
 }
 
+#if 0
+/* MOVED */
 void Interp::populateGlobalEnv()
 {
   bind(globalEnv, S_QUOTE, quote_f);
@@ -258,6 +260,7 @@ void Interp::populateGlobalEnv()
   bind(globalEnv, "list", list_f);
   bind(globalEnv, "sqrt", sqrt_f);
 }
+#endif
 
 // ----------------------------------------------------------
 

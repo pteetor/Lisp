@@ -48,12 +48,12 @@ int main()
   // Constants evaluate to themselves
   {
     Frame f = heap.newFrame(2);
-    heap.alloc(3.14);
+    heap.alloc(1.618);
     heap.push(nil);
     interp.eval(f);
     double result = (double) *(heap.pop());
     cout << result << endl;
-    assert(result == 3.14);
+    assert(result == 1.618);
   }
 
   {

@@ -188,7 +188,6 @@ public:
   bool boolp() const { return tag == BOOL_TAG; }
   bool callablep() const;
   bool charp() const { return tag == CHAR_TAG; }
-  bool doublep() const { return tag == DOUBLE_TAG; }
   bool macrop() const { return tag == MACRO_TAG; }
   bool neq(const Object* x) { return x != this; }
   bool nonNull() const { return tag != NIL_TAG; }

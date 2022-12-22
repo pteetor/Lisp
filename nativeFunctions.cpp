@@ -11,6 +11,7 @@
 #include "Heap.h"
 #include "functions.h"
 #include "Frame.h"
+#include "Interp.h"
 #include "nativeFunctions.h"
 
 void car_f(Frame& f, Heap& heap)
@@ -83,6 +84,20 @@ void div_f(Frame& f, Heap& heap)
   }
 
   heap.alloc(div);
+  heap.collapse(f);
+}
+
+void floatp_f(Frame& f, Heap& heap)
+{
+  f.checkNArgs(1);
+  heap.alloc(f.arg(0)->floatp());
+  heap.collapse(f);
+}
+
+void integerp_f(Frame& f, Heap& heap)
+{
+  f.checkNArgs(1);
+  heap.alloc(f.arg(0)->integerp());
   heap.collapse(f);
 }
 
@@ -159,4 +174,27 @@ void sum_f(Frame& f, Heap& heap)
     }
 
   heap.alloc(d_sum);
+}
+
+// ----------------------------------------------------------
+
+void Interp::populateGlobalEnv()
+{
+  bind(globalEnv, S_QUOTE, quote_f);
+  
+  bind(globalEnv, "-", diff_f);
+  bind(globalEnv, "/", div_f);
+  bind(globalEnv, "*", prod_f);
+  bind(globalEnv, "+", sum_f);
+
+  bind(globalEnv, "floatp", floatp_f);
+  bind(globalEnv, "integerp", integerp_f);
+
+  bind(globalEnv, "pi", 3.1415926);
+
+  bind(globalEnv, "car", car_f);
+  bind(globalEnv, "cdr", cdr_f);
+  bind(globalEnv, "cons", cons_f);
+  bind(globalEnv, "list", list_f);
+  bind(globalEnv, "sqrt", sqrt_f);
 }

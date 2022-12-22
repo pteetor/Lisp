@@ -10,6 +10,10 @@ CPPFLAGS = -g
 APPS = repl
 TESTS = test-String test-Object test-Heap test-Tokenizer test-Reader test-gc test-StringFinder
 
+GLOBAL_HDR = globals.h functions.h
+
+GLOBAL_OBJ = functions.o
+
 HEAP_HDR = globals.h Heap.h ObjPool.h Object.h StringFinder.h
 
 HEAP_OBJ = Heap.o ObjPool.o Object.o StringFinder.o String.o
@@ -27,10 +31,10 @@ all: $(APPS) $(TESTS)
 #
 # detailed rules
 #
-repl: repl.o $(HEAP_OBJ) $(INTERP_OBJ) functions.o
+repl: repl.o $(GLOBAL_OBJ) $(HEAP_OBJ) $(INTERP_OBJ) functions.o
 	g++ -g -o $@ $^
 
-repl.o: repl.cpp $(HEAP_HDR) Reader.h Tokenizer.h
+repl.o: repl.cpp $(GLOBAL_HDR) $(HEAP_HDR) $(INTERP_HDR)
 
 Object.o: Object.cpp $(HEAP_HDR)
 
@@ -54,7 +58,7 @@ Interp.o: Interp.cpp $(INTERP_HDR) $(HEAP_HDR)
 
 ConsoleBuffer.o: ConsoleBuffer.cpp ConsoleBuffer.h
 
-nativeFunctions.o: nativeFunctions.cpp nativeFunctions.h $(HEAP_HDR)
+nativeFunctions.o: nativeFunctions.cpp $(HEAP_HDR) $(INTERP_HDR)
 
 LispEx.o: LispEx.cpp globals.h
 
