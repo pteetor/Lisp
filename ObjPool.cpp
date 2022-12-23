@@ -103,10 +103,14 @@ Object* ObjPool::alloc(NativeMacro* m)
   return alloc()->set(m);
 }
 
-// Allocate typed pointer to Object
-Object* ObjPool::alloc(Object* p, Tag t)
+Object* ObjPool::allocClosure(Object* p)
 {
-  return alloc()->set(p, t);
+  return alloc()->set(p, CLOSURE_TAG);
+}
+
+Object* ObjPool::allocSymbol(Object* p)
+{
+  return alloc()->set(p, SYMBOL_TAG);
 }
 
 Object* ObjPool::cons(Object* a, Object* d)

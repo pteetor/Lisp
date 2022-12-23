@@ -36,7 +36,9 @@ public:
   Object* alloc(const char* s);
   Object* alloc(NativeFunction* p);     // New built-in function
   Object* alloc(NativeMacro* m);        // New built-in macro
-  Object* alloc(Object* p, Tag t);      // Typed pointer to Object
+  
+  Object* allocClosure(Object* p);
+  Object* allocSymbol(Object* pname);
 
   void cons();                          // Implicit car & cdr on stack
   void cons(int n);                     // Perform N cons() calls

@@ -114,7 +114,7 @@ void lambda_f(Frame& f, Object* env, Heap& heap)
   heap.push(arg->cdr()->car());
   heap.push(env);
   heap.makeList(3);
-  heap.alloc(heap.top(), CLOSURE_TAG);
+  heap.allocClosure(heap.top());
   heap.collapse(f);
 }
 

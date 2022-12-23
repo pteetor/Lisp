@@ -34,7 +34,9 @@ public:
   Object* alloc(String* s);          // New string
   Object* alloc(NativeFunction* f);
   Object* alloc(NativeMacro* m);
-  Object* alloc(Object* p, Tag t);   // Typed pointer
+
+  Object* allocSymbol(Object* s);
+  Object* allocClosure(Object* c);
 
   Object* cons(Object* a, Object* d);
 

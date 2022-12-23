@@ -111,9 +111,14 @@ Object* Heap::alloc(NativeMacro* m)
   return push(obj->alloc(m));
 }
 
-Object* Heap::alloc(Object* p, Tag t)
+Object* Heap::allocClosure(Object* p)
 {
-  return push(obj->alloc(p, t));
+  return push(obj->allocClosure(p));
+}
+
+Object* Heap::allocSymbol(Object* pname)
+{
+  return push(obj->allocSymbol(pname));
 }
 
 // Stack-argument version of cons()
@@ -189,7 +194,7 @@ void Heap::makeSymbol(const char* s)
   if (lookupSymbol())
     return;
 
-  alloc(top(), SYMBOL_TAG);
+  allocSymbol(top());
   insertSymbol();
   collapse(1);     // Pop string, retain symbol
 }
