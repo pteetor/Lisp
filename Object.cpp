@@ -129,9 +129,9 @@ Object* Object::set(NativeMacro* p)
   return this;
 }
 
-Object* Object::set(Object* p)
+Object* Object::set(Object* p, Tag t)
 {
-  tag = SYMBOL_TAG;
+  tag = t;
   pname_p = p;
   return this;
 }

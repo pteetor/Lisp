@@ -8,7 +8,7 @@
 #include "StringFinder.h"
 #include "Heap.h"
 #include "functions.h"
-#include "nativeFunctions.h"
+// #include "nativeFunctions.h"
 
 #include "Frame.h"
 #include "Interp.h"

@@ -7,12 +7,12 @@
 #include "Object.h"
 #include "ObjPool.h"
 #include "StringFinder.h"
-#include "Dict.h"
+// #include "Dict.h"
 #include "Heap.h"
 #include "functions.h"
 #include "Frame.h"
 #include "Interp.h"
-#include "nativeFunctions.h"
+// #include "nativeFunctions.h"
 
 void car_f(Frame& f, Heap& heap)
 {
@@ -101,6 +101,23 @@ void integerp_f(Frame& f, Heap& heap)
   heap.collapse(f);
 }
 
+//
+// The lambda(parms,expr) creates a closure object
+// from the lambda expression and the environment.
+//
+void lambda_f(Frame& f, Object* env, Heap& heap)
+{
+  f.checkMacroArgs(2);
+  Object* arg = f.arg(0);
+
+  heap.push(arg->car());
+  heap.push(arg->cdr()->car());
+  heap.push(env);
+  heap.makeList(3);
+  heap.alloc(heap.top(), CLOSURE_TAG);
+  heap.collapse(f);
+}
+
 void list_f(Frame& f, Heap& heap)
 {
   int nArgs = f.nArgs();
@@ -181,6 +198,7 @@ void sum_f(Frame& f, Heap& heap)
 void Interp::populateGlobalEnv()
 {
   bind(globalEnv, S_QUOTE, quote_f);
+  bind(globalEnv, S_LAMBDA, lambda_f);
   
   bind(globalEnv, "-", diff_f);
   bind(globalEnv, "/", div_f);

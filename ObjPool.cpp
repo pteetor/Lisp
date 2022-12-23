@@ -103,10 +103,10 @@ Object* ObjPool::alloc(NativeMacro* m)
   return alloc()->set(m);
 }
 
-// Allocate symbol object, with initial property list
-Object* ObjPool::alloc(Object* p)
+// Allocate typed pointer to Object
+Object* ObjPool::alloc(Object* p, Tag t)
 {
-  return alloc()->set(p);
+  return alloc()->set(p, t);
 }
 
 Object* ObjPool::cons(Object* a, Object* d)

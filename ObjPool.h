@@ -31,10 +31,10 @@ public:
   Object* alloc(char c);
   Object* alloc(int i);
   Object* alloc(double d);
-  Object* alloc(String* s);       // New string
+  Object* alloc(String* s);          // New string
   Object* alloc(NativeFunction* f);
   Object* alloc(NativeMacro* m);
-  Object* alloc(Object* p);       // New symbol, with prop. list
+  Object* alloc(Object* p, Tag t);   // Typed pointer
 
   Object* cons(Object* a, Object* d);
 

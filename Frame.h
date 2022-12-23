@@ -21,6 +21,7 @@ class Frame {
   int nArgs() const;
   Object* arg(int i);
 
+  void checkMacroArgs(int nParams);
   void checkNArgs(int nParams);
 
   friend class Heap;

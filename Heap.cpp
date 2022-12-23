@@ -111,13 +111,12 @@ Object* Heap::alloc(NativeMacro* m)
   return push(obj->alloc(m));
 }
 
-// Allocate symbol object, with initial property list
-Object* Heap::alloc(Object* p)
+Object* Heap::alloc(Object* p, Tag t)
 {
-  return push(obj->alloc(p));
+  return push(obj->alloc(p, t));
 }
 
-// Stack-argument version
+// Stack-argument version of cons()
 void Heap::cons()
 {
   push(obj->cons(down(1), down(0)));
@@ -130,6 +129,7 @@ void Heap::cons(int n)
     cons();
 }
 
+// Explicit-argument version of cons()
 Object* Heap::cons(Object* a, Object* d)
 {
   return push(obj->cons(a, d));
@@ -189,9 +189,9 @@ void Heap::makeSymbol(const char* s)
   if (lookupSymbol())
     return;
 
-  alloc(top());
+  alloc(top(), SYMBOL_TAG);
   insertSymbol();
-  collapse(1);     // Remove string, retain symbol
+  collapse(1);     // Pop string, retain symbol
 }
 
 // ----------------------------------------------------------

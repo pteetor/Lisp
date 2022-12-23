@@ -155,9 +155,9 @@ public:
   Object* set(int i) { tag = INT_TAG; int_v = i; return this; }
   Object* set(double d) { tag = DOUBLE_TAG; double_v = d; return this; }
   Object* set(String* p);                // String with pointer into string space
-  Object* set(Object* pname);            // Symbol with print-name
   Object* set(NativeFunction* f);        // Wrapper for native functions
   Object* set(NativeMacro* p);           // Wrapper for native macros
+  Object* set(Object* pname, Tag t);     // Typed pointer to Object
   Object* set(Object *a, Object *d);     // Cons cell
 
   bool isFree() const { return tag == FREE_TAG; }
